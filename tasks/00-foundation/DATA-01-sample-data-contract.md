@@ -1,7 +1,7 @@
 ---
 id: DATA-01
 owner: D2
-status: todo
+status: in_progress
 wave: 0
 size: M
 depends_on: []
@@ -47,9 +47,9 @@ data/sample_catalog/; data/purchase_terms/; data/attachments/; data/expected/; s
 
 ## Done when
 
-- [ ] Validator проверяет обязательные поля, ссылки и уникальные SKU/IDs; invalid examples отделены от seed.
-- [ ] Каждый AC-1…10 имеет конкретный reproducible dataset; AC-11 имеет каждое семейство файлов.
-- [ ] Сценарий 12+8 и whole20 математически и по unit/stock корректен.
+- [x] Validator проверяет обязательные поля, ссылки и уникальные SKU/IDs; invalid examples отделены от seed.
+- [x] Каждый AC-1…10 имеет конкретный reproducible dataset; AC-11 имеет каждое семейство файлов.
+- [x] Сценарий 12+8 и whole20 математически и по unit/stock корректен.
 - [ ] D1/D3 используют одинаковые IDs и значения, а не создают несовместимые локальные моки.
 - [ ] Проверки выполнены на своей ветке; PR содержит результат проверок и известные ограничения.
 
@@ -62,3 +62,28 @@ data/sample_catalog/; data/purchase_terms/; data/attachments/; data/expected/; s
 **Передать:** D1: stock/cart scenarios и quantity rules; D3: product/proposal/upload examples; D2: baseline качества и данные для idempotent initializer.
 
 **Evidence после выполнения:** заполнить commit/PR, команды, ссылки на отчёты и фактический результат; до выполнения статус остаётся todo.
+
+## Evidence DATA-01 — 23.09.2026
+
+Подготовлено в `codex/d2-data-services`, только DATA-01. Commit/PR: изменения
+подготовлены для пользовательского коммита; следующие задачи не включены.
+
+- [Данные и контракт передачи](../../data/README.md): 36 товаров / 3 категории,
+  4 versioned FAQ источника, 13 файлов (включая негативные), 54 исходных вопроса.
+- [JSON Schema](../../data/sample_catalog/catalog.schema.json) и
+  [validator](../../scripts/validate-demo-data.sh): PASS. Проверены десятичные строки,
+  ведущие нули, уникальность, unknown/zero, несовместимый и неполный аналог,
+  недоступный склад, 12+8/whole20, ссылки, SHA-256 и негативные примеры.
+- XLS/XLSX, DOC/DOCX, text/scan/mixed PDF, label/rotated/blurred/product-only JPEG:
+  файлы созданы, Office-конвертация прошла. XLS после обратной конвертации
+  сохраняет `000001`, `000013`, `2.5`. DOCX/PDF просмотрены после рендера;
+  PDF проверены по количеству страниц и наличию/отсутствию текстового слоя.
+- `cd backend && ./gradlew build --no-daemon`: PASS (исходный backend, тестов пока нет).
+- `cd frontend && npm run build && npm run lint`: PASS.
+- API, миграции, runtime, корзина и generated SDK не изменены; БД не сбрасывалась.
+
+**Оставшийся gate:** FOUND-01 отсутствует в исходном checkout. Формат fixtures
+следует его требованиям (string IDs, decimal strings), но принятие контракта
+и использование одинаковых fixtures разработчиками D1/D3 пока не подтверждено.
+Поэтому статус остаётся `in_progress`; полная приёмка и пункт передачи не отмечены
+как выполненные. Проверки данных не засчитываются за ATT, QA-02 или продуктовый E2E.

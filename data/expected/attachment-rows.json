@@ -1,0 +1,26 @@
+{
+  "synthetic": true,
+  "rows": [
+    {
+      "article": "000001",
+      "description": "Автомат SYN C16 1P 01",
+      "quantity": "20",
+      "unit": "pcs",
+      "productId": "1001"
+    },
+    {
+      "article": "000013",
+      "description": "Кабель SYN ВВГ 3x2.5 13",
+      "quantity": "2.5",
+      "unit": "m",
+      "productId": "1013"
+    },
+    {
+      "article": "999999",
+      "description": "Неизвестная позиция",
+      "quantity": null,
+      "unit": null,
+      "productId": null
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "synthetic": true,
+  "expectedError": "INVALID_QUANTITY",
+  "products": [
+    {
+      "id": "1001",
+      "article": "000001",
+      "name": "Автомат SYN C16 1P 01",
+      "brand": "SYNTHETIC",
+      "category": "breakers",
+      "unit": "pcs",
+      "minimum": "1",
+      "step": "1",
+      "price": "1500.00",
+      "currency": "KZT",
+      "specs": {
+        "poles": "1",
+        "currentA": "16",
+        "voltageV": "230",
+        "curve": "C",
+        "breakingCapacityKa": "6"
+      },
+      "certificates": [
+        {
+          "id": "SYN-CERT-breakers",
+          "url": "https://example.invalid/certificates/breakers",
+          "file": "data/sample_catalog/certificates/synthetic-certificate.pdf",
+          "version": "1",
+          "synthetic": true
+        }
+      ],
+      "sourceUrl": "https://example.invalid/products/000001",
+      "sourceVersion": "synthetic-v1",
+      "synthetic": true,
+      "warehouses": [
+        {
+          "warehouseId": "ALA",
+          "availableQuantity": "-1",
+          "status": "IN_STOCK",
+          "eligible": true
+        }
+      ]
+    }
+  ]
+}

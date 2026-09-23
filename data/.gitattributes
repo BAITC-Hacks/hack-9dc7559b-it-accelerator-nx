@@ -1,0 +1,8 @@
+# Parser fixtures are binary artifacts, even when PDF streams look like text.
+*.pdf binary
+*.doc binary
+*.docx binary
+*.xls binary
+*.xlsx binary
+*.jpg binary
+*.jpeg binary

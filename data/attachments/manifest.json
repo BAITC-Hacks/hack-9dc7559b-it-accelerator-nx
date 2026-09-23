@@ -1,0 +1,123 @@
+{
+  "synthetic": true,
+  "version": "attachments-v1",
+  "files": [
+    {
+      "file": "data/attachments/images/blurred.jpg",
+      "family": "jpg",
+      "expected": "NEEDS_REVIEW",
+      "expectedRows": null,
+      "expectedRowOccurrences": 0,
+      "synthetic": true,
+      "sha256": "187d220455a2f756cf6a8a5cebb49c787123ab9c1562986c6af0f00d31f73b17"
+    },
+    {
+      "file": "data/attachments/images/label.jpg",
+      "family": "jpg",
+      "expected": "NEEDS_REVIEW",
+      "expectedRows": "data/expected/attachment-rows.json",
+      "expectedRowOccurrences": 1,
+      "synthetic": true,
+      "sha256": "eb830340de7726c031eb043e5ee1546821da68e8d94e29c2f4e3d2c3713c58c5"
+    },
+    {
+      "file": "data/attachments/images/product-only.jpg",
+      "family": "jpg",
+      "expected": "NEEDS_REVIEW",
+      "expectedRows": null,
+      "expectedRowOccurrences": 0,
+      "synthetic": true,
+      "sha256": "c03a3cadce33080b9046dd48ea1e40c6beec2b216fe9b9f31e7bfb278d85d561"
+    },
+    {
+      "file": "data/attachments/images/rotated.jpg",
+      "family": "jpg",
+      "expected": "NEEDS_REVIEW",
+      "expectedRows": "data/expected/attachment-rows.json",
+      "expectedRowOccurrences": 1,
+      "synthetic": true,
+      "sha256": "60f600f24f52f55fc191f5c3f953a28a5acc460dd5a09477f306c29da1d5ab5c"
+    },
+    {
+      "file": "data/attachments/invalid/corrupt.pdf",
+      "family": "pdf",
+      "expected": "REJECT",
+      "expectedRows": null,
+      "expectedRowOccurrences": 0,
+      "synthetic": true,
+      "sha256": "dc91ad827f2e9957a3ed7a70da202130ac1022d57839d81b1027cd4777ca2b1a"
+    },
+    {
+      "file": "data/attachments/invalid/renamed-executable.jpg",
+      "family": "jpg",
+      "expected": "REJECT",
+      "expectedRows": null,
+      "expectedRowOccurrences": 0,
+      "synthetic": true,
+      "sha256": "52859df6cbf0d84d8842235d5ce7c823edc4ee37bc424f69c04a5441c10afce8"
+    },
+    {
+      "file": "data/attachments/office/specification.doc",
+      "family": "doc",
+      "expected": "EXTRACT_ROWS",
+      "expectedRows": "data/expected/attachment-rows.json",
+      "expectedRowOccurrences": 1,
+      "synthetic": true,
+      "sha256": "98a7b1418d030235f6d89537c37996c84768b4e7f38288dbe00676915222d4bf"
+    },
+    {
+      "file": "data/attachments/office/specification.docx",
+      "family": "docx",
+      "expected": "EXTRACT_ROWS",
+      "expectedRows": "data/expected/attachment-rows.json",
+      "expectedRowOccurrences": 1,
+      "synthetic": true,
+      "sha256": "51984c6b8080ac9cca3672dee0e6207d3da36e4e4a652b06f341ac0a11c9375c"
+    },
+    {
+      "file": "data/attachments/office/specification.xls",
+      "family": "xls",
+      "expected": "EXTRACT_ROWS",
+      "expectedRows": "data/expected/attachment-rows.json",
+      "expectedRowOccurrences": 1,
+      "synthetic": true,
+      "sha256": "e2c75da32adb67fdcc29fea324a7c905375273880f4e96514c5baea2899d98cb"
+    },
+    {
+      "file": "data/attachments/office/specification.xlsx",
+      "family": "xlsx",
+      "expected": "EXTRACT_ROWS",
+      "expectedRows": "data/expected/attachment-rows.json",
+      "expectedRowOccurrences": 1,
+      "synthetic": true,
+      "sha256": "12dc449d892b9a75abfe3a131634ac1af3fcc9295621e41acee849f9d562452d"
+    },
+    {
+      "file": "data/attachments/pdf/mixed.pdf",
+      "family": "pdf",
+      "expected": "NEEDS_REVIEW",
+      "expectedRows": "data/expected/attachment-rows.json",
+      "expectedRowOccurrences": 2,
+      "synthetic": true,
+      "sha256": "f53480ca1f8aa72f4970aaea28f977d873064107c5e15a1ef6d83e1a02fb4e69"
+    },
+    {
+      "file": "data/attachments/pdf/scan.pdf",
+      "family": "pdf",
+      "expected": "NEEDS_REVIEW",
+      "expectedRows": "data/expected/attachment-rows.json",
+      "expectedRowOccurrences": 1,
+      "synthetic": true,
+      "sha256": "558dbec5b0ae0733e27c07ee446f449c36a01517f14d8fd8883dd248385b48cb"
+    },
+    {
+      "file": "data/attachments/pdf/text.pdf",
+      "family": "pdf",
+      "expected": "EXTRACT_ROWS",
+      "expectedRows": "data/expected/attachment-rows.json",
+      "expectedRowOccurrences": 1,
+      "synthetic": true,
+      "sha256": "98046f13668e0d0442883d3cc1c7ae4910d085d925017327c6c60ce74622ccd3"
+    }
+  ]
+}
