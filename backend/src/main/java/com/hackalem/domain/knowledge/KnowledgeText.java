@@ -13,7 +13,7 @@ public final class KnowledgeText {
             "(?is)(ignore.{0,60}(instruction|previous|system)|system\\s*prompt|developer\\s*message|"
             + "игнориру[йя].{0,60}(инструкц|правил)|раскрой.{0,40}(секрет|ключ)|"
             + "(add|confirm|подтверд|добавь).{0,50}(cart|корзин)|<\\|(?:system|assistant))");
-    private static final Set<String> STOP = Set.of("сколько", "как", "какие", "какой", "какая", "условия", "условий", "ли", "есть", "для", "при", "про", "расскажи", "мне", "можно", "что", "это", "the", "is", "are", "a", "of", "and", "how", "what", "terms", "purchase", "покупки", "товара", "товаров", "заказа", "заказ", "или", "по", "на", "в", "с", "и", "о", "об", "у", "до", "вы", "вас");
+    private static final Set<String> STOP = Set.of("нужна", "нужно", "нужен", "нужны", "требуется", "требуются", "количество", "количества", "товар", "товары", "сколько", "как", "какие", "какой", "какая", "условия", "условий", "ли", "есть", "для", "при", "про", "расскажи", "мне", "можно", "что", "это", "the", "is", "are", "a", "of", "and", "how", "what", "terms", "purchase", "покупки", "товара", "товаров", "заказа", "заказ", "или", "по", "на", "в", "с", "и", "о", "об", "у", "до", "вы", "вас");
     public record ParsedChunk(int ordinal, int page, String heading, String text, boolean suspicious) {}
     public static List<ParsedChunk> chunks(String raw) {
         if (raw == null || raw.isBlank() || raw.length() > 200_000)
@@ -52,7 +52,7 @@ public final class KnowledgeText {
     public static Set<String> tokens(String text) {
         return Arrays.stream(text.toLowerCase(Locale.ROOT).replace('ё', 'е').split("[^\\p{L}\\p{N}]+"))
                 .filter(word -> !word.isBlank() && !STOP.contains(word)).map(KnowledgeText::stem)
-                .filter(word -> word.length() > 1).collect(Collectors.toCollection(LinkedHashSet::new));
+                .filter(word -> word.length() > 1 || word.matches("[0-9]+" )).collect(Collectors.toCollection(LinkedHashSet::new));
     }
     private static String stem(String word) {
         if (word.matches("стоимост.*|стоит|цен[аыуе]|cost")) return "cost";

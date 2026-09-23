@@ -104,6 +104,13 @@ class KnowledgeIntegrationTest {
         assertThat(port.retrieve("Как оплатить?",visitor,6000).getFirst().source().version()).matches("[0-9a-f-]{36}");
         verify(embeddings,never()).embed(anyList());
     }
+    @Test void genericRequestWordsDoNotHideEvidenceOrInventMissingFacts() throws Exception {
+        new KnowledgeSeed(service,repository,json,new DefaultResourceLoader(),true,"file:../data/purchase_terms/terms.json").run(null);
+        for(String query:List.of("Требуется ли предоплата?", "Нужен ли банковский перевод?", "Требуется самовывоз товара?"))
+            assertThat(service.search(query,visitor,6000).answerability()).as(query).isEqualTo(ANSWERABLE);
+        for(String query:List.of("Нужна гарантия 8 лет?", "Требуются документы для скидки?", "Требуется ли предоплата 25 процентов?"))
+            assertThat(service.search(query,visitor,6000).answerability()).as(query).isEqualTo(NO_ANSWER);
+    }
     @Test void fixtureSourceKeysAndLabelsMapToImmutableRuntimeIds() throws Exception {
         new KnowledgeSeed(service,repository,json,new DefaultResourceLoader(),true,"file:../data/purchase_terms/terms.json").run(null);
         var expected=json.readTree(java.nio.file.Path.of("../data/expected/terms-answers.json").toFile());
