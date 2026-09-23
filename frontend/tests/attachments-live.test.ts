@@ -15,6 +15,7 @@ beforeEach(() => {
   const values = new Map<string, string>();
   vi.stubGlobal('sessionStorage', { getItem: (key: string) => values.get(key) ?? null, setItem: (key: string, value: string) => values.set(key, value), removeItem: (key: string) => values.delete(key) });
   vi.stubGlobal('document', { visibilityState: 'visible' });
+  vi.stubGlobal('window', new EventTarget());
   vi.mocked(sdk.capabilities).mockResolvedValue({ data: { maxBytes: 10485760, extensions: ['xlsx'], ocrAvailable: true } } as never);
   vi.mocked(sdk.status).mockResolvedValue({ data: snapshot } as never);
   vi.mocked(sdk.upload).mockResolvedValue({ data: { attachmentId: 'file-1', version: '1', deduplicated: false } } as never);
@@ -67,6 +68,15 @@ describe('live attachment workflow', () => {
     active.clearPrivateData(); resolve({ data: { attachmentId: 'file-1' } } as never); await pending;
     expect(active.getSnapshot().jobs).toEqual([]);
     expect(sdk.status).not.toHaveBeenCalled();
+  });
+  it('publishes the linked file context immediately for the chat parameter panel', async () => {
+    const active = await ready();
+    vi.mocked(sdk.status).mockResolvedValue({ data: { ...snapshot, selections: [{ selected: true, rowId: 'row-1', productId: 'product-1' }] } } as never);
+    await active.open?.('file-1');
+    vi.mocked(sdk.getDialogue).mockResolvedValue({ data: { version: '5' } } as never);
+    vi.mocked(sdk.updateDialogue).mockResolvedValue({ data: { version: '6', attachmentId: 'file-1', attachmentVersion: '2' } } as never);
+    expect(await active.linkConversation?.('file-1')).toBe(true);
+    expect(queryClient.getQueryData(['dialogue', 'chat-1'])).toMatchObject({ version: '6', attachmentId: 'file-1' });
   });
   it('reprocesses the current revision and deletes through authenticated SDK', async () => {
     const active = await ready(); await active.open?.('file-1');

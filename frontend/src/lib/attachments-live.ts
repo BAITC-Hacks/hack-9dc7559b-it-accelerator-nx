@@ -4,6 +4,7 @@ import type { Snapshot, Capabilities, Location, AttachmentSelection } from '../c
 import type { AttachmentDriver, AttachmentJob, AttachmentView, FileFamily, ReviewRow } from '../components/attachments/model';
 import { scaled } from '../components/catalog/decimal';
 import { queryClient } from './query';
+import { publishDialogue } from './dialogue-state';
 
 const busyStages = new Set(['queued', 'extracting', 'ocr', 'matching']);
 const families: FileFamily[] = ['xls', 'xlsx', 'doc', 'docx', 'pdf', 'jpg', 'jpeg'];
@@ -234,8 +235,9 @@ export function createLiveAttachmentDriver(sessionToken?: string): AttachmentDri
         if (!snapshot?.conversationId || !snapshot.version || !snapshot.selections?.some((item) => item.selected)) throw new Error('Сначала сохраните выбранные строки.');
         const path = { id: snapshot.conversationId };
         const state = (await sdk.getDialogue({ path, throwOnError: true })).data;
-        await mutate(() => sdk.updateDialogue({ path, body: { expectedVersion: state.version, attachmentId: jobKey, attachmentVersion: snapshot.version }, throwOnError: true }));
-        await queryClient.invalidateQueries({ queryKey: ['dialogue', path.id] });
+        const { data } = await mutate(() => sdk.updateDialogue({ path, body: { expectedVersion: state.version, attachmentId: jobKey, attachmentVersion: snapshot.version }, throwOnError: true }));
+        publishDialogue(path.id, data);
+        window.dispatchEvent(new CustomEvent('hackalem:conversation', { detail: { id: path.id } }));
         publish({ notice: 'Проверенный файл связан с диалогом. Можно продолжить подбор в чате.' });
         return true;
       }, false);
