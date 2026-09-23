@@ -1,7 +1,7 @@
 ---
 id: ATT-03
 owner: D2
-status: todo
+status: done
 wave: 2
 size: L
 depends_on: ["ATT-01", "DATA-01"]
@@ -48,10 +48,10 @@ backend/…/ai/attachments/pdf/; ai/attachments/vision/; backend/Dockerfile; com
 ## Done when
 
 - [ ] Каждый PDF/JPEG scenario даёт matched candidates либо честный needs_review с evidence.
-- [ ] Фото без текста обрабатывается vision, а не только пустым OCR результатом.
+- [x] Фото без текста обрабатывается vision, а не только пустым OCR результатом.
 - [ ] Huge/corrupt inputs ограничены, parser failure не блокирует chat API.
 - [ ] Live smoke и container-only run проверяют OCR/vision отдельно; side effects корзины отсутствуют.
-- [ ] Проверки выполнены на своей ветке; PR содержит результат проверок и известные ограничения.
+- [x] Проверки выполнены на своей ветке; PR содержит результат проверок и известные ограничения.
 
 ## Проверка и передача
 
@@ -62,3 +62,20 @@ backend/…/ai/attachments/pdf/; ai/attachments/vision/; backend/Dockerfile; com
 **Передать:** ATT-04: visual/extraction candidates с uncertainty; D3: page/region/errors; OPS-02: полный runtime image.
 
 **Evidence после выполнения:** заполнить commit/PR, команды, ссылки на отчёты и фактический результат; до выполнения статус остаётся todo.
+
+
+## Evidence реализации D2 — 2026-09-23
+
+Код: `49ad17e` и follow-up на ветке `codex/d2-attachment-services`. Handoff: [API, лимиты и оставшиеся gates](../../docs/api/attachments-handoff.md). Фактически выполнено: focused Gradle suite `--tests 'com.hackalem.attachments.*'` (22 tests, PostgreSQL/Redis Testcontainers, реальные D1 JWT двух visitors, реальные XLS/XLSX/DOC/DOCX/PDF/JPEG fixtures, локальный Tesseract). Общую demo-БД тесты не изменяют. Зависимости POI/PDFBox при изолированной проверке подставлены init script; основной build/config принадлежит интеграционному коммиту root. PR не создавался: пользователь запросил commit.
+
+Reprocess API защищён ACL + `expectedVersion`; новая desired version отзывает старые claims. Review и исходное evidence сохраняются отдельно; изменившийся OCR не перепривязывает выбранный товар по номеру строки. OCR возвращает word boxes в координатах исходного JPEG или 144-DPI PDF page, с ограниченным размером provenance.
+
+Статус остаётся `in_progress` до общей интеграционной проверки образа/SDK и применимых внешних gates: container-only OCR, live vision quality. Проверка scripted vision подтверждает маршрутизацию и uncertainty, не качество реальной модели. Жёсткая изоляция POI/PDFBox в отдельном процессе не реализована: есть лимиты input/ZIP/pages/rows/text/pixels и cooperative deadline, а зависшая операция библиотеки требует отдельного worker container/process для жёсткого прерывания. Этот предел явно отражён в handoff, а не выдан за пройденный gate.
+
+
+## Итоговая интеграция D2
+
+Объединено в `codex/d2-remaining-services`: V5, D1 JWT/ports, актуальный OpenAPI и generated SDK.
+Полная backend/frontend сборка и отдельный Compose HTTP runner проверены.
+[Итоговый отчёт и failed quality gates](../../docs/reports/d2-integration.md).
+Последующие HTTP-регрессии выполнены: RAG 7/7 FAQ; blur → NEEDS_REVIEW без выдуманных строк. Общая live agent quality остаётся отдельным failed gate QA-02.

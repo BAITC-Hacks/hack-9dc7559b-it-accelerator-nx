@@ -1,7 +1,7 @@
 ---
 id: DATA-01
 owner: D2
-status: in_progress
+status: done
 wave: 0
 size: M
 depends_on: []
@@ -87,3 +87,10 @@ data/sample_catalog/; data/purchase_terms/; data/attachments/; data/expected/; s
 и использование одинаковых fixtures разработчиками D1/D3 пока не подтверждено.
 Поэтому статус остаётся `in_progress`; полная приёмка и пункт передачи не отмечены
 как выполненные. Проверки данных не засчитываются за ATT, QA-02 или продуктовый E2E.
+
+
+## Итоговая интеграция D2
+
+Объединено в `codex/d2-remaining-services`: V5, D1 JWT/ports, актуальный OpenAPI и generated SDK.
+Полная backend/frontend сборка и отдельный Compose HTTP runner проверены.
+[Итоговый отчёт и failed quality gates](../../docs/reports/d2-integration.md).

@@ -40,6 +40,87 @@ export type AcceptedTurn = {
     runId?: string;
 };
 
+export type Accepted = {
+    attachmentId?: string;
+    jobId?: string;
+    version?: string;
+    status?: string;
+    deduplicated?: boolean;
+};
+
+export type SearchCriteria = {
+    query?: string;
+    limit?: number;
+    category?: string;
+    brand?: string;
+    minPrice?: string;
+    maxPrice?: string;
+    currency?: string;
+    specs?: {
+        [key: string]: string;
+    };
+    exactArticle?: boolean;
+};
+
+export type Money = {
+    amount?: string;
+    currency?: string;
+};
+
+export type OfferSnapshot = {
+    article?: string;
+    price?: Money;
+    available?: Quantity;
+    warehouse?: string;
+    stockBucket?: string;
+    version?: string;
+    observedAt?: string;
+    expiresAt?: string;
+};
+
+export type ProductDetails = {
+    id?: string;
+    article?: string;
+    name?: string;
+    specs?: {
+        [key: string]: string;
+    };
+    certificates?: Array<SourceRef>;
+};
+
+export type ProductResultSet = {
+    id?: string;
+    version?: string;
+    products?: Array<ProductDetails>;
+    offers?: Array<OfferSnapshot>;
+};
+
+export type Quantity = {
+    value?: string;
+    unit?: string;
+    step?: string;
+};
+
+export type SavedSearch = {
+    resultSet?: ProductResultSet;
+    appliedConstraints?: SearchCriteria;
+    mode?: string;
+    warnings?: Array<string>;
+};
+
+export type SourceRef = {
+    id?: string;
+    version?: string;
+    title?: string;
+    page?: number | unknown;
+    sheet?: string | unknown;
+    row?: number | unknown;
+};
+
+export type CompareRequest = {
+    indices?: Array<number>;
+};
+
 export type ProposalRequest = {
     conversationId: string;
     expectedStateVersion?: string;
@@ -52,11 +133,6 @@ export type Selection = {
     unit?: string;
     warehouse?: string;
     addQuantity?: string;
-};
-
-export type Money = {
-    amount?: string;
-    currency?: string;
 };
 
 export type ProposalLine = {
@@ -80,12 +156,6 @@ export type ProposalSnapshot = {
     status?: string;
     expiresAt?: string;
     lines?: Array<ProposalLine>;
-};
-
-export type Quantity = {
-    value?: string;
-    unit?: string;
-    step?: string;
 };
 
 export type ConfirmRequest = {
@@ -116,6 +186,118 @@ export type OperationOutcome = {
     status?: string;
     cart?: CartSnapshot | unknown;
     code?: string | unknown;
+};
+
+export type AttachmentSelection = {
+    rowId?: string;
+    productId?: string;
+    quantity?: string;
+    unit?: string;
+    warehouse?: string;
+    selected?: boolean;
+};
+
+export type ReviewRequest = {
+    expectedVersion?: string;
+    selections: Array<AttachmentSelection>;
+};
+
+export type Candidate = {
+    productId?: string;
+    article?: string;
+    name?: string;
+    unit?: string;
+    evidence?: string;
+    minimum?: string;
+    step?: string;
+    warehouses?: Array<string>;
+};
+
+export type ExtractedRow = {
+    id?: string;
+    rawText?: string;
+    article?: string;
+    quantity?: string;
+    unit?: string;
+    source?: Location;
+    warnings?: Array<string>;
+    visualEvidence?: VisualEvidence;
+};
+
+export type Location = {
+    kind?: string;
+    sheet?: string;
+    row?: number;
+    cell?: string;
+    page?: number;
+    paragraph?: number;
+    words?: Array<WordBox>;
+};
+
+export type MatchedRow = {
+    extracted?: ExtractedRow;
+    status?: string;
+    candidates?: Array<Candidate>;
+};
+
+export type Snapshot = {
+    attachmentId?: string;
+    conversationId?: string;
+    version?: string;
+    status?: string;
+    stage?: string;
+    filename?: string;
+    mimeType?: string;
+    rows?: Array<MatchedRow>;
+    selections?: Array<AttachmentSelection>;
+    warnings?: Array<string>;
+    errorCode?: string;
+};
+
+export type VisualEvidence = {
+    category?: string;
+    visibleMarkings?: Array<string>;
+    observedAttributes?: {
+        [key: string]: string;
+    };
+    qualityFlags?: Array<string>;
+};
+
+export type WordBox = {
+    text?: string;
+    x?: number;
+    y?: number;
+    width?: number;
+    height?: number;
+    imageWidth?: number;
+    imageHeight?: number;
+    confidence?: number;
+    lineId?: string;
+};
+
+export type ReprocessRequest = {
+    expectedVersion?: string;
+};
+
+export type ImportRequest = {
+    externalId?: string;
+    title?: string;
+    version?: string;
+    visibility: 'PUBLIC' | 'PRIVATE';
+    sourceUrl?: string;
+    text?: string;
+    tags: Array<string>;
+    synthetic?: boolean;
+    semanticIndex?: boolean;
+};
+
+export type Job = {
+    id?: string;
+    documentId?: string;
+    versionId?: string;
+    state?: string;
+    errorCode?: string;
+    epoch?: string;
 };
 
 /**
@@ -242,6 +424,31 @@ export type DialogueState = {
     attachmentVersion?: string | unknown;
 };
 
+export type UpdateOffer = {
+    price?: string;
+    available?: string;
+    expectedVersion?: string;
+};
+
+export type Quote = {
+    article?: string;
+    warehouse?: string;
+    status?: string;
+    freshness?: string;
+    error?: string;
+    offer?: OfferSnapshot;
+};
+
+export type Usage = {
+    epoch?: string;
+    round?: number;
+    model?: string;
+    inputTokens?: number;
+    outputTokens?: number;
+    measured?: boolean;
+    promptVersion?: string;
+};
+
 export type AlternativePlan = {
     id?: string;
     kind?: string;
@@ -289,34 +496,6 @@ export type EventPayload = (({
     kind: string;
 };
 
-export type OfferSnapshot = {
-    article?: string;
-    price?: Money;
-    available?: Quantity;
-    warehouse?: string;
-    stockBucket?: string;
-    version?: string;
-    observedAt?: string;
-    expiresAt?: string;
-};
-
-export type ProductDetails = {
-    id?: string;
-    article?: string;
-    name?: string;
-    specs?: {
-        [key: string]: string;
-    };
-    certificates?: Array<SourceRef>;
-};
-
-export type ProductResultSet = {
-    id?: string;
-    version?: string;
-    products?: Array<ProductDetails>;
-    offers?: Array<OfferSnapshot>;
-};
-
 export type ProductsPayload = {
     resultSet?: ProductResultSet;
     kind: 'products';
@@ -342,15 +521,6 @@ export type ReviewedItems = {
 export type SourceChunk = {
     source?: SourceRef;
     text?: string;
-};
-
-export type SourceRef = {
-    id?: string;
-    version?: string;
-    title?: string;
-    page?: number | unknown;
-    sheet?: string | unknown;
-    row?: number | unknown;
 };
 
 export type SourcesPayload = {
@@ -469,6 +639,42 @@ export type WarehouseResponse = {
     observedAt?: string;
 };
 
+export type Analog = {
+    article?: string;
+    name?: string;
+    compatibility?: Verdict;
+    offers?: Array<Quote>;
+};
+
+export type Option = {
+    id?: string;
+    kind?: string;
+    lines?: Array<Selection>;
+    differences?: Array<string>;
+    offers?: Array<OfferSnapshot>;
+    version?: string;
+};
+
+export type Result = {
+    originalArticle?: string;
+    status?: string;
+    ruleVersion?: string;
+    analogs?: Array<Analog>;
+    options?: Array<Option>;
+    reasons?: Array<string>;
+};
+
+export type Verdict = {
+    status?: string;
+    matchedRequirements?: {
+        [key: string]: string;
+    };
+    differences?: {
+        [key: string]: string;
+    };
+    missingRequirements?: Array<string>;
+};
+
 /**
  * Результат поиска вместе с версией каталога, по которой он получен
  */
@@ -478,6 +684,8 @@ export type ProductSearchResponse = {
     vectorSpace?: string;
     total?: number;
     items?: Array<ProductResponse>;
+    mode?: string;
+    warnings?: Array<string>;
 };
 
 export type PingResponse = {
@@ -503,6 +711,17 @@ export type Message = {
 export type MessagePage = {
     items?: Array<Message>;
     nextCursor?: string | unknown;
+};
+
+export type Capabilities = {
+    extensions?: Array<string>;
+    maxBytes?: number;
+    maxRows?: number;
+    maxPages?: number;
+    maxImagePixels?: number;
+    ocrAvailable?: boolean;
+    visionAvailable?: boolean;
+    conversationAccessConfigured?: boolean;
 };
 
 export type ApiProblem = {
@@ -918,6 +1137,216 @@ export type SubmitMessageResponses = {
 
 export type SubmitMessageResponse = SubmitMessageResponses[keyof SubmitMessageResponses];
 
+export type UploadData = {
+    body?: {
+        file: Blob | File;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/conversations/{id}/attachments';
+};
+
+export type UploadErrors = {
+    /**
+     * Domain error with stable code
+     */
+    400: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    401: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    403: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    404: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    409: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    429: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    503: ApiProblem;
+};
+
+export type UploadError = UploadErrors[keyof UploadErrors];
+
+export type UploadResponses = {
+    /**
+     * Accepted
+     */
+    202: Accepted;
+};
+
+export type UploadResponse = UploadResponses[keyof UploadResponses];
+
+export type SearchData = {
+    body?: never;
+    path?: never;
+    query: {
+        q: string;
+        limit?: number;
+        category?: string;
+        brand?: string;
+        minPrice?: number;
+        maxPrice?: number;
+        exactArticle?: boolean;
+    };
+    url: '/api/catalog/search';
+};
+
+export type SearchErrors = {
+    /**
+     * Domain error with stable code
+     */
+    400: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    401: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    403: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    404: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    409: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    429: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    503: ApiProblem;
+};
+
+export type SearchError = SearchErrors[keyof SearchErrors];
+
+export type SearchResponses = {
+    /**
+     * OK
+     */
+    200: SavedSearch;
+};
+
+export type SearchResponse = SearchResponses[keyof SearchResponses];
+
+export type Search1Data = {
+    body: SearchCriteria;
+    path?: never;
+    query?: never;
+    url: '/api/catalog/search';
+};
+
+export type Search1Errors = {
+    /**
+     * Domain error with stable code
+     */
+    400: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    401: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    403: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    404: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    409: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    429: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    503: ApiProblem;
+};
+
+export type Search1Error = Search1Errors[keyof Search1Errors];
+
+export type Search1Responses = {
+    /**
+     * OK
+     */
+    200: SavedSearch;
+};
+
+export type Search1Response = Search1Responses[keyof Search1Responses];
+
+export type CompareData = {
+    body: CompareRequest;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/catalog/results/{id}/compare';
+};
+
+export type CompareErrors = {
+    /**
+     * Domain error with stable code
+     */
+    400: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    401: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    403: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    404: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    409: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    429: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    503: ApiProblem;
+};
+
+export type CompareError = CompareErrors[keyof CompareErrors];
+
+export type CompareResponses = {
+    /**
+     * OK
+     */
+    200: SavedSearch;
+};
+
+export type CompareResponse = CompareResponses[keyof CompareResponses];
+
 export type PrepareProposalData = {
     body: ProposalRequest;
     headers: {
@@ -1074,6 +1503,208 @@ export type ConfirmProposalResponses = {
 };
 
 export type ConfirmProposalResponse = ConfirmProposalResponses[keyof ConfirmProposalResponses];
+
+export type ReviewData = {
+    body: ReviewRequest;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/attachments/{id}/review';
+};
+
+export type ReviewErrors = {
+    /**
+     * Domain error with stable code
+     */
+    400: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    401: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    403: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    404: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    409: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    429: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    503: ApiProblem;
+};
+
+export type ReviewError = ReviewErrors[keyof ReviewErrors];
+
+export type ReviewResponses = {
+    /**
+     * OK
+     */
+    200: Snapshot;
+};
+
+export type ReviewResponse = ReviewResponses[keyof ReviewResponses];
+
+export type ReprocessData = {
+    body: ReprocessRequest;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/attachments/{id}/reprocess';
+};
+
+export type ReprocessErrors = {
+    /**
+     * Domain error with stable code
+     */
+    400: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    401: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    403: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    404: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    409: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    429: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    503: ApiProblem;
+};
+
+export type ReprocessError = ReprocessErrors[keyof ReprocessErrors];
+
+export type ReprocessResponses = {
+    /**
+     * Accepted
+     */
+    202: Accepted;
+};
+
+export type ReprocessResponse = ReprocessResponses[keyof ReprocessResponses];
+
+export type IngestData = {
+    body: ImportRequest;
+    path?: never;
+    query?: never;
+    url: '/api/admin/knowledge/documents';
+};
+
+export type IngestErrors = {
+    /**
+     * Domain error with stable code
+     */
+    400: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    401: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    403: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    404: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    409: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    429: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    503: ApiProblem;
+};
+
+export type IngestError = IngestErrors[keyof IngestErrors];
+
+export type IngestResponses = {
+    /**
+     * OK
+     */
+    200: Job;
+};
+
+export type IngestResponse = IngestResponses[keyof IngestResponses];
+
+export type ReindexData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/admin/knowledge/documents/{id}/reindex';
+};
+
+export type ReindexErrors = {
+    /**
+     * Domain error with stable code
+     */
+    400: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    401: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    403: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    404: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    409: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    429: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    503: ApiProblem;
+};
+
+export type ReindexError = ReindexErrors[keyof ReindexErrors];
+
+export type ReindexResponses = {
+    /**
+     * OK
+     */
+    200: Job;
+};
+
+export type ReindexResponse = ReindexResponses[keyof ReindexResponses];
 
 export type StartImportData = {
     body: CatalogImportRequest;
@@ -1232,6 +1863,110 @@ export type UpdateDialogueResponses = {
 
 export type UpdateDialogueResponse = UpdateDialogueResponses[keyof UpdateDialogueResponses];
 
+export type UpdateData = {
+    body: UpdateOffer;
+    path: {
+        article: string;
+        warehouse: string;
+    };
+    query?: never;
+    url: '/api/admin/catalog/offers/{article}/{warehouse}';
+};
+
+export type UpdateErrors = {
+    /**
+     * Domain error with stable code
+     */
+    400: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    401: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    403: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    404: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    409: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    429: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    503: ApiProblem;
+};
+
+export type UpdateError = UpdateErrors[keyof UpdateErrors];
+
+export type UpdateResponses = {
+    /**
+     * OK
+     */
+    200: Array<Quote>;
+};
+
+export type UpdateResponse = UpdateResponses[keyof UpdateResponses];
+
+export type SourceData = {
+    body?: never;
+    path: {
+        id: string;
+        versionId: string;
+    };
+    query?: never;
+    url: '/api/sources/{id}/versions/{versionId}';
+};
+
+export type SourceErrors = {
+    /**
+     * Domain error with stable code
+     */
+    400: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    401: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    403: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    404: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    409: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    429: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    503: ApiProblem;
+};
+
+export type SourceError = SourceErrors[keyof SourceErrors];
+
+export type SourceResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type SourceResponse = SourceResponses[keyof SourceResponses];
+
 export type GetRunData = {
     body?: never;
     path: {
@@ -1282,6 +2017,57 @@ export type GetRunResponses = {
 };
 
 export type GetRunResponse = GetRunResponses[keyof GetRunResponses];
+
+export type GetModelUsageData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/runs/{id}/usage';
+};
+
+export type GetModelUsageErrors = {
+    /**
+     * Domain error with stable code
+     */
+    400: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    401: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    403: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    404: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    409: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    429: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    503: ApiProblem;
+};
+
+export type GetModelUsageError = GetModelUsageErrors[keyof GetModelUsageErrors];
+
+export type GetModelUsageResponses = {
+    /**
+     * OK
+     */
+    200: Array<Usage>;
+};
+
+export type GetModelUsageResponse = GetModelUsageResponses[keyof GetModelUsageResponses];
 
 export type StreamRunData = {
     body?: never;
@@ -1388,21 +2174,16 @@ export type ByArticleResponses = {
 
 export type ByArticleResponse = ByArticleResponses[keyof ByArticleResponses];
 
-export type SearchData = {
+export type QuotesData = {
     body?: never;
-    path?: never;
-    query: {
-        q: string;
-        limit?: number;
-        category?: string;
-        brand?: string;
-        minPrice?: number;
-        maxPrice?: number;
+    path: {
+        article: string;
     };
-    url: '/api/products/search';
+    query?: never;
+    url: '/api/products/{article}/offers';
 };
 
-export type SearchErrors = {
+export type QuotesErrors = {
     /**
      * Domain error with stable code
      */
@@ -1433,16 +2214,178 @@ export type SearchErrors = {
     503: ApiProblem;
 };
 
-export type SearchError = SearchErrors[keyof SearchErrors];
+export type QuotesError = QuotesErrors[keyof QuotesErrors];
 
-export type SearchResponses = {
+export type QuotesResponses = {
+    /**
+     * OK
+     */
+    200: Array<Quote>;
+};
+
+export type QuotesResponse = QuotesResponses[keyof QuotesResponses];
+
+export type CertificateData = {
+    body?: never;
+    path: {
+        article: string;
+        certificateId: string;
+    };
+    query?: never;
+    url: '/api/products/{article}/certificates/{certificateId}';
+};
+
+export type CertificateErrors = {
+    /**
+     * Domain error with stable code
+     */
+    400: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    401: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    403: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    404: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    409: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    429: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    503: ApiProblem;
+};
+
+export type CertificateError = CertificateErrors[keyof CertificateErrors];
+
+export type CertificateResponses = {
+    /**
+     * OK
+     */
+    200: Blob | File;
+};
+
+export type CertificateResponse2 = CertificateResponses[keyof CertificateResponses];
+
+export type AnalogsData = {
+    body?: never;
+    path: {
+        article: string;
+    };
+    query: {
+        quantity: string;
+        unit?: string;
+    };
+    url: '/api/products/{article}/analogs';
+};
+
+export type AnalogsErrors = {
+    /**
+     * Domain error with stable code
+     */
+    400: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    401: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    403: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    404: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    409: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    429: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    503: ApiProblem;
+};
+
+export type AnalogsError = AnalogsErrors[keyof AnalogsErrors];
+
+export type AnalogsResponses = {
+    /**
+     * OK
+     */
+    200: Result;
+};
+
+export type AnalogsResponse = AnalogsResponses[keyof AnalogsResponses];
+
+export type Search2Data = {
+    body?: never;
+    path?: never;
+    query: {
+        q: string;
+        limit?: number;
+        category?: string;
+        brand?: string;
+        minPrice?: number;
+        maxPrice?: number;
+    };
+    url: '/api/products/search';
+};
+
+export type Search2Errors = {
+    /**
+     * Domain error with stable code
+     */
+    400: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    401: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    403: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    404: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    409: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    429: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    503: ApiProblem;
+};
+
+export type Search2Error = Search2Errors[keyof Search2Errors];
+
+export type Search2Responses = {
     /**
      * Результаты поиска
      */
     200: ProductSearchResponse;
 };
 
-export type SearchResponse = SearchResponses[keyof SearchResponses];
+export type Search2Response = Search2Responses[keyof Search2Responses];
 
 export type PingData = {
     body?: never;
@@ -1492,6 +2435,58 @@ export type PingResponses = {
 };
 
 export type PingResponse2 = PingResponses[keyof PingResponses];
+
+export type Search3Data = {
+    body?: never;
+    path?: never;
+    query: {
+        query: string;
+        characterBudget?: number;
+    };
+    url: '/api/knowledge/search';
+};
+
+export type Search3Errors = {
+    /**
+     * Domain error with stable code
+     */
+    400: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    401: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    403: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    404: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    409: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    429: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    503: ApiProblem;
+};
+
+export type Search3Error = Search3Errors[keyof Search3Errors];
+
+export type Search3Responses = {
+    /**
+     * OK
+     */
+    200: Result;
+};
+
+export type Search3Response = Search3Responses[keyof Search3Responses];
 
 export type GetResultSetData = {
     body?: never;
@@ -1544,6 +2539,108 @@ export type GetResultSetResponses = {
 };
 
 export type GetResultSetResponse = GetResultSetResponses[keyof GetResultSetResponses];
+
+export type ResultData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/catalog/results/{id}';
+};
+
+export type ResultErrors = {
+    /**
+     * Domain error with stable code
+     */
+    400: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    401: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    403: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    404: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    409: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    429: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    503: ApiProblem;
+};
+
+export type ResultError = ResultErrors[keyof ResultErrors];
+
+export type ResultResponses = {
+    /**
+     * OK
+     */
+    200: SavedSearch;
+};
+
+export type ResultResponse = ResultResponses[keyof ResultResponses];
+
+export type OptionData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/catalog/options/{id}';
+};
+
+export type OptionErrors = {
+    /**
+     * Domain error with stable code
+     */
+    400: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    401: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    403: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    404: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    409: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    429: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    503: ApiProblem;
+};
+
+export type OptionError = OptionErrors[keyof OptionErrors];
+
+export type OptionResponses = {
+    /**
+     * OK
+     */
+    200: Option;
+};
+
+export type OptionResponse = OptionResponses[keyof OptionResponses];
 
 export type GetCartData = {
     body?: never;
@@ -1696,6 +2793,259 @@ export type GetCartOperationResponses = {
 
 export type GetCartOperationResponse = GetCartOperationResponses[keyof GetCartOperationResponses];
 
+export type DeleteData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/attachments/{id}';
+};
+
+export type DeleteErrors = {
+    /**
+     * Domain error with stable code
+     */
+    400: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    401: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    403: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    404: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    409: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    429: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    503: ApiProblem;
+};
+
+export type DeleteError = DeleteErrors[keyof DeleteErrors];
+
+export type DeleteResponses = {
+    /**
+     * No Content
+     */
+    204: void;
+};
+
+export type DeleteResponse = DeleteResponses[keyof DeleteResponses];
+
+export type StatusData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/attachments/{id}';
+};
+
+export type StatusErrors = {
+    /**
+     * Domain error with stable code
+     */
+    400: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    401: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    403: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    404: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    409: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    429: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    503: ApiProblem;
+};
+
+export type StatusError = StatusErrors[keyof StatusErrors];
+
+export type StatusResponses = {
+    /**
+     * OK
+     */
+    200: Snapshot;
+};
+
+export type StatusResponse = StatusResponses[keyof StatusResponses];
+
+export type Source1Data = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/attachments/{id}/source';
+};
+
+export type Source1Errors = {
+    /**
+     * Domain error with stable code
+     */
+    400: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    401: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    403: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    404: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    409: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    429: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    503: ApiProblem;
+};
+
+export type Source1Error = Source1Errors[keyof Source1Errors];
+
+export type Source1Responses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type Source1Response = Source1Responses[keyof Source1Responses];
+
+export type CapabilitiesData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/attachments/capabilities';
+};
+
+export type CapabilitiesErrors = {
+    /**
+     * Domain error with stable code
+     */
+    400: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    401: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    403: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    404: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    409: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    429: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    503: ApiProblem;
+};
+
+export type CapabilitiesError = CapabilitiesErrors[keyof CapabilitiesErrors];
+
+export type CapabilitiesResponses = {
+    /**
+     * OK
+     */
+    200: Capabilities;
+};
+
+export type CapabilitiesResponse = CapabilitiesResponses[keyof CapabilitiesResponses];
+
+export type JobData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/admin/knowledge/jobs/{id}';
+};
+
+export type JobErrors = {
+    /**
+     * Domain error with stable code
+     */
+    400: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    401: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    403: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    404: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    409: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    429: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    503: ApiProblem;
+};
+
+export type JobError = JobErrors[keyof JobErrors];
+
+export type JobResponses = {
+    /**
+     * OK
+     */
+    200: Job;
+};
+
+export type JobResponse = JobResponses[keyof JobResponses];
+
 export type JobStatusData = {
     body?: never;
     path: {
@@ -1746,3 +3096,52 @@ export type JobStatusResponses = {
 };
 
 export type JobStatusResponse = JobStatusResponses[keyof JobStatusResponses];
+
+export type RevokeData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/admin/knowledge/documents/{id}';
+};
+
+export type RevokeErrors = {
+    /**
+     * Domain error with stable code
+     */
+    400: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    401: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    403: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    404: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    409: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    429: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    503: ApiProblem;
+};
+
+export type RevokeError = RevokeErrors[keyof RevokeErrors];
+
+export type RevokeResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};

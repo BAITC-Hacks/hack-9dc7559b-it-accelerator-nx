@@ -11,6 +11,8 @@ import java.util.UUID;
 public class ApiErrors {
     @ExceptionHandler(ApiException.class)
     public ResponseEntity<ProblemDetail> domain(ApiException e) { return problem(e.status,e.code); }
+    @ExceptionHandler(org.springframework.web.multipart.MaxUploadSizeExceededException.class)
+    public ResponseEntity<ProblemDetail> oversized(Exception e) { return problem(413,"file_too_large"); }
     @ExceptionHandler({MethodArgumentNotValidException.class, HandlerMethodValidationException.class,
         HttpMessageNotReadableException.class, MethodArgumentTypeMismatchException.class, ConstraintViolationException.class})
     public ResponseEntity<ProblemDetail> invalid(Exception e) { return problem(400,"invalid_request"); }

@@ -40,7 +40,9 @@ public class AgentTools {
     public String execute(ChatService.Claim claim,ToolCall call){
         if(!NAMES.contains(call.name()))throw new ApiException(400,"tool_not_allowed");
         if(call.id()==null || call.id().length()>160 || call.arguments()==null || call.arguments().length()>8000)throw new ApiException(400,"invalid_tool_arguments");
-        chat.assertActive(claim);String hash=Json.hash(call.name()+"|"+call.arguments());var old=chat.previousTool(claim,call.id(),hash);if(old.isPresent())return old.get();
+        chat.assertActive(claim);String hash=Json.hash(call.name()+"|"+call.arguments());var old=chat.previousTool(claim,call.id(),hash);
+        // Recheck current ACL, review revision and stock even when the model repeats a call ID.
+        if(old.isPresent() && !Set.of("search_purchase_terms","read_reviewed_attachment","check_stock").contains(call.name()))return old.get();
         JsonNode args;try{args=mapper.readTree(call.arguments());var schema=mapper.readTree(schema(call.name()));
             if(!args.isObject())throw new IllegalArgumentException();
             for(var names=args.fieldNames();names.hasNext();)if(!schema.get("properties").has(names.next()))throw new IllegalArgumentException();

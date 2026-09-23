@@ -1,7 +1,7 @@
 ---
 id: QA-02
 owner: D2
-status: todo
+status: done
 wave: 4
 size: M
 depends_on: ["CAT-04", "RAG-01", "ATT-04"]
@@ -67,3 +67,11 @@ data/evaluation/; tests/evaluation/; scripts/evaluate.*; docs/reports/ quality r
 **Передать:** D1: prompt/tool/data quality failures; D3: QA-01 expected assertions; PERF-02: measured token/tool mix.
 
 **Evidence после выполнения:** заполнить commit/PR, команды, ссылки на отчёты и фактический результат; до выполнения статус остаётся todo.
+
+
+## Итоговая интеграция D2
+
+Объединено в `codex/d2-remaining-services`: V5, D1 JWT/ports, актуальный OpenAPI и generated SDK.
+Полная backend/frontend сборка и отдельный Compose HTTP runner проверены.
+[Итоговый отчёт и failed quality gates](../../docs/reports/d2-integration.md).
+Оценка выполнена; конкретные метрики явно FAILED. Это не pass AC-15 и не разрешение на релиз.

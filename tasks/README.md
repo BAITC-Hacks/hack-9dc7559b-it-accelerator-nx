@@ -56,7 +56,7 @@ V1 и V2 уже существуют и не изменяются. Текущи�
 - **V3/V4 baseline catalog** — исходная V3 CAT-01, затем D1 в V4 для уже существующих catalog-only БД.
 - Flyway выбирает baseline по существующей записи V3 (read-only); новая БД получает identity baseline.
 - Исходные V3 SQL сохранены без изменений в `db/baseline-identity/` и `db/baseline-catalog/`.
-- **V5** — следующие D2 KB/attachments. Новые миграции общие в `db/migration/`.
+- **V5** — интегрированные catalog projections, KB, attachments и model telemetry. Новые миграции общие в `db/migration/`.
 
 
 V6/V7 отдельно под D1 больше не резервируются: их плановый scope включён в V3. После V5 следующий номер выдаётся D1 по фактическому merge order. В общей integration DB применять только непрерывный согласованный prefix: сейчас V1→V2→V3, затем V4→V5. Перед назначением сверить интегрированную ветку, чтобы не было двух SQL с одним номером. Не создавать holes и не включать Flyway outOfOrder. Применённый SQL не редактировать; изменения — новой следующей миграцией. Contract/UI могут использовать ports и snapshot до D2 schema. Подробности: [handoff D1](../docs/api/d1-handoff.md).
@@ -131,17 +131,17 @@ OPS-02 должен поставить:
 - [ ] [PERF-01 — Общие лимиты, replay нескольких реплик и метрики](08-platform/PERF-01-limits-events-and-metrics.md) — G4, L. `in_progress` — [handoff](../docs/api/d1-handoff.md).
 
 ### D2 — Каталог, RAG и распознавание
-- [ ] [DATA-01 — Синтетические данные и ожидаемые сценарии](00-foundation/DATA-01-sample-data-contract.md) — G0, M.
-- [ ] [CAT-01 — Развитие каталога V2, безопасный импорт и индексация](03-catalog/CAT-01-import-and-schema.md) — G1, L. Реализация выполнена, V3 применена; закрытие карточки ждёт AUTH-01 (admin identity).
-- [ ] [ATT-01 — Приватные вложения, storage и durable processing](06-attachments/ATT-01-upload-and-jobs.md) — G1, M.
-- [ ] [CAT-02 — Точный, лексический и семантический поиск](03-catalog/CAT-02-search-and-comparison.md) — G2, M.
-- [ ] [CAT-03 — Актуальные цены, остатки и склады](03-catalog/CAT-03-offers-and-stock.md) — G2, M.
-- [ ] [RAG-01 — Условия покупки, versioned RAG и источники](04-knowledge/RAG-01-terms-and-sources.md) — G2, L.
-- [ ] [ATT-02 — Excel и Word: строки, количества и координаты](06-attachments/ATT-02-office-extraction.md) — G2, M.
-- [ ] [ATT-03 — PDF, OCR и распознавание товара на JPEG](06-attachments/ATT-03-pdf-ocr-and-photo.md) — G2, L.
-- [ ] [CAT-04 — Совместимые аналоги и варианты частичной поставки](03-catalog/CAT-04-analogs-and-fulfillment.md) — G3, M.
-- [ ] [ATT-04 — Сопоставление каталогу и ручная проверка строк](06-attachments/ATT-04-matching-and-review.md) — G3, M.
-- [ ] [QA-02 — Качество поиска, аналогов, RAG и распознавания](09-quality/QA-02-rag-and-recognition-evaluation.md) — G4, M.
+- [x] [DATA-01 — Синтетические данные и ожидаемые сценарии](00-foundation/DATA-01-sample-data-contract.md) — G0, M.
+- [x] [CAT-01 — Развитие каталога V2, безопасный импорт и индексация](03-catalog/CAT-01-import-and-schema.md) — G1, L. `done` — объединено с D1 JWT, обе V3 histories сохранены.
+- [x] [ATT-01 — Приватные вложения, storage и durable processing](06-attachments/ATT-01-upload-and-jobs.md) — G1, M.
+- [x] [CAT-02 — Точный, лексический и семантический поиск](03-catalog/CAT-02-search-and-comparison.md) — G2, M.
+- [x] [CAT-03 — Актуальные цены, остатки и склады](03-catalog/CAT-03-offers-and-stock.md) — G2, M.
+- [x] [RAG-01 — Условия покупки, versioned RAG и источники](04-knowledge/RAG-01-terms-and-sources.md) — G2, L.
+- [x] [ATT-02 — Excel и Word: строки, количества и координаты](06-attachments/ATT-02-office-extraction.md) — G2, M.
+- [x] [ATT-03 — PDF, OCR и распознавание товара на JPEG](06-attachments/ATT-03-pdf-ocr-and-photo.md) — G2, L.
+- [x] [CAT-04 — Совместимые аналоги и варианты частичной поставки](03-catalog/CAT-04-analogs-and-fulfillment.md) — G3, M.
+- [x] [ATT-04 — Сопоставление каталогу и ручная проверка строк](06-attachments/ATT-04-matching-and-review.md) — G3, M.
+- [x] [QA-02 — Качество поиска, аналогов, RAG и распознавания](09-quality/QA-02-rag-and-recognition-evaluation.md) — G4, M.
 
 ### D3 — Виджет, инфраструктура и приёмка
 - [ ] [OPS-01 — Изолированный Compose и основа режимов запуска](08-platform/OPS-01-compose-foundation.md) — G0, M.
@@ -173,3 +173,8 @@ OPS-02 должен поставить:
 Нормативный для реализации продуктовый текст — [ekt-assistant-spec.md](../docs/ekt-assistant-spec.md), workflow — AGENTS.md. Старые `ai-chat-architecture.md` и `ai-chat-backlog.md` заменены ссылками на этот документ и новые карточки, чтобы не осталось конкурирующего TXT-only/без-cart scope. Исходное ТЗ не удаляется и не изменяется.
 
 Названия/IDs задач стабильны; при уточнении требования обновить spec, affected карточки и acceptance mapping одним PR. Изменения в поддержке версий/model API проверять на фактически закреплённых зависимостях, не копировать latest примеры без compatibility spike.
+
+## D2 — результат интеграции
+
+11 D2 карточек реализованы и проверены. Итоговая agent quality не прошла AC-15; это явно сохранено в QA-02.
+QA-02 содержит фактические failed metrics, не ложный pass. [Отчёт](../docs/reports/d2-integration.md).

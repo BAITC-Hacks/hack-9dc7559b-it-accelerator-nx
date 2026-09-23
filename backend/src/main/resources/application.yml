@@ -5,6 +5,10 @@ server:
   shutdown: graceful
 
 spring:
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 11MB
   application:
     name: hackalem-backend
   profiles:
@@ -50,6 +54,7 @@ spring:
         options:
           model: ${OPENAI_MODEL:gpt-4o-mini}
           temperature: 0.2
+          stream-usage: true
       embedding:
         options:
           model: ${OPENAI_EMBEDDING_MODEL:text-embedding-3-small}
@@ -107,6 +112,19 @@ app:
       location: ${CATALOG_SEED_LOCATION:file:../data/sample_catalog/products.json}
     retained-versions: ${CATALOG_RETAINED_VERSIONS:3}
     import-queue-capacity: ${CATALOG_IMPORT_QUEUE_CAPACITY:8}
+
+  knowledge:
+    seed-enabled: ${KNOWLEDGE_SEED_ENABLED:true}
+    seed-location: ${KNOWLEDGE_SEED_LOCATION:file:../data/purchase_terms/terms.json}
+    worker-enabled: ${KNOWLEDGE_WORKER_ENABLED:true}
+  attachments:
+    worker-enabled: ${ATTACHMENT_WORKER_ENABLED:true}
+    ocr:
+      enabled: ${ATTACHMENT_OCR_ENABLED:false}
+      executable: ${ATTACHMENT_OCR_EXECUTABLE:tesseract}
+      languages: ${ATTACHMENT_OCR_LANGUAGES:eng+rus}
+    vision:
+      enabled: ${ATTACHMENT_VISION_ENABLED:false}
 
 management:
   endpoints:

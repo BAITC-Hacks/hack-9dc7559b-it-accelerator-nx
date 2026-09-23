@@ -17,7 +17,7 @@ WORKDIR /app
 
 # curl нужен для healthcheck сервиса в docker-compose.yml (/actuator/health)
 RUN apt-get update \
- && apt-get install -y --no-install-recommends curl \
+ && apt-get install -y --no-install-recommends curl tesseract-ocr tesseract-ocr-eng tesseract-ocr-rus \
  && rm -rf /var/lib/apt/lists/*
 
 COPY --from=build /app/build/libs/*.jar /app/app.jar

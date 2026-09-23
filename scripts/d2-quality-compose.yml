@@ -1,0 +1,59 @@
+# Isolated QA-02 stack: no host ports/container names/shared demo volumes.
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: hackalem
+      POSTGRES_USER: hackalem
+      POSTGRES_PASSWORD: hackalem
+    volumes: ["qualitypg:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hackalem -d hackalem"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--maxmemory", "128mb", "--maxmemory-policy", "noeviction"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+  backend:
+    build: ../backend
+    depends_on:
+      db: {condition: service_healthy}
+      redis: {condition: service_healthy}
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-d2}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/hackalem
+      REDIS_HOST: redis
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-offline}
+      VISITOR_SESSION_ENABLED: "true"
+      CATALOG_EMBEDDING_MODE: ${CATALOG_EMBEDDING_MODE:-fake}
+      CATALOG_SEED_LOCATION: file:/app/data/sample_catalog/products.json
+      KNOWLEDGE_SEED_LOCATION: file:/app/data/purchase_terms/terms.json
+      ATTACHMENT_OCR_ENABLED: "true"
+      ATTACHMENT_VISION_ENABLED: ${ATTACHMENT_VISION_ENABLED:-false}
+      LLM_GLOBAL_RPM: "1000"
+      LLM_PRINCIPAL_RPM: "100"
+      CHAT_MAX_ROUNDS: "4"
+      CHAT_MAX_TOKENS: "16000"
+    volumes: ["../data:/app/data:ro"]
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/actuator/health"]
+      interval: 3s
+      timeout: 3s
+      retries: 60
+  evaluator:
+    profiles: ["evaluation"]
+    build:
+      context: ..
+      dockerfile: scripts/evaluation.Dockerfile
+    depends_on:
+      backend: {condition: service_healthy}
+    volumes: ["../docs/reports:/reports"]
+    command: ["--base-url", "http://backend:8080", "--report", "/reports/qa02-offline.json"]
+volumes:
+  qualitypg:

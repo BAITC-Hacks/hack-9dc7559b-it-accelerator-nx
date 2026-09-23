@@ -1,0 +1,9 @@
+{
+  "status": "NEEDS_REVIEW",
+  "rows": [],
+  "warnings": [
+    "IMAGE_BLURRED_RETAKE"
+  ],
+  "providerCalls": 0,
+  "note": "Blur gate executes before OCR/vision, verified by extractor spy tests and real HTTP fixture."
+}

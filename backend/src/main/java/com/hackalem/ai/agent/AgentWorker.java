@@ -21,10 +21,12 @@ public class AgentWorker {
     private final ThreadPoolExecutor workers,toolPool;private final Semaphore slots;
     private final Map<UUID,Future<?>> active=new ConcurrentHashMap<>();private final Map<UUID,ChatService.Claim> claims=new ConcurrentHashMap<>();
     private final boolean enabled;private final int rounds,maxTokens;private volatile boolean draining;
-    public AgentWorker(ChatService chat,AgentTools tools,LlmGateway llm,Limits limits,Json json,MeterRegistry metrics,
+    private final ModelUsage usage;
+    public AgentWorker(ChatService chat,AgentTools tools,LlmGateway llm,Limits limits,Json json,MeterRegistry metrics,ModelUsage usage,
         @Value("${app.worker.enabled}") boolean enabled,@Value("${app.worker.threads}") int threads,
         @Value("${app.worker.max-rounds}") int rounds,@Value("${app.worker.max-tokens}") int maxTokens){
         this.chat=chat;this.tools=tools;this.llm=llm;this.limits=limits;this.json=json;this.metrics=metrics;this.enabled=enabled;this.rounds=rounds;this.maxTokens=maxTokens;
+        this.usage=usage;
         workers=new ThreadPoolExecutor(threads,threads,0,TimeUnit.MILLISECONDS,new ArrayBlockingQueue<>(threads),Thread.ofPlatform().name("generation-",0).factory(),new ThreadPoolExecutor.AbortPolicy());
         toolPool=new ThreadPoolExecutor(threads,threads,0,TimeUnit.MILLISECONDS,new SynchronousQueue<>(),Thread.ofPlatform().name("tools-",0).factory(),new ThreadPoolExecutor.AbortPolicy());
         slots=new Semaphore(threads);metrics.gauge("agent.workers.active",active,Map::size);
@@ -81,6 +83,7 @@ public class AgentWorker {
                     actual=response.inputTokens()+response.outputTokens();knownUsage=actual>0;
                     consumed+=knownUsage?actual:reservation;
                     metrics.counter("agent.tokens.input").increment(response.inputTokens());metrics.counter("agent.tokens.output").increment(response.outputTokens());
+                    usage.record(claim,round,response);
                 }finally{limits.release(callId,knownUsage?Math.max(0,reservation-actual):0);}
                 if(consumed>maxTokens)throw new ApiException(429,"token_budget_exhausted");
                 if(response.calls().isEmpty()){

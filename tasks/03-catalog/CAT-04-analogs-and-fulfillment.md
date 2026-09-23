@@ -1,7 +1,7 @@
 ---
 id: CAT-04
 owner: D2
-status: todo
+status: done
 wave: 3
 size: M
 depends_on: ["CAT-02", "CAT-03"]
@@ -62,3 +62,18 @@ backend/…/domain/catalog/Analogs…; ai/catalog/; data/compatibility-rules/; s
 **Передать:** D1: bounded find_analogs tool + optionId snapshots; D3: объяснения, различия и выбор комплектации.
 
 **Evidence после выполнения:** заполнить commit/PR, команды, ссылки на отчёты и фактический результат; до выполнения статус остаётся todo.
+
+## Evidence — 23.09.2026, CAT services integration
+
+Реализация передана в `codex/d2-catalog-services`; описание API и границ: [catalog handoff](../../docs/catalog/services-handoff.md). Реальные D1 ports подключены без изменений кода корзины.
+
+Проверено: `DOCKER_HOST=unix:///Users/zubanyszarylkasynov/.docker/run/docker.sock TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=/var/run/docker.sock ./gradlew build --no-daemon` — **PASS**, включая существующие D1 regression tests и новые PostgreSQL/Redis Testcontainers. В catalog integration suite проверены exact/no embedding, missing SKU, typo/hard constraints, 12→7 и изменение цены без сброса при чтении, неизвестный/закрытый склад, дробный шаг, реальный SQL timeout, отказ embedding, 12+8/full20, отсутствие cart writes, ownership и стабильность ordinal snapshots.
+
+Следующие gates остаются интегратору: объединить SQL draft в общую следующую миграцию, регенерировать SDK и прогнать итоговый HTTP/Compose QA-02. Синтетические embeddings не подтверждают real-model recall/latency; реальный partner stock API и partner compatibility rules не предоставлены и не проверены. До этих gates статус остаётся `in_progress`.
+
+
+## Итоговая интеграция D2
+
+Объединено в `codex/d2-remaining-services`: V5, D1 JWT/ports, актуальный OpenAPI и generated SDK.
+Полная backend/frontend сборка и отдельный Compose HTTP runner проверены.
+[Итоговый отчёт и failed quality gates](../../docs/reports/d2-integration.md).

@@ -14,7 +14,7 @@ import java.util.function.Consumer;
 import java.util.concurrent.atomic.AtomicReference;
 
 /** Spring AI 1.0.0 manual tool continuation; automatic execution/retries are disabled. */
-@Component @Profile("!contract & !test")
+@Component @Profile("!contract & !test & !d2")
 public class OpenAiGateway implements LlmGateway {
     private final ChatModel model;
     public OpenAiGateway(ChatModel model){this.model=model;}
@@ -36,7 +36,9 @@ public class OpenAiGateway implements LlmGateway {
         AtomicReference<org.springframework.ai.chat.metadata.ChatResponseMetadata> metadata=new AtomicReference<>();
         // block() is interruptible; worker cancellation disposes the reactive HTTP subscription.
         model.stream(new Prompt(messages,options)).doOnNext(response->{
-            metadata.set(response.getMetadata());
+            var next=response.getMetadata();
+            // Preserve the final usage chunk if a trailing empty event has no counters.
+            if(metadata.get()==null || next.getUsage()!=null && next.getUsage().getTotalTokens()>0)metadata.set(next);
             if(response.getResult()==null)return;
             var output=response.getResult().getOutput();
             if(output.getText()!=null){text.append(output.getText());sink.accept(output.getText());}

@@ -71,7 +71,7 @@ public final class CatalogResponses {
                                         String sourceVersion,
                                         String vectorSpace,
                                         int total,
-                                        List<ProductResponse> items) {
+                                        List<ProductResponse> items, String mode, List<String> warnings) {
     }
 
     @Schema(description = "Состояние задания импорта каталога")

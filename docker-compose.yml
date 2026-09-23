@@ -107,6 +107,14 @@ services:
       CATALOG_SEED_LOCATION: file:/app/data/sample_catalog/products.json
       CATALOG_RETAINED_VERSIONS: ${CATALOG_RETAINED_VERSIONS:-3}
       CATALOG_IMPORT_QUEUE_CAPACITY: ${CATALOG_IMPORT_QUEUE_CAPACITY:-8}
+      ATTACHMENT_WORKER_ENABLED: ${ATTACHMENT_WORKER_ENABLED:-true}
+      ATTACHMENT_OCR_ENABLED: ${ATTACHMENT_OCR_ENABLED:-false}
+      ATTACHMENT_OCR_EXECUTABLE: ${ATTACHMENT_OCR_EXECUTABLE:-tesseract}
+      ATTACHMENT_OCR_LANGUAGES: ${ATTACHMENT_OCR_LANGUAGES:-eng+rus}
+      ATTACHMENT_VISION_ENABLED: ${ATTACHMENT_VISION_ENABLED:-false}
+      KNOWLEDGE_SEED_ENABLED: ${KNOWLEDGE_SEED_ENABLED:-true}
+      KNOWLEDGE_SEED_LOCATION: file:/app/data/purchase_terms/terms.json
+      KNOWLEDGE_WORKER_ENABLED: ${KNOWLEDGE_WORKER_ENABLED:-true}
     volumes:
       # Синтетический каталог не копируется в образ: build context — ./backend.
       # Монтируем только на чтение, чтобы seed видел тот же файл, что и валидатор.

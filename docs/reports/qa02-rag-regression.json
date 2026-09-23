@@ -1,0 +1,93 @@
+{
+  "mode": "real data port, lexical HTTP regression after normalization",
+  "note": "Previously observed questions are regression cases now, not a fresh held-out quality estimate. Original live agent failure report retained.",
+  "passed": 7,
+  "total": 7,
+  "cases": [
+    {
+      "id": "terms-1",
+      "query": "Как оплатить заказ?",
+      "answerability": "ANSWERABLE",
+      "sourceKeys": [
+        "payment",
+        "delivery"
+      ],
+      "expectedSourceIds": [
+        "payment"
+      ],
+      "pass": true
+    },
+    {
+      "id": "terms-2",
+      "query": "Нужна ли предоплата?",
+      "answerability": "ANSWERABLE",
+      "sourceKeys": [
+        "payment"
+      ],
+      "expectedSourceIds": [
+        "payment"
+      ],
+      "pass": true
+    },
+    {
+      "id": "terms-3",
+      "query": "Сколько занимает доставка по Алматы?",
+      "answerability": "ANSWERABLE",
+      "sourceKeys": [
+        "delivery"
+      ],
+      "expectedSourceIds": [
+        "delivery"
+      ],
+      "pass": true
+    },
+    {
+      "id": "terms-4",
+      "query": "Есть самовывоз?",
+      "answerability": "ANSWERABLE",
+      "sourceKeys": [
+        "delivery"
+      ],
+      "expectedSourceIds": [
+        "delivery"
+      ],
+      "pass": true
+    },
+    {
+      "id": "terms-5",
+      "query": "Минимальная партия кабеля?",
+      "answerability": "ANSWERABLE",
+      "sourceKeys": [
+        "minimum"
+      ],
+      "expectedSourceIds": [
+        "minimum"
+      ],
+      "pass": true
+    },
+    {
+      "id": "terms-6",
+      "query": "Какой шаг количества для кабеля?",
+      "answerability": "ANSWERABLE",
+      "sourceKeys": [
+        "minimum"
+      ],
+      "expectedSourceIds": [
+        "minimum"
+      ],
+      "pass": true
+    },
+    {
+      "id": "terms-7",
+      "query": "Как вернуть товар?",
+      "answerability": "ANSWERABLE",
+      "sourceKeys": [
+        "returns"
+      ],
+      "expectedSourceIds": [
+        "returns"
+      ],
+      "pass": true
+    }
+  ]
+}
