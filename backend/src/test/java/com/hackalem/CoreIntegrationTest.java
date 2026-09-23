@@ -45,7 +45,7 @@ class CoreIntegrationTest {
     @Autowired AgentTools tools;@Autowired AgentWorker worker;@Autowired EventJournal events;@Autowired Limits limits;
     @Autowired JdbcTemplate db;@Autowired StringRedisTemplate cache;@Autowired MockMvc mvc;@Autowired Json json;
     @MockitoSpyBean SampleCartAdapter adapter;
-    @MockitoSpyBean KnowledgePort knowledge;
+    @Autowired org.springframework.context.ApplicationContext application;
     TrustedScope a,b;SessionToken tokenA,tokenB;
     @BeforeEach void reset(){
         db.execute("TRUNCATE visitor_sessions CASCADE");
@@ -203,10 +203,14 @@ class CoreIntegrationTest {
         assertThat(carts.cart(a).lines()).isEmpty();
     }
     @Test void repeatedKnowledgeCallCannotReplayARevokedSource(){
+        var knowledge=mock(KnowledgePort.class);
+        when(knowledge.retrieve(anyString(),any(),anyInt())).thenReturn(List.of(new SourceChunk(new SourceRef("private","1","Private",null,null,null),"Allowed at first"))).thenThrow(ApiException.missing());
+        var provider=new org.springframework.beans.factory.support.StaticListableBeanFactory(Map.of("knowledge",knowledge)).getBeanProvider(KnowledgePort.class);
+        var checkedTools=new AgentTools(application.getBeanProvider(CatalogPort.class),application.getBeanProvider(StockPort.class),
+                application.getBeanProvider(AnalogsPort.class),provider,application.getBeanProvider(AttachmentPort.class),chat,carts,json,application.getBean(com.fasterxml.jackson.databind.ObjectMapper.class));
         var claim=claim(conversation());var call=new LlmGateway.ToolCall("knowledge-replay","search_purchase_terms","{\"query\":\"доставка\"}");
-        assertThat(tools.execute(claim,call)).isNotBlank();
-        doThrow(ApiException.missing()).when(knowledge).retrieve(anyString(),any(),anyInt());
-        assertThatThrownBy(()->tools.execute(claim,call)).isInstanceOf(ApiException.class);
+        assertThat(checkedTools.execute(claim,call)).contains("Allowed at first");
+        assertThatThrownBy(()->checkedTools.execute(claim,call)).isInstanceOf(ApiException.class);
     }
     @Test void agentUsesTypedProductsAndFinishesOffline()throws Exception{
         var claim=claim(conversation());worker.execute(claim);assertThat(chat.run(a,claim.id()).status()).isEqualTo("completed");
