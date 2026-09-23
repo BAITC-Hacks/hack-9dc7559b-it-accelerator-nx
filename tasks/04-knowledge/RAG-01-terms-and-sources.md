@@ -1,7 +1,7 @@
 ---
 id: RAG-01
 owner: D2
-status: todo
+status: in_progress
 wave: 2
 size: L
 depends_on: ["CAT-01"]
@@ -62,3 +62,13 @@ backend/…/domain/documents/; ai/rag/; web/sources/; db/migration/; data/purcha
 **Передать:** D1: search_purchase_terms и sources; D3: versioned citation UI; OPS-02: KB seed+ready.
 
 **Evidence после выполнения:** заполнить commit/PR, команды, ссылки на отчёты и фактический результат; до выполнения статус остаётся todo.
+
+
+## Evidence D2 (2026-09-23)
+
+Реализованы versioned ingestion/lease-CAS, shared/private ACL, immutable source
+route, D1 KnowledgePort, bounded lexical retrieval и opt-in versioned embeddings.
+Локальные PostgreSQL/JWT checks: `./gradlew test --tests 'com.hackalem.knowledge.*' --no-daemon`
+(12 tests). Полный `./gradlew build --no-daemon`: PASS, 81 tests/0 failures. Описание API, настройки и ограничения: [handoff](../../docs/knowledge/rag-handoff.md).
+Статус остаётся in_progress до объединённой V5/SDK/QA-02 проверки; реальная LLM
+groundedness и deployed E2E не утверждаются на основании offline тестов.
