@@ -137,8 +137,9 @@ export default function ChatPage({ embed = false, onOpenCart, onRequestClose, pa
           <aside id="selection-context" className={`selection-context ${contextOpen ? 'context-open' : ''}`} aria-label="Контекст подбора"
             onKeyDown={(event) => { if (event.key === 'Escape') setContextOpen(false); }}>
             <button className="icon-button close-context" onClick={() => setContextOpen(false)} aria-label="Закрыть параметры"><X size={18} /></button>
-            <ContextPanel fields={chat?.context ?? []} />
-            {chat && view.mode === 'live' && <DialogueEditor key={chat.key} conversation={chat.key} />}
+            {chat && view.mode === 'live'
+              ? <DialogueEditor key={chat.key} conversation={chat.key} />
+              : <ContextPanel fields={chat?.context ?? []} />}
           </aside>
         </div>
       </main>

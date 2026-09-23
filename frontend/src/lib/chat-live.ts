@@ -6,6 +6,7 @@ import { queryClient } from './query';
 import { streamEvents } from './stream';
 import { apiError } from './api-errors';
 import { isAxiosError } from 'axios';
+import { dialogueContext, publishDialogue, subscribeDialogue } from './dialogue-state';
 
 const terminal = (status?: string) => ['completed', 'cancelled', 'failed'].includes(status ?? '');
 const phase = (status?: string): ReplyPhase => terminal(status) ? status as ReplyPhase : 'streaming';
@@ -54,13 +55,24 @@ export function createLiveChatDriver(): ChatDriver {
   }
   async function loadState(id: string) {
     const data = await query(['dialogue', id], async (requestSignal) => (await getDialogue({ path: { id }, signal: requestSignal, throwOnError: true })).data);
-    patch(id, (chat) => ({ ...chat, dialogue: data, context: [
-      ...(typeof data.category === 'string' ? [{ label: 'Категория', value: data.category }] : []),
-      ...Object.entries(data.hardConstraints ?? {}).map(([label, value]) => ({ label, value })),
-      ...(data.selectedArticles?.length ? [{ label: 'Выбрано', value: data.selectedArticles.join(', ') }] : []),
-      ...(typeof data.attachmentId === 'string' ? [{ label: 'Спецификация', value: data.attachmentId }] : []),
-    ] }));
+    if (!signal.aborted) publishDialogue(id, data);
   }
+  const unsubscribeDialogue = subscribeDialogue((id, data) => {
+    patch(id, chat => ({ ...chat, dialogue: data, context: dialogueContext(data) }));
+  });
+  async function restoreRunEvents(id: string, runId: string) {
+    // Read the saved journal only. Do not submit a new turn or replay commerce side effects.
+    const events = streamEvents(options => streamRun({ ...options, path: { id: runId } }), {
+      session: auth, signal, isTerminal: event => event.payload?.kind === 'terminal',
+    });
+    for await (const event of events) {
+      if (event.runId !== runId || event.schemaVersion !== '1') continue;
+      if (!['delta', 'status', 'terminal'].includes(event.payload?.kind ?? '')) {
+        patch(id, chat => applyLiveEvent(chat, event));
+      }
+    }
+  }
+
   function snapshot(id: string, run: RunSnapshot) {
     cursors.set(run.id!, { epoch: run.epoch ?? '0', sequence: run.sequence ?? '0' });
     patch(id, (chat) => applyLiveEvent(chat, { runId: run.id, payload: { kind: 'terminal', snapshot: run } }));
@@ -106,6 +118,15 @@ export function createLiveChatDriver(): ChatDriver {
       messages.push(...(page.items ?? [])); cursor = typeof page.nextCursor === 'string' ? page.nextCursor : undefined;
     } while (cursor && !signal.aborted);
     if (signal.aborted) return;
+    const saved = stored(`hackalem.pending.${id}`);
+    if (saved) {
+      try {
+        const value = JSON.parse(saved) as { key?: unknown; body?: TurnRequest; runId?: string };
+        if (typeof value.key === 'string' && typeof value.body?.text === 'string') {
+          pending.set(id, { key: value.key, body: value.body, runId: value.runId });
+        }
+      } catch { store(`hackalem.pending.${id}`, null); }
+    }
     const last = messages.at(-1);
     patch(id, (chat) => ({ ...chat, messages: messages.map(messageView), title: messages.find((item) => item.role === 'user')?.text?.slice(0, 48) || 'Новый диалог', visibleCount: 30, reply: null }));
     await loadState(id);
@@ -115,16 +136,11 @@ export function createLiveChatDriver(): ChatDriver {
       patch(id, (chat) => ({ ...chat, messages: last.role === 'assistant' ? chat.messages : [...chat.messages, { key: assistant, author: 'assistant', text: run.text ?? '', createdAt: run.createdAt ?? chat.updatedAt }], reply: { key: run.id!, messageKey: assistant, submissionKey: '', prompt: '', phase: phase(run.status), generation: 0, lastChunk: 0, recoveryCount: 0, faultShown: false, notice: null, retryAt: null } }));
       snapshot(id, run);
       if (!terminal(run.status)) void listen(id, run.id!);
+      else runTask(() => restoreRunEvents(id, run.id!));
     }
-    const saved = stored(`hackalem.pending.${id}`);
-    if (saved && (!chatFor(id)?.reply || ['completed', 'failed', 'cancelled'].includes(chatFor(id)?.reply?.phase ?? ''))) {
-      try {
-        const value = JSON.parse(saved) as { key?: unknown; body?: TurnRequest };
-        if (typeof value.key === 'string' && typeof value.body?.text === 'string') {
-          pending.set(id, { key: value.key, body: value.body });
-          patch(id, (chat) => ({ ...chat, draft: value.body!.text ?? '', reply: { key: value.key as string, messageKey: '', submissionKey: value.key as string, prompt: value.body!.text ?? '', phase: 'interrupted', generation: 0, lastChunk: 0, recoveryCount: 0, faultShown: false, notice: 'Статус отправки неизвестен. Продолжите с тем же ключом запроса.', retryAt: null } }));
-        }
-      } catch { store(`hackalem.pending.${id}`, null); }
+    const uncertain = pending.get(id);
+    if (uncertain && (!chatFor(id)?.reply || terminal(chatFor(id)?.reply?.phase))) {
+      patch(id, chat => ({ ...chat, draft: uncertain.body.text ?? '', reply: { key: uncertain.key, messageKey: '', submissionKey: uncertain.key, prompt: uncertain.body.text ?? '', phase: 'interrupted', generation: 0, lastChunk: 0, recoveryCount: 0, faultShown: false, notice: 'Статус отправки неизвестен. Продолжите с тем же ключом запроса.', retryAt: null } }));
     }
     announce(id);
   }
@@ -183,7 +199,7 @@ export function createLiveChatDriver(): ChatDriver {
     loadEarlier(id) { patch(id, (chat) => ({ ...chat, visibleCount: chat.visibleCount + 30 })); },
     setScenario: noOp,
     clearPrivateData() { streams.forEach((controller) => controller.abort()); pending.clear(); emit({ ...view, conversations: [], selectedKey: null }); },
-    dispose() { lifecycle.abort(); streams.forEach((controller) => controller.abort()); queryClient.removeQueries({ queryKey: queryScope }); listeners.clear(); },
+    dispose() { unsubscribeDialogue(); lifecycle.abort(); streams.forEach((controller) => controller.abort()); queryClient.removeQueries({ queryKey: queryScope }); listeners.clear(); },
   };
   runTask(start);
   return driver;

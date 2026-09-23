@@ -227,6 +227,31 @@ class CoreIntegrationTest {
         var state=chat.state(a,c);var update=new UpdateDialogue(state.version(),"breakers",new Money("2000","KZT"),Map.of("current","16A"),new Quantity("20","piece","1"),first.id(),List.of(0),null,null,null);
         var saved=chat.updateState(a,c,update);assertThat(saved.selectedArticles()).containsExactly(original);assertThat(saved.lastResultSetId()).isEqualTo(first.id());
         assertThatThrownBy(()->chat.updateState(a,c,update)).hasMessage("stale_dialogue");assertThat(chat.state(a,c)).isEqualTo(saved);
+        var replaced=chat.updateState(a,c,new UpdateDialogue(saved.version(),null,null,null,null,second.id(),null,null,null,null));
+        assertThat(replaced.selectedArticles()).isEmpty();assertThat(replaced.lastResultSetId()).isEqualTo(second.id());
+    }
+    @Test void dialogueParametersCanBeClearedExplicitlyThroughHttpWithoutLosingSavedSelection()throws Exception{
+        UUID c=conversation();var claim=claim(c);var results=result(claim);chat.finish(claim,"completed",null);
+        var saved=chat.updateState(a,c,new UpdateDialogue(chat.state(a,c).version(),"breakers",new Money("0","KZT"),Map.of("currentA","16"),new Quantity("2.5","m","0.5"),results.id(),List.of(0),null,null,null));
+        mvc.perform(patch("/api/conversations/"+c+"/state").header("Authorization","Bearer "+tokenA.accessToken())
+                .contentType("application/json").content(json.write(Map.of("expectedVersion",saved.version(),"clearFields",List.of("category","budget","quantity","hardConstraints")))))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.category").doesNotExist()).andExpect(jsonPath("$.budget").doesNotExist())
+                .andExpect(jsonPath("$.quantity").doesNotExist()).andExpect(jsonPath("$.hardConstraints").isEmpty());
+        var cleared=chat.state(a,c);assertThat(cleared.lastResultSetId()).isEqualTo(saved.lastResultSetId());assertThat(cleared.selectedArticles()).isEqualTo(saved.selectedArticles());
+        assertThatThrownBy(()->chat.updateState(a,c,new UpdateDialogue(saved.version(),null,null,null,null,null,null,null,null,null,List.of("budget")))).hasMessage("stale_dialogue");
+        assertThatThrownBy(()->chat.updateState(b,c,new UpdateDialogue(cleared.version(),null,null,null,null,null,null,null,null,null,List.of("budget")))).hasMessage("resource_not_found");
+    }
+    @Test void invalidDialogueParametersNeverAdvanceVersion(){
+        UUID c=conversation();var original=chat.state(a,c);String version=original.version();
+        for(String amount:List.of("-1","1e3","0.1234567","1000000000000000000"))
+            assertThatThrownBy(()->chat.updateState(a,c,new UpdateDialogue(version,null,new Money(amount,"KZT"),null,null,null,null,null,null,null))).hasMessage("invalid_price_range");
+        for(Quantity quantity:List.of(new Quantity("0","pcs","1"),new Quantity("1","pcs","0"),new Quantity("1e3","pcs","1")))
+            assertThatThrownBy(()->chat.updateState(a,c,new UpdateDialogue(version,null,null,null,quantity,null,null,null,null,null))).hasMessage("invalid_quantity");
+        assertThatThrownBy(()->chat.updateState(a,c,new UpdateDialogue(version,null,null,null,new Quantity("1.5","pcs","1"),null,null,null,null,null))).hasMessage("invalid_quantity_step");
+        assertThatThrownBy(()->chat.updateState(a,c,new UpdateDialogue(version,null,new Money("1","kzt"),null,null,null,null,null,null,null))).hasMessage("invalid_currency");
+        assertThatThrownBy(()->chat.updateState(a,c,new UpdateDialogue(version,null,null,null,null,null,null,null,null,null,List.of("attachmentId")))).hasMessage("invalid_dialogue_patch");
+        assertThatThrownBy(()->chat.updateState(a,c,new UpdateDialogue(version,"breakers",null,null,null,null,null,null,null,null,List.of("category")))).hasMessage("invalid_dialogue_patch");
+        assertThat(chat.state(a,c)).isEqualTo(original);
     }
     @Test void shortQuantityReplySupersedesOldProposalWithoutConsent(){
         var p=proposal("2");UUID c=UUID.fromString(p.conversationId());

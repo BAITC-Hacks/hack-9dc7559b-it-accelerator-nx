@@ -65,7 +65,9 @@ class CatalogServicesIntegrationTest {
         UUID conversation=UUID.fromString(chat.create(owner).id());
         var selected=analogs.find("000001",new BigDecimal("20"),"pcs",query("analogs"),owner).options().stream().filter(o->o.kind().equals("PARTIAL_REPLACEMENT")).findFirst().orElseThrow();
         var state=chat.updateState(owner,conversation,new UpdateDialogue(chat.state(owner,conversation).version(),null,null,null,null,null,null,selected.id(),null,null));
-        var proposal=carts.propose(owner,new ProposalRequest(conversation,state.version(),state.lastResultSetId(),selected.lines()),"browser-analog");
+        var patched=chat.updateState(owner,conversation,new UpdateDialogue(state.version(),null,new Money("2000","KZT"),null,null,null,null,null,null,null));
+        assertThat(patched.fulfillmentOptionId()).isEqualTo(selected.id());assertThat(patched.lastResultSetId()).isEqualTo(state.lastResultSetId());
+        var proposal=carts.propose(owner,new ProposalRequest(conversation,patched.version(),patched.lastResultSetId(),selected.lines()),"browser-analog");
         assertThat(proposal.lines()).hasSize(2);assertThat(carts.cart(owner).lines()).isEmpty();
         var outcome=carts.confirm(owner,UUID.fromString(proposal.id()),"browser-confirm",new ConfirmRequest(proposal.revision(),proposal.digest(),ConsentOrigin.button,null));
         assertThat(outcome.status()).isEqualTo("succeeded");assertThat(carts.cart(owner).lines()).hasSize(2);
@@ -80,7 +82,14 @@ class CatalogServicesIntegrationTest {
         var state=chat.updateState(owner,conversation,new UpdateDialogue(chat.state(owner,conversation).version(),null,null,null,null,null,null,null,accepted.attachmentId(),reviewed.version()));
         var proposal=carts.propose(owner,new ProposalRequest(conversation,state.version(),state.lastResultSetId(),List.of(new Selection("000001","pcs","ALA","1"))),"browser-file");
         assertThat(proposal.status()).isEqualTo("pending");assertThat(carts.cart(owner).lines()).isEmpty();
+        var patched=chat.updateState(owner,conversation,new UpdateDialogue(chat.state(owner,conversation).version(),null,new Money("2000","KZT"),null,null,null,null,null,null,null));
+        assertThat(patched.attachmentId()).isEqualTo(accepted.attachmentId());assertThat(patched.attachmentVersion()).isEqualTo(reviewed.version());
+        assertThat(patched.lastResultSetId()).isEqualTo(state.lastResultSetId());assertThat(patched.activeProposalId()).isNull();
+        assertThat(carts.get(owner,UUID.fromString(proposal.id())).status()).isEqualTo("superseded");assertThat(carts.cart(owner).lines()).isEmpty();
         assertThatThrownBy(()->chat.updateState(owner,conversation,new UpdateDialogue(chat.state(owner,conversation).version(),null,null,null,null,null,null,null,accepted.attachmentId(),snapshot.version()))).hasMessage("stale_attachment");
+        var search=adapter.searchSnapshot(query("000003"),owner);
+        var replaced=chat.updateState(owner,conversation,new UpdateDialogue(patched.version(),null,null,null,null,search.resultSet().id(),null,null,null,null));
+        assertThat(replaced.attachmentId()).isNull();assertThat(replaced.attachmentVersion()).isNull();assertThat(replaced.selectedArticles()).isEmpty();
     }
     @Test void exactAndMissingSkuNeverCallEmbedding(){
         assertThat(search.search(query("000001")).products()).extracting(CatalogProduct::article).containsExactly("000001");
