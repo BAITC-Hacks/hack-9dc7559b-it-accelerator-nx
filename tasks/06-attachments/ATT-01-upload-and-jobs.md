@@ -5,6 +5,7 @@ status: todo
 wave: 1
 size: M
 depends_on: ["FOUND-01"]
+acceptance_depends_on: ["AUTH-01"]
 ---
 
 # ATT-01 — Приватные вложения, storage и durable processing
@@ -12,6 +13,8 @@ depends_on: ["FOUND-01"]
 **Исполнитель:** D2. **Этап:** G1. **Объём:** M. Все задачи обязательны для полного scope; отметка todo означает, что реализация не выполнена.
 **Зависимости для старта:** [FOUND-01](../00-foundation/FOUND-01-contracts-and-ports.md)
 **Покрытие:** FR-6; AC-11/13/14.
+
+**Дополнительно для итоговой приёмки:** подключить [AUTH-01](../01-identity/AUTH-01-session-and-ownership.md) и проверить приватность вложений HTTP-тестами двух пользователей. Реализацию на TrustedScope fakes можно начать после FOUND-01; они не закрывают проверку ownership.
 
 ## Goal
 

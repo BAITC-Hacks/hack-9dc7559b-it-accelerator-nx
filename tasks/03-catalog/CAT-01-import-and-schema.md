@@ -5,6 +5,7 @@ status: todo
 wave: 1
 size: L
 depends_on: ["FOUND-01", "DATA-01"]
+acceptance_depends_on: ["AUTH-01"]
 ---
 
 # CAT-01 — Развитие каталога V2, безопасный импорт и индексация
@@ -12,6 +13,8 @@ depends_on: ["FOUND-01", "DATA-01"]
 **Исполнитель:** D2. **Этап:** G1. **Объём:** L. Все задачи обязательны для полного scope; отметка todo означает, что реализация не выполнена.
 **Зависимости для старта:** [FOUND-01](../00-foundation/FOUND-01-contracts-and-ports.md), [DATA-01](../00-foundation/DATA-01-sample-data-contract.md)
 **Покрытие:** FR-1; AC-1/8/17.
+
+**Дополнительно для итоговой приёмки:** подключить [AUTH-01](../01-identity/AUTH-01-session-and-ownership.md) и проверить HTTP-доступ к импорту с разрешённой и запрещённой identity. Реализацию на TrustedScope fakes можно начать после FOUND-01; они не закрывают проверку admin-only доступа.
 
 ## Goal
 

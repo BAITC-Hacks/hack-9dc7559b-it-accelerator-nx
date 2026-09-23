@@ -5,6 +5,7 @@ status: todo
 wave: 4
 size: M
 depends_on: ["CAT-04", "RAG-01", "ATT-04"]
+acceptance_depends_on: ["CHAT-04", "OPS-02"]
 ---
 
 # QA-02 — Качество поиска, аналогов, RAG и распознавания
@@ -12,6 +13,8 @@ depends_on: ["CAT-04", "RAG-01", "ATT-04"]
 **Исполнитель:** D2. **Этап:** G4. **Объём:** M. Все задачи обязательны для полного scope; отметка todo означает, что реализация не выполнена.
 **Зависимости для старта:** [CAT-04](../03-catalog/CAT-04-analogs-and-fulfillment.md), [RAG-01](../04-knowledge/RAG-01-terms-and-sources.md), [ATT-04](../06-attachments/ATT-04-matching-and-review.md)
 **Покрытие:** AC-15; FR-1/2/3/6/7.
+
+**Дополнительно для итоговой приёмки:** [CHAT-04](../02-chat/CHAT-04-dialogue-context.md), включая его зависимость CHAT-02, и [OPS-02](../08-platform/OPS-02-complete-product-compose.md) должны быть интегрированы в проверяемый checkout. Retrieval/extraction наборы готовятся независимо; grounding, follow-up и число model/tool rounds оцениваются на настоящем agent pipeline через воспроизводимый containerized runner. См. [схему зависимостей](../DEPENDENCIES.md).
 
 ## Goal
 
@@ -52,6 +55,7 @@ data/evaluation/; tests/evaluation/; scripts/evaluate.*; docs/reports/ quality r
 - [ ] Все обязательные file families имеют quality evidence, vision отдельно от scripted fake.
 - [ ] Stock/prices/cart-related counts100% совпадают с authoritative fixtures.
 - [ ] Report фиксирует model/data versions и может быть воспроизведён через containerized runner.
+- [ ] Итоговый отчёт использует интегрированный CHAT-02/CHAT-04 и runner OPS-02; изолированная проверка retrieval не закрывает качество ответа агента.
 - [ ] Проверки выполнены на своей ветке; PR содержит результат проверок и известные ограничения.
 
 ## Проверка и передача

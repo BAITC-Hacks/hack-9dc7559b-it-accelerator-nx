@@ -25,8 +25,8 @@ depends_on: ["QA-01", "QA-02", "PERF-02", "OPS-02"]
 
 ## План реализации
 
-1. Собрать короткие зелёные PR в integration branch, resolve conflicts generated code только регенерацией; обновить snapshot из springdoc.
-2. Запустить backend build, frontend build/lint и необходимые integration/browser/eval/load checks из итогового checkout.
+1. Зафиксировать поставку из общего checkout, уже интегрированного в OPS-02 и проверенного в QA-01/QA-02/PERF-02. Короткие зелёные PR объединяются до этих проверок; generated conflicts разрешаются регенерацией, snapshot получается из springdoc.
+2. Сверить commit, schema, конфигурацию и образы с отчётами. При новых изменениях выполнить необходимые build/integration/browser/eval/load проверки затронутого поведения на итоговом checkout; неизменённые пройденные проверки без причины не повторять.
 3. Прогнать ./scripts/test-compose.sh на чистом isolated project, restart/upgrade и --live-ai с sample cart; зафиксировать реальные urls/readiness.
 4. Сопоставить AC1…17 с evidence; отдельные статусы functional build, liveAI/quality, partner compatibility и high-load.
 5. README содержит key/env setup, compose start/stop/data retention, host-demo/widget/cart links, fixture provenance, test commands и known limitations.
