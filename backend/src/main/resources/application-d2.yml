@@ -1,0 +1,21 @@
+# Real D2 persistence/parsers/data ports with an explicit scripted LLM baseline.
+# This profile is never evidence of live LLM/embedding/vision quality.
+spring:
+  ai:
+    openai:
+      api-key: offline-d2-no-provider-calls
+    model:
+      chat: none
+      embedding: none
+app:
+  visitor-enabled: true
+  catalog:
+    embedding:
+      mode: fake
+    seed:
+      enabled: true
+  knowledge:
+    seed-enabled: true
+  attachments:
+    vision:
+      enabled: false

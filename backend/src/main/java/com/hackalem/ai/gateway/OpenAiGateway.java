@@ -14,7 +14,7 @@ import java.util.function.Consumer;
 import java.util.concurrent.atomic.AtomicReference;
 
 /** Spring AI 1.0.0 manual tool continuation; automatic execution/retries are disabled. */
-@Component @Profile("!contract & !test")
+@Component @Profile("!contract & !test & !d2")
 public class OpenAiGateway implements LlmGateway {
     private final ChatModel model;
     public OpenAiGateway(ChatModel model){this.model=model;}

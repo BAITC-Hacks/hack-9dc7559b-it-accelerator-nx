@@ -28,8 +28,8 @@ class SchemaLineageConfigTest {
         before.migrate();
         var history=db.queryForMap("SELECT description, checksum FROM flyway_schema_history WHERE version='3'");
         assertThat(SchemaLineageConfig.location(source)).isEqualTo("classpath:db/baseline-"+lineage);
-        var after=Flyway.configure().dataSource(source).locations("classpath:db/migration",SchemaLineageConfig.location(source)).target("4").load();
-        assertThat(after.migrate().migrationsExecuted).isEqualTo(1);
+        var after=Flyway.configure().dataSource(source).locations("classpath:db/migration",SchemaLineageConfig.location(source)).target("5").load();
+        assertThat(after.migrate().migrationsExecuted).isEqualTo(2);
         assertThat(after.migrate().migrationsExecuted).isZero();
         assertThat(db.queryForMap("SELECT description, checksum FROM flyway_schema_history WHERE version='3'")).isEqualTo(history);
         assertThat(db.queryForObject("SELECT article FROM products WHERE id=42",String.class)).isEqualTo("000042");

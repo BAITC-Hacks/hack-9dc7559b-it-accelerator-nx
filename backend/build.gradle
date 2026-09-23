@@ -58,6 +58,9 @@ dependencies {
 
     // ─── Spring AI (OpenAI + tool calling) ──────────────────────────────────
     implementation 'org.springframework.ai:spring-ai-starter-model-openai'
+    implementation 'org.apache.poi:poi-ooxml:5.4.1'
+    implementation 'org.apache.poi:poi-scratchpad:5.4.1'
+    implementation 'org.apache.pdfbox:pdfbox:3.0.5'
 
     // ─── JWT ────────────────────────────────────────────────────────────────
     implementation "io.jsonwebtoken:jjwt-api:${jjwtVersion}"

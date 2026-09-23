@@ -201,10 +201,14 @@ class CoreIntegrationTest {
         var claim=claim(conversation());for(String name:List.of("cart_add","confirm","sql","delete_all"))assertThatThrownBy(()->tools.execute(claim,new LlmGateway.ToolCall("x",name,"{}"))).hasMessage("tool_not_allowed");
         assertThat(carts.cart(a).lines()).isEmpty();
     }
-    @Test void agentUsesTypedProductsAndFinishesOffline(){
+    @Test void agentUsesTypedProductsAndFinishesOffline()throws Exception{
         var claim=claim(conversation());worker.execute(claim);assertThat(chat.run(a,claim.id()).status()).isEqualTo("completed");
         assertThat(events.read(claim.id(),0).stream().map(ChatEvent::type)).contains("products.result","message.delta","run.completed");
         assertThat(carts.cart(a).lines()).isEmpty();
+        mvc.perform(get("/api/runs/"+claim.id()+"/usage").header("Authorization","Bearer "+tokenA.accessToken()))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].model").value("contract-scripted")).andExpect(jsonPath("$[0].inputTokens").value(100));
+        mvc.perform(get("/api/runs/"+claim.id()+"/usage").header("Authorization","Bearer "+tokenB.accessToken())).andExpect(status().isNotFound());
     }
     @Test void dialogueVersionsAndOriginalResultOrderSurviveNewRanking(){
         UUID c=conversation();var claim=claim(c);var first=result(claim);var original=first.products().getFirst().article();
@@ -225,14 +229,14 @@ class CoreIntegrationTest {
         UUID run=UUID.randomUUID();limits.reserve(run,a.principalId(),100,60);limits.reserve(run,a.principalId(),100,60);
         assertThat(cache.opsForZSet().size("ekt:active")).isEqualTo(1);limits.release(run,50);assertThat(cache.opsForZSet().size("ekt:active")).isZero();
     }
-    @Test void cleanSchemaAndUpgradeRegistryAreApplied(){assertThat(db.queryForList("SELECT version FROM flyway_schema_history WHERE success ORDER BY installed_rank",String.class)).contains("1","2","3","4");}
+    @Test void cleanSchemaAndUpgradeRegistryAreApplied(){assertThat(db.queryForList("SELECT version FROM flyway_schema_history WHERE success ORDER BY installed_rank",String.class)).contains("1","2","3","4","5");}
     @Test void existingV2DatabaseUpgradesWithoutChangingOldMigrations(){
         db.execute("CREATE DATABASE upgrade_d1");
         String url=postgres.getJdbcUrl().replace("/"+postgres.getDatabaseName(),"/upgrade_d1");
         var flyway=org.flywaydb.core.Flyway.configure().dataSource(url,postgres.getUsername(),postgres.getPassword()).target("2").load();
         assertThat(flyway.migrate().migrationsExecuted).isEqualTo(2);
-        var upgrade=org.flywaydb.core.Flyway.configure().dataSource(url,postgres.getUsername(),postgres.getPassword()).locations("classpath:db/migration","classpath:db/baseline-identity").target("4").load();
-        assertThat(upgrade.migrate().migrationsExecuted).isEqualTo(2);assertThat(upgrade.info().current().getVersion().getVersion()).isEqualTo("4");
+        var upgrade=org.flywaydb.core.Flyway.configure().dataSource(url,postgres.getUsername(),postgres.getPassword()).locations("classpath:db/migration","classpath:db/baseline-identity").target("5").load();
+        assertThat(upgrade.migrate().migrationsExecuted).isEqualTo(3);assertThat(upgrade.info().current().getVersion().getVersion()).isEqualTo("5");
     }
     @Test void eventOpenApiHasDiscriminatorWithoutCircularSubtypeInheritance()throws Exception{
         var response=mvc.perform(get("/v3/api-docs")).andExpect(status().isOk()).andReturn();
