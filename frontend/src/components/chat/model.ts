@@ -1,3 +1,4 @@
+import type { ChatEvent, DialogueState } from '../../client';
 /** Local presentation state. These are NOT HTTP DTOs or a ChatEvent wire schema.
  * A future backend driver maps generated DTOs into this view model.
  */
@@ -40,13 +41,15 @@ export interface ConversationView {
   reply: ReplyView | null;
   visibleCount: number;
   loadingEarlier: boolean;
+  events?: ChatEvent[];
+  dialogue?: DialogueState;
 }
 
 export type DemoScenario = 'normal' | 'disconnect' | 'duplicate' | 'expired'
   | 'unauthorized' | 'busy' | 'send-timeout';
 
 export interface WorkspaceView {
-  mode: 'unavailable' | 'loading' | 'demo';
+  mode: 'unavailable' | 'loading' | 'demo' | 'live';
   conversations: ConversationView[];
   selectedKey: string | null;
   scenario: DemoScenario;
@@ -58,7 +61,7 @@ export interface WorkspaceView {
 export interface ChatDriver {
   getSnapshot: () => WorkspaceView;
   subscribe: (listener: () => void) => () => void;
-  newConversation: () => void;
+  newConversation: (draft?: string) => void;
   selectConversation: (key: string) => void;
   setDraft: (key: string, text: string) => void;
   send: (key: string, text: string) => void;

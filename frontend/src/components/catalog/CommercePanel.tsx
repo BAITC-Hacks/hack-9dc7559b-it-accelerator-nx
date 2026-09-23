@@ -1,3 +1,4 @@
+import { LiveCatalogPanel } from './LiveCatalogPanel';
 import { Link } from 'react-router-dom';
 import { useCommerce } from '../../hooks/useCommerce';
 import { ProductCard } from './ProductCard';
@@ -12,6 +13,7 @@ const scenarios: { value: CommerceScenario; label: string }[] = [
 ];
 export function CommercePanel({ conversation }: { conversation: string }) {
   const { driver, view } = useCommerce();
+  if (view.mode === 'live') return <LiveCatalogPanel conversation={conversation} />;
   if (view.mode !== 'demo') return null;
   const selection = view.selections[conversation];
   const amount = selection?.quantity ?? '20';

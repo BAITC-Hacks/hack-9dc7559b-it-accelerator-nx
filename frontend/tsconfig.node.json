@@ -10,6 +10,8 @@
     "verbatimModuleSyntax": true,
     "moduleDetection": "force",
     "noEmit": true,
+    "types": ["vite/client", "node"],
+    "paths": { "@/*": ["./src/*"] },
     "strict": true
   },
   "include": ["vite.config.ts", "vitest.config.ts", "openapi-ts.config.ts", "tests"]

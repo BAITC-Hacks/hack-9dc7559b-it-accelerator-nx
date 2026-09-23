@@ -22,14 +22,16 @@ export function useChatWorkspace(onSessionExpired?: () => void) {
   const view = useSyncExternalStore(driver.subscribe, driver.getSnapshot, driver.getSnapshot);
 
   useEffect(() => {
-    if (!DEMO) return;
     let disposed = false;
     let active: ChatDriver | undefined;
     let unsubscribe = noop;
     // Only initialize UI state here. Send/create-run happens in a user handler.
-    void import('../mocks/chat-demo').then(({ createDemoChatDriver }) => {
+    const factory = DEMO
+      ? import('../mocks/chat-demo').then(({ createDemoChatDriver }) => () => createDemoChatDriver(() => sessionExpired.current?.()))
+      : import('../lib/chat-live').then(({ createLiveChatDriver }) => createLiveChatDriver);
+    void factory.then((createDriver) => {
       if (disposed) return;
-      active = createDemoChatDriver(() => sessionExpired.current?.());
+      active = createDriver();
       unsubscribe = auth.subscribe(() => active?.clearPrivateData());
       setDriver(active);
     }).catch(() => {

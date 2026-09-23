@@ -36,6 +36,12 @@ public class OpenApiConfig {
             // Flatten the generated subtype properties; retain the real wire discriminator.
             var variants=java.util.Map.of("StatusPayload","status","DeltaPayload","delta","ProductsPayload","products",
                 "ProposalPayload","proposal","TerminalPayload","terminal","SourcesPayload","sources","AlternativesPayload","alternatives","ReviewPayload","review");
+            var payload = api.getComponents().getSchemas().get("EventPayload");
+            if (payload != null) {
+                var discriminator = new io.swagger.v3.oas.models.media.Discriminator().propertyName("kind");
+                variants.forEach((name, kind) -> discriminator.mapping(kind, "#/components/schemas/" + name));
+                payload.setDiscriminator(discriminator);
+            }
             variants.forEach((name,kind)->{
                 var schema=api.getComponents().getSchemas().get(name);
                 if(schema==null)return;

@@ -189,7 +189,7 @@ export function createDemoCommerce(): CommerceDriver {
     },
     prepare,
     prepareReviewed: (conversation, source) => {
-      if (blocked() || !source.jobKey || !Number.isSafeInteger(source.version) || source.version < 1 || !source.lines.length || source.lines.length > 100) return null;
+      if (blocked() || !source.jobKey || !Number.isSafeInteger(Number(source.version)) || Number(source.version) < 1 || !source.lines.length || source.lines.length > 100) return null;
       const lines: LineView[] = [];
       for (const selection of source.lines) {
         const next = makeLines({ mode: 'single', productKey: selection.productKey, quantity: selection.quantity });

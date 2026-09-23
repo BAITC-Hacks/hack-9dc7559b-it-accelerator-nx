@@ -13,6 +13,9 @@ import { Composer } from '../components/chat/Composer';
 import { isReplyActive, needsRecovery, type DemoScenario } from '../components/chat/model';
 import { useVisualViewport } from '../widget/useVisualViewport';
 import '../components/chat/chat.css';
+import { FeatureNav } from '../components/FeatureNav';
+import { DialogueEditor } from '../components/chat/DialogueEditor';
+import { RunDetails } from '../components/chat/RunDetails';
 
 const scenarios: { value: DemoScenario; label: string }[] = [
   { value: 'normal', label: 'Обычный ответ' },
@@ -42,7 +45,7 @@ export default function ChatPage({ embed = false, onOpenCart, onRequestClose, pa
   const menuButton = useRef<HTMLButtonElement>(null);
   const drawer = useRef<HTMLDivElement>(null);
   const clearDialog = useRef<HTMLDialogElement>(null);
-  const enabled = view.mode === 'demo';
+  const enabled = view.mode === 'demo' || view.mode === 'live';
   const cartLabel = `Корзина${commerce.view.cart ? ` · ${commerce.view.cart.lines.length}` : ''}${commerce.view.proposals.some((item) => item.state === 'outcome_unknown') ? ' ?' : ''}`;
 
   useEffect(() => {
@@ -75,7 +78,8 @@ export default function ChatPage({ embed = false, onOpenCart, onRequestClose, pa
     onClose={mobile ? () => setDrawerOpen(false) : undefined} />;
 
   const choosePrompt = (text: string) => {
-    if (!chat || !enabled) return;
+    if (!enabled) return;
+    if (!chat) { driver.newConversation(text); return; }
     driver.setDraft(chat.key, text);
     document.getElementById('chat-message')?.focus();
   };
@@ -92,7 +96,7 @@ export default function ChatPage({ embed = false, onOpenCart, onRequestClose, pa
           <div className="chat-header-title"><button ref={menuButton} className="icon-button mobile-menu" onClick={() => setDrawerOpen(true)} aria-label="Открыть диалоги" aria-expanded={drawerOpen}><Menu size={21} /></button>
             <span className="header-muted">Онлайн-консультант</span><ChevronRight size={14} /><strong>Помощь с выбором</strong>
           </div>
-          <div className="chat-header-actions"><span className={`mode-badge ${enabled ? 'demo' : ''}`}><i />{enabled ? 'Локальное демо' : view.mode === 'loading' ? 'Подключение' : 'Скоро онлайн'}</span>
+          <div className="chat-header-actions"><span className={`mode-badge ${enabled ? 'demo' : ''}`}><i />{view.mode === 'live' ? 'Подключено' : view.mode === 'demo' ? 'Локальное демо' : view.mode === 'loading' ? 'Подключение' : 'Нет связи'}</span>
             {onOpenCart
               ? <button type="button" className="header-cart-link" onClick={onOpenCart}>{cartLabel}</button>
               : <Link className="header-cart-link" to="/cart">{cartLabel}</Link>}
@@ -100,24 +104,25 @@ export default function ChatPage({ embed = false, onOpenCart, onRequestClose, pa
             <button className="icon-button context-toggle" onClick={() => setContextOpen(!contextOpen)} aria-expanded={contextOpen} aria-controls="selection-context" aria-label="Параметры подбора"><SlidersHorizontal size={18} /></button>
           </div>
         </header>
+        {!embed && <FeatureNav />}
         {embed && parentTrusted === false && typeof window !== 'undefined' && window.parent !== window && (
           <div className="workspace-notice" role="status">Ожидаем подтверждение страницы-хоста. Сессию и корзину хост назначить не может.</div>
         )}
-        {enabled && <div className="demo-strip"><span>Демонстрация · ответы и история сохраняются только в этой вкладке</span>
+        {view.mode === 'demo' && <div className="demo-strip"><span>Демонстрация · ответы и история сохраняются только в этой вкладке</span>
           <label>Сценарий<select value={view.scenario} onChange={(event) => {
             const option = scenarios.find((item) => item.value === event.target.value);
             if (option) driver.setScenario(option.value);
           }}>{scenarios.map((option) => <option value={option.value} key={option.value}>{option.label}</option>)}</select></label>
         </div>}
-        {view.mode === 'unavailable' && <div className="availability-notice" role="status">Чат пока не подключён. Отправка сообщений станет доступна после подключения сервиса.</div>}
+        {view.mode === 'unavailable' && <div className="availability-notice" role="status">Не удалось подключиться к чату. Проверьте соединение и обновите страницу.</div>}
         {view.banner && <div className="workspace-notice" role="status">{view.banner}</div>}
         {!view.storageAvailable && <div className="workspace-notice" role="status">Браузер не разрешил сохранение. История доступна до обновления страницы.</div>}
         <div className="chat-body">
           <section className="conversation-area" aria-label="Чат с консультантом">
-            <MessageTimeline chat={chat} enabled={enabled} loading={view.mode === 'loading'} onChoose={choosePrompt}
+            <MessageTimeline chat={chat} enabled={enabled} demo={view.mode === 'demo'} loading={view.mode === 'loading'} onChoose={choosePrompt}
               renderMessageExtras={(message) => chat && message.author === 'assistant' && message.key === chat.reply?.messageKey
                 && (chat.reply.phase === 'completed' || commerce.view.proposals.some((item) => item.conversationKey === chat.key))
-                ? <CommercePanel conversation={chat.key} /> : null}
+                ? <><CommercePanel conversation={chat.key} />{view.mode === 'live' && <RunDetails chat={chat} />}</> : null}
               onLoadEarlier={() => chat && driver.loadEarlier(chat.key)} onResume={() => chat && driver.resume(chat.key)} onStop={() => chat && driver.stop(chat.key)} />
             <Composer draft={chat?.draft ?? ''} enabled={enabled && !!chat} active={isReplyActive(chat?.reply ?? null)} interrupted={needsRecovery(chat?.reply ?? null)}
               attachmentAction={<AttachmentPanel conversation={chat?.key ?? null} enabled={enabled} />}
@@ -133,11 +138,12 @@ export default function ChatPage({ embed = false, onOpenCart, onRequestClose, pa
             onKeyDown={(event) => { if (event.key === 'Escape') setContextOpen(false); }}>
             <button className="icon-button close-context" onClick={() => setContextOpen(false)} aria-label="Закрыть параметры"><X size={18} /></button>
             <ContextPanel fields={chat?.context ?? []} />
+            {chat && view.mode === 'live' && <DialogueEditor key={chat.key} conversation={chat.key} />}
           </aside>
         </div>
       </main>
       <dialog ref={clearDialog} className="clear-history-dialog" onCancel={() => setClearDialogOpen(false)} onClose={() => setClearDialogOpen(false)}>
-        <h2>Очистить локальное демо?</h2><p>Сообщения, файлы, проверки, предложения и учебная корзина этой вкладки будут удалены.</p>
+        <h2>{view.mode === 'live' ? 'Скрыть локальную историю?' : 'Очистить локальное демо?'}</h2><p>{view.mode === 'live' ? 'Серверные диалоги, файлы и корзина сохранятся. Обновите страницу, чтобы снова загрузить историю.' : 'Сообщения, файлы, проверки, предложения и учебная корзина этой вкладки будут удалены.'}</p>
         <div><button onClick={() => setClearDialogOpen(false)} autoFocus>Сохранить</button><button className="confirm-clear" onClick={() => { driver.clearPrivateData(); commerce.driver.clearPrivateData(); attachments.driver.clearPrivateData(); setClearDialogOpen(false); }}>Очистить</button></div>
       </dialog>
     </div>
