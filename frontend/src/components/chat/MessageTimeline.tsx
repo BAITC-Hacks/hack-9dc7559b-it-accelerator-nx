@@ -3,6 +3,7 @@ import { ArrowDown, LoaderCircle, Zap } from 'lucide-react';
 import type { ConversationView, MessageView } from './model';
 import { Welcome } from './Welcome';
 import { ReplyStatus } from './ReplyStatus';
+import { SafeMarkdown } from '../sources/SafeMarkdown';
 
 interface Props {
   chat: ConversationView | null;
@@ -76,7 +77,7 @@ export function MessageTimeline({ chat, enabled, loading, onChoose, onLoadEarlie
                         {message.author === 'assistant' && <span className="message-demo-tag">демо</span>}
                       </div>
                       <div className="message-text">
-                        {message.text || <span className="message-placeholder">{chat.reply?.phase === 'cancelled' ? 'Ответ остановлен до получения текста.'
+                        {message.text ? <SafeMarkdown text={message.text} /> : <span className="message-placeholder">{chat.reply?.phase === 'cancelled' ? 'Ответ остановлен до получения текста.'
                           : chat.reply?.phase === 'interrupted' ? 'Сообщение сохранено. Ожидаем восстановления ответа.' : 'Готовим ответ…'}</span>}
                       </div>
                       {renderMessageExtras?.(message)}

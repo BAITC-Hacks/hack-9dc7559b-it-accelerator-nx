@@ -46,8 +46,8 @@ function demoAnswer(chat: ConversationView): string {
   if (/первые два/.test(prompt)) {
     return 'Запомнил: нужно сравнить первые два варианта из предыдущего подбора.\n\nВ демонстрации нет подтверждённой выдачи товаров. После подключения каталога сравнение будет связано с конкретным результатом поиска, а не с произвольными товарами.';
   }
-  if (/добав|корзин|подтвержда/.test(prompt)) {
-    return 'Корзина не изменена. Сначала нужно выбрать проверенные товары и количество, затем увидеть точное предложение и отдельно подтвердить его.\n\nЭтот экран демонстрирует диалог — операции с корзиной здесь не выполняются.';
+  if (/добав|корзин|подтвержда/.test(prompt) || /^(да|ага|ок|окей|yes|согласен)[.!\s]*$/iu.test(prompt.trim())) {
+    return 'Это сообщение не добавляет товары в корзину. Какое предложение вы хотите подтвердить? Проверьте состав и нажмите «Подтвердить этот состав» на нужной карточке.\n\nНиже — синтетический учебный набор. Фактический результат операции показывают карточка предложения и сохранённый снимок демо-корзины, а не текст этого ответа.';
   }
   if (/\d{5,}|артикул/.test(prompt)) {
     return 'Принял запрос по артикулу. Для точного совпадения потребуется подключённый каталог: только оттуда можно получить характеристики, цену и наличие.\n\nСейчас открыт локальный пример диалога. Название похожего товара не будет выдано за точное совпадение.';
@@ -85,7 +85,7 @@ function isConversation(value: unknown): value is ConversationView {
     && (value.reply === null || isReply(value.reply));
 }
 
-export function createDemoChatDriver(): ChatDriver {
+export function createDemoChatDriver(onSessionExpired?: () => void): ChatDriver {
   let storage: Storage | undefined;
   try { storage = window.sessionStorage; } catch { /* Private iframe may deny storage. */ }
   let state: WorkspaceView = {
@@ -207,6 +207,7 @@ export function createDemoChatDriver(): ChatDriver {
     const chat = getChat(key);
     if (!chat?.reply) return;
     if (state.scenario === 'unauthorized' && !chat.reply.faultShown) {
+      onSessionExpired?.();
       clearPrivateData();
       return;
     }

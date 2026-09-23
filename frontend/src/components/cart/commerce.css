@@ -1,0 +1,75 @@
+.commerce-panel { margin-top: 24px; color: #253b32; font-size: 14px; }
+.commerce-panel h2, .commerce-panel h3, .commerce-page h1, .commerce-page h2, .commerce-page h3 { font-weight: 650; letter-spacing: -.03em; }
+.commerce-panel h2 { font-size: 22px; }
+.commerce-panel h3 { font-size: 17px; }
+.commerce-panel p { margin: 10px 0; line-height: 1.6; }
+.commerce-panel small, .commerce-page small { color: #627469; font-size: 11px; line-height: 1.6; }
+.commerce-eyebrow { text-transform: uppercase; letter-spacing: .1em; font-size: 10px; color: #627469; }
+.commerce-section-heading, .proposal-heading, .product-card-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.commerce-panel a, .commerce-page a { color: #265b42; text-decoration: underline; text-underline-offset: 3px; }
+.commerce-notice { background: #f5f1df; color: #675a2c; padding: 12px 14px; border-radius: 9px; font-size: 12px; line-height: 1.6; }
+.product-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 18px 0; }
+.product-card { border: 1px solid #dce3d9; background: #fff; border-radius: 12px; padding: 18px; display: flex; flex-direction: column; align-items: stretch; gap: 9px; min-width: 0; }
+.product-card.is-selected { border-color: #326447; box-shadow: 0 0 0 1px #326447; }
+.product-article { color: #627469; font: 10px monospace; }
+.product-card h3, .product-card p { margin: 0; }
+.offer-status { font-size: 10px; background: #edf4e8; color: #3f6842; border-radius: 20px; padding: 3px 7px; white-space: nowrap; }
+.offer-status.unknown { background: #f3edde; color: #796336; }
+.product-specs { display: grid; gap: 4px; margin: 8px 0; }
+.product-specs > div { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; }
+.product-specs dt { color: #6e7c70; }
+.product-specs dd { margin: 0; }
+.product-price { font-size: 20px; font-weight: 650; }
+.source-links { display: flex; flex-wrap: wrap; gap: 8px; font-size: 11px; margin: 12px 0; }
+.product-card .commerce-secondary { margin-top: auto; }
+.commerce-primary, .commerce-secondary, .commerce-choice { border-radius: 8px; padding: 10px 13px; cursor: pointer; font: inherit; font-size: 12px; min-height: 40px; }
+.commerce-primary { background: #1d4532; color: #fff; border: 1px solid #1d4532; }
+.commerce-secondary { color: #294a37; border: 1px solid #ccd7c8; background: #fff; }
+.commerce-panel button:disabled, .commerce-page button:disabled, .commerce-panel input:disabled { opacity: .5; cursor: not-allowed; }
+.commerce-panel :is(button, input, select, a):focus-visible, .commerce-page :is(button, a):focus-visible { outline: 3px solid #88a956; outline-offset: 3px; }
+.analogue-comparison { background: #f0f4ea; padding: 16px; border-radius: 10px; margin-bottom: 18px; }
+.selection-builder { display: flex; flex-direction: column; align-items: stretch; gap: 10px; }
+.selection-builder label { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.selection-builder input { border: 1px solid #cdd6c7; border-radius: 7px; background: white; padding: 9px; width: 85px; font: inherit; }
+.selection-builder > p { margin: 0; font-size: 12px; color: #627469; }
+.choice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.commerce-choice { border: 1px solid #d6dfce; background: #fff; text-align: left; display: flex; flex-direction: column; gap: 8px; }
+.commerce-choice[aria-pressed="true"] { border-color: #306442; background: #edf5e8; box-shadow: inset 0 0 0 1px #306442; }
+.commerce-choice span { font-size: 12px; color: #64785e; }
+.commerce-scenario { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; font-size: 11px; margin: 22px 0; }
+.commerce-scenario select { border: 1px solid #d5dece; border-radius: 7px; padding: 6px; max-width: 100%; background: white; }
+.commerce-error { color: #a34832 !important; }
+.proposal-card { margin: 18px 0; padding: 20px; border-radius: 12px; background: #fff; border: 1px solid #bdcdab; }
+.proposal-heading > span { font-size: 11px; color: #60774c; max-width: 150px; text-align: right; }
+.proposal-superseded, .proposal-rejected, .proposal-expired { background: #f6f7f3; border-color: #dce1d7; }
+.proposal-outcome_unknown { border-color: #c3a85a; }
+.commerce-lines { list-style: none; margin: 18px 0; padding: 0; }
+.commerce-lines li { display: flex; justify-content: space-between; gap: 14px; padding: 12px 0; border-bottom: 1px solid #edf0e8; font-size: 13px; }
+.commerce-lines li > div { display: flex; flex-direction: column; gap: 5px; }
+.commerce-lines li > strong { white-space: nowrap; }
+.commerce-total { display: flex; justify-content: space-between; gap: 10px; margin: 18px 0; font-size: 15px; }
+.commerce-total strong { font-size: 22px; }
+.commerce-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.commerce-cart-link { display: inline-block; margin-top: 14px; }
+.commerce-page { min-height: 100dvh; background: #f8f9f4; padding: 32px max(24px, calc((100vw - 850px) / 2)); color: #253b32; }
+.commerce-page header { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 50px; font-size: 13px; }
+.commerce-page h1 { font-size: clamp(28px, 5vw, 42px); margin: 0 0 12px; }
+.commerce-page > p { margin: 16px 0; }
+.cart-snapshot, .source-document { background: #fff; border: 1px solid #dce3d5; padding: 26px; border-radius: 14px; margin-top: 26px; }
+.cart-snapshot h2 { font-size: 19px; }
+.cart-empty { text-align: center; padding: 45px 14px; }
+.cart-empty p { margin: 14px 0; color: #60715e; }
+.safe-markdown { white-space: pre-wrap; overflow-wrap: anywhere; }
+.safe-markdown p { margin: 0 0 12px; }
+.safe-markdown p:last-child { margin-bottom: 0; }
+.safe-markdown code { background: #edf0e9; border-radius: 3px; padding: 1px 4px; }
+.header-cart-link { font-size: 12px; text-decoration: none; color: #31583b; white-space: nowrap; }
+@media (max-width: 650px) {
+  .product-grid, .choice-grid { grid-template-columns: 1fr; }
+  .commerce-page { padding: 22px 16px; }
+  .cart-snapshot, .source-document, .proposal-card { padding: 16px; }
+  .commerce-page header { margin-bottom: 30px; }
+  .commerce-lines li { flex-direction: column; }
+  .commerce-section-heading, .proposal-heading { align-items: flex-start; }
+  .commerce-panel h2 { font-size: 20px; }
+}

@@ -1,4 +1,4 @@
-import { useEffect, useState, useSyncExternalStore } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { auth } from '../lib/api';
 import type { ChatDriver, WorkspaceView } from '../components/chat/model';
 
@@ -15,7 +15,9 @@ const unavailable: ChatDriver = {
   clearPrivateData: noop, dispose: noop,
 };
 
-export function useChatWorkspace() {
+export function useChatWorkspace(onSessionExpired?: () => void) {
+  const sessionExpired = useRef(onSessionExpired);
+  useEffect(() => { sessionExpired.current = onSessionExpired; }, [onSessionExpired]);
   const [driver, setDriver] = useState<ChatDriver>(unavailable);
   const view = useSyncExternalStore(driver.subscribe, driver.getSnapshot, driver.getSnapshot);
 
@@ -27,7 +29,7 @@ export function useChatWorkspace() {
     // Only initialize UI state here. Send/create-run happens in a user handler.
     void import('../mocks/chat-demo').then(({ createDemoChatDriver }) => {
       if (disposed) return;
-      active = createDemoChatDriver();
+      active = createDemoChatDriver(() => sessionExpired.current?.());
       unsubscribe = auth.subscribe(() => active?.clearPrivateData());
       setDriver(active);
     }).catch(() => {
