@@ -31,6 +31,49 @@ npm run lint
 
 Общий Compose-контракт сохраняется: `docker compose up -d` — зависимости, `docker compose --profile full up -d --build` — контейнерный запуск. Live требует `OPENAI_API_KEY` и настроенных data/identity adapters. `.env.example` — единый шаблон; `bootRun` сам по себе `.env` не загружает, переменные передаются окружением процесса. Общую demo-БД не сбрасывать. Остановить только D1 dependencies без потери данных: `docker compose -p hackalem-d1 -f scripts/d1-compose.yml down`.
 
+## OPS-01: изолированные worktree и тестовый Compose
+
+Базовый проект `hackalem` сохраняет порты 5432/6379/8080/5173 и DNS-имена
+`db`, `redis`, `backend`, `frontend`. Имена контейнеров больше не фиксированы.
+Все host-порты параметризованы, volume `pgdata` и `attachment-files` получают
+имя проекта. Backend ждёт healthy DB и Redis, frontend ждёт healthy backend.
+Redis нужен также при host `bootRun`, поэтому входит в запуск зависимостей.
+Backend пока совмещает API и chat worker (`CHAT_WORKER_ENABLED`); отдельный
+worker service не требуется. Файловый volume смонтирован в
+`/var/lib/hackalem/attachments` для будущего storage adapter.
+
+Два независимых offline проекта рядом с общим demo:
+
+```bash
+sh scripts/isolated-compose.sh hackalem-ui-test1 1 config
+sh scripts/isolated-compose.sh hackalem-ui-test2 2 config
+sh scripts/isolated-compose.sh hackalem-ui-test1 1 deps  # только DB + Redis
+sh scripts/isolated-compose.sh hackalem-ui-test2 2 deps
+sh scripts/isolated-compose.sh hackalem-ui-test1 1 up
+sh scripts/isolated-compose.sh hackalem-ui-test2 2 up
+sh scripts/isolated-compose.sh hackalem-ui-test1 1 ps
+# Остановить только свой проект без удаления его данных:
+sh scripts/isolated-compose.sh hackalem-ui-test1 1 down
+```
+
+Слоты 1/2 используют DB 55441/55442, Redis 56381/56382, API 18091/18092,
+UI 15191/15192. Слоты 1…9 доступны для других worktree/CI. Скрипт запрещает
+имя `hackalem` и никогда не выполняет `down -v`. Тестовый профиль использует
+backend `test` (offline LLM, no Spring AI chat/embedding auto-config), sample
+catalog/stock/cart. Test override принудительно отключает partner cart token и
+verified flag; включение live OpenAI не разрешает partner writes.
+
+При host `bootRun` Compose **не экспортирует** `.env` в shell. Передайте нужные
+переменные процессу отдельно, например `SPRING_PROFILES_ACTIVE=contract
+SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:55441/hackalem REDIS_PORT=56381
+PORT=18091 ./gradlew bootRun`. Для full/test UI `VITE_API_URL` передаётся только
+как Docker build arg, с адресом API из браузера (`localhost:<host-port>`), без
+ключей. После изменения адреса frontend нужно пересобрать. Настройки адаптеров
+`LLM_ADAPTER_MODE`, `CATALOG_STOCK_ADAPTER_MODE`, `CART_MODE` раздельны в env и
+application; существующий backend пока выбирает LLM по Spring profile, а
+catalog/stock adapter будет подключён D2. `CART_MODE=sample` и
+`PARTNER_CART_VERIFIED=false` остаются безопасными defaults.
+
 ## Что реализовано в D1
 
 - Visitor JWT/session ACL, durable conversations/history/runs и idempotent submit.

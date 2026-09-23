@@ -23,7 +23,6 @@ services:
 
   db:
     image: pgvector/pgvector:pg16
-    container_name: hackalem-db
     restart: unless-stopped
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-hackalem}
@@ -43,11 +42,10 @@ services:
       start_period: 10s
 
   backend:
-    profiles: ["full"]
+    profiles: ["full", "test"]
     build:
       context: ./backend
-    image: hackalem-backend
-    container_name: hackalem-backend
+    image: ${COMPOSE_PROJECT_NAME:-hackalem}-backend
     restart: unless-stopped
     depends_on:
       redis:
@@ -64,6 +62,9 @@ services:
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
       OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4o-mini}
       OPENAI_EMBEDDING_MODEL: ${OPENAI_EMBEDDING_MODEL:-text-embedding-3-small}
+      LLM_ADAPTER_MODE: ${LLM_ADAPTER_MODE:-live}
+      CATALOG_STOCK_ADAPTER_MODE: ${CATALOG_STOCK_ADAPTER_MODE:-sample}
+      ATTACHMENT_STORAGE_PATH: /var/lib/hackalem/attachments
       DB_POOL_MAX_SIZE: ${DB_POOL_MAX_SIZE:-30}
       DB_POOL_MIN_IDLE: ${DB_POOL_MIN_IDLE:-5}
       DB_POOL_CONNECTION_TIMEOUT_MS: ${DB_POOL_CONNECTION_TIMEOUT_MS:-2000}
@@ -98,7 +99,9 @@ services:
       SSE_MAX_SUBSCRIBERS: ${SSE_MAX_SUBSCRIBERS:-100}
       ADMIN_PRINCIPAL_IDS: ${ADMIN_PRINCIPAL_IDS:-}
     ports:
-      - "8080:8080"
+      - "${BACKEND_PORT:-8080}:8080"
+    volumes:
+      - attachment-files:/var/lib/hackalem/attachments
     healthcheck:
       test: ["CMD-SHELL", "curl -fsS http://localhost:8080/actuator/health | grep -q UP"]
       interval: 10s
@@ -107,7 +110,7 @@ services:
       start_period: 40s
 
   frontend:
-    profiles: ["full"]
+    profiles: ["full", "test"]
     build:
       context: ./frontend
       args:
@@ -115,16 +118,16 @@ services:
         # Поменял значение → docker compose up -d --build frontend (рестарта мало).
         # Это адрес ИЗ БРАУЗЕРА: http://backend:8080 здесь не работает.
         VITE_API_URL: ${VITE_API_URL:-http://localhost:8080}
-    image: hackalem-frontend
-    container_name: hackalem-frontend
+    image: ${COMPOSE_PROJECT_NAME:-hackalem}-frontend
     restart: unless-stopped
     depends_on:
       backend:
         condition: service_healthy
     ports:
-      - "5173:80"
+      - "${FRONTEND_PORT:-5173}:80"
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost/ >/dev/null 2>&1 || exit 1"]
+      # Alpine resolves localhost to ::1 first while nginx listens on IPv4.
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1/ >/dev/null 2>&1 || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -132,3 +135,4 @@ services:
 
 volumes:
   pgdata:
+  attachment-files:

@@ -17,6 +17,32 @@ depends_on: []
 
 Подготовить окружение, в котором три worktree и CI не конфликтуют с общей demo-БД.
 
+## D3 evidence (2026-09-23, ветка `codex/ui-01-client-transport`)
+
+- До изменений общий project `hackalem`: `hackalem-db` healthy, volume
+  `hackalem_pgdata`, host 5432. Backend 8080 и frontend 5173 не запущены.
+- Убраны фиксированные имена контейнеров; host-порты задаются env, volume
+  создаются на project, добавлен `attachment-files` и test override с offline
+  Spring profile и закрытым partner cart. Redis healthcheck остаётся обязательным
+  для backend. Команды и port slots: `README.md` (OPS-01).
+- `docker compose config --quiet`, `docker compose --profile full config --quiet`
+  и `sh scripts/isolated-compose.sh hackalem-ui-test{1,2} {1,2} config` прошли.
+- Два тестовых DB+Redis проекта запущены; все четыре контейнера healthy.
+  Тестовые volumes: `hackalem-ui-test1_pgdata` и `hackalem-ui-test2_pgdata`.
+  Общий `hackalem_pgdata` после запуска остался healthy.
+- `cd backend && ./gradlew build`: success; `cd frontend && npm run build`:
+  success; `cd frontend && npm run lint`: success; `git diff --check`: success.
+- `sh scripts/isolated-compose.sh hackalem-ui-test1 1 up`: полный offline
+  Compose успешно собран и запущен; DB, Redis, backend и frontend healthy.
+  `GET http://localhost:18091/actuator/health` вернул `UP`, UI на 15191
+  ответил HTTP 200. Первый запуск выявил IPv6 `localhost` в nginx healthcheck;
+  заменено на `127.0.0.1`, повторный full startup завершился успешно.
+- Проект 2: DB/Redis healthy на 55442/56382. Полный backend/frontend для
+  второго проекта не собирались; отдельные порты 18092/15192 и конфиг проверены.
+- Shared `hackalem-db` и `hackalem_pgdata` после теста healthy; `down -v`
+  не запускался. PR пока не создан; HTTP business E2E и PERF-02 не входят в
+  эту проверку инфраструктуры.
+
 ## Context
 
 В compose фиксированы container_name и backend/frontend host ports. Одного -p для изоляции сейчас недостаточно.

@@ -55,6 +55,10 @@ spring:
           model: ${OPENAI_EMBEDDING_MODEL:text-embedding-3-small}
 
 app:
+  adapters:
+    llm: ${LLM_ADAPTER_MODE:live}
+    catalog-stock: ${CATALOG_STOCK_ADAPTER_MODE:sample}
+  attachment-storage-path: ${ATTACHMENT_STORAGE_PATH:/var/lib/hackalem/attachments}
   cart-mode: ${CART_MODE:sample}
   partner-cart:
     verified: ${PARTNER_CART_VERIFIED:false}
