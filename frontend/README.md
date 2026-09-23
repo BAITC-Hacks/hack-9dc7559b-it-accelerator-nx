@@ -1,4 +1,16 @@
-# Frontend / UI-01…04
+# Frontend / UI-01…05
+
+## Embed / mobile / UI-05
+
+- Loader: `public/embed/v1/widget.js` → launcher + iframe `/widget` (origin из `script.src`).
+- Host-demo: отдельный origin `http://localhost:5180` (`host-demo/`, compose profile `full`).
+- Handshake: `hackalem:ready` / `hello` / `close` / `open-cart`; allowlist
+  `VITE_EMBED_ALLOWED_ORIGINS` + `event.source === parent`; token/cartId отклоняются.
+- Production image: nginx `frame-ancestors` via `EMBED_FRAME_ANCESTORS`.
+- Cart из iframe: `postMessage` → host `window.open` на тот же frontend origin `/cart`.
+- Mobile: `--vvh` / `visualViewport`, sticky composer, breakpoint 390px для embed.
+
+Проверка: `npm run test && npm run lint && npm run build`. Browser E2E → QA-01.
 
 ## Файлы и проверка строк / UI-04
 

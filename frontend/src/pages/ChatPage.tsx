@@ -11,6 +11,7 @@ import { ContextPanel } from '../components/chat/ContextPanel';
 import { MessageTimeline } from '../components/chat/MessageTimeline';
 import { Composer } from '../components/chat/Composer';
 import { isReplyActive, needsRecovery, type DemoScenario } from '../components/chat/model';
+import { useVisualViewport } from '../widget/useVisualViewport';
 import '../components/chat/chat.css';
 
 const scenarios: { value: DemoScenario; label: string }[] = [
@@ -23,7 +24,15 @@ const scenarios: { value: DemoScenario; label: string }[] = [
   { value: 'send-timeout', label: 'Потеря ответа на отправку' },
 ];
 
-export default function ChatPage() {
+export type ChatPageProps = {
+  embed?: boolean;
+  onOpenCart?: () => void;
+  onRequestClose?: () => void;
+  parentTrusted?: boolean;
+};
+
+export default function ChatPage({ embed = false, onOpenCart, onRequestClose, parentTrusted }: ChatPageProps) {
+  useVisualViewport(true);
   const commerce = useCommerce();
   const attachments = useAttachments();
   const { driver, view, chat } = useChatWorkspace(() => { commerce.driver.clearPrivateData(); attachments.driver.clearPrivateData(); });
@@ -34,6 +43,7 @@ export default function ChatPage() {
   const drawer = useRef<HTMLDivElement>(null);
   const clearDialog = useRef<HTMLDialogElement>(null);
   const enabled = view.mode === 'demo';
+  const cartLabel = `Корзина${commerce.view.cart ? ` · ${commerce.view.cart.lines.length}` : ''}${commerce.view.proposals.some((item) => item.state === 'outcome_unknown') ? ' ?' : ''}`;
 
   useEffect(() => {
     if (!drawerOpen) return;
@@ -70,7 +80,7 @@ export default function ChatPage() {
   };
 
   return (
-    <div className="chat-shell">
+    <div className={`chat-shell${embed ? ' chat-shell-embed' : ''}`} data-embed={embed ? 'true' : undefined}>
       <aside className="desktop-sidebar">{sidebar()}</aside>
       {drawerOpen && <div className="mobile-drawer-backdrop">
         <button className="drawer-scrim" aria-label="Закрыть меню" tabIndex={-1} onClick={() => setDrawerOpen(false)} />
@@ -82,10 +92,16 @@ export default function ChatPage() {
             <span className="header-muted">Онлайн-консультант</span><ChevronRight size={14} /><strong>Помощь с выбором</strong>
           </div>
           <div className="chat-header-actions"><span className={`mode-badge ${enabled ? 'demo' : ''}`}><i />{enabled ? 'Локальное демо' : view.mode === 'loading' ? 'Подключение' : 'Скоро онлайн'}</span>
-            <Link className="header-cart-link" to="/cart">Корзина{commerce.view.cart ? ` · ${commerce.view.cart.lines.length}` : ''}{commerce.view.proposals.some((item) => item.state === 'outcome_unknown') ? ' ?' : ''}</Link>
+            {onOpenCart
+              ? <button type="button" className="header-cart-link" onClick={onOpenCart}>{cartLabel}</button>
+              : <Link className="header-cart-link" to="/cart">{cartLabel}</Link>}
+            {onRequestClose && <button type="button" className="icon-button embed-close" onClick={onRequestClose} aria-label="Скрыть виджет"><X size={18} /></button>}
             <button className="icon-button context-toggle" onClick={() => setContextOpen(!contextOpen)} aria-expanded={contextOpen} aria-controls="selection-context" aria-label="Параметры подбора"><SlidersHorizontal size={18} /></button>
           </div>
         </header>
+        {embed && parentTrusted === false && typeof window !== 'undefined' && window.parent !== window && (
+          <div className="workspace-notice" role="status">Ожидаем подтверждение страницы-хоста. Сессию и корзину хост назначить не может.</div>
+        )}
         {enabled && <div className="demo-strip"><span>Демонстрация · ответы и история сохраняются только в этой вкладке</span>
           <label>Сценарий<select value={view.scenario} onChange={(event) => {
             const option = scenarios.find((item) => item.value === event.target.value);

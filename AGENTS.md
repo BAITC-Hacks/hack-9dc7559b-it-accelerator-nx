@@ -40,6 +40,7 @@ docker compose --profile full up -d --build
 | `db`       | `pgvector/pgvector:pg16` | `5432:5432`     | default | `db`                |
 | `backend`  | build `./backend`  | `8080:8080`           | `full`  | `backend`           |
 | `frontend` | build `./frontend` | `5173:80`             | `full`  | `frontend`          |
+| `host-demo`| `nginx:alpine` + `./host-demo` | `5180:80`   | `full`  | `host-demo`         |
 
 Правила, на которые опирается код:
 - **Имя сервиса = хост внутри сети.** Переименовал `db` → обязан поправить `SPRING_DATASOURCE_URL` и `.env.example`.
@@ -57,8 +58,11 @@ docker compose --profile full up -d --build
 | `SPRING_DATASOURCE_USERNAME` / `_PASSWORD` | backend | `hackalem` |
 | `OPENAI_API_KEY` | backend | **нет дефолта, обязателен** |
 | `JWT_SECRET` | backend | dev-значение из `.env.example` |
-| `CORS_ALLOWED_ORIGINS` | backend | `http://localhost:5173` |
+| `CORS_ALLOWED_ORIGINS` | backend | `http://localhost:5173,http://localhost:5180` |
 | `VITE_API_URL` | frontend (**build-time!**) | `http://localhost:8080` |
+| `VITE_EMBED_ALLOWED_ORIGINS` | frontend (**build-time!**) | `http://localhost:5180,http://localhost:5173` |
+| `EMBED_FRAME_ANCESTORS` | frontend nginx (runtime) | `'self' http://localhost:5180 http://localhost:5173` |
+| `HOST_DEMO_PORT` | host-demo | `5180` |
 
 Добавил новую переменную → **сразу** допиши её в `.env.example` и в `docker-compose.yml`. Переменная, которой нет в `.env.example`, считается несуществующей: у соседнего агента всё упадёт.
 

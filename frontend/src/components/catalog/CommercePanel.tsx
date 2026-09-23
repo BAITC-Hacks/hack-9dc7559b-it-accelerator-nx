@@ -17,7 +17,13 @@ export function CommercePanel({ conversation }: { conversation: string }) {
   const amount = selection?.quantity ?? '20';
   const unknown = view.proposals.some((item) => item.state === 'outcome_unknown');
   const disabled = view.busy || unknown;
-  const choose = (patch: Partial<SelectionView>) => driver.select(conversation, { mode: 'split', productKey: 'demo-original', quantity: amount, ...selection, ...patch });
+  const choose = (patch: Partial<SelectionView>) => {
+    driver.select(conversation, {
+      mode: patch.mode ?? selection?.mode ?? 'split',
+      productKey: patch.productKey ?? selection?.productKey ?? 'demo-original',
+      quantity: patch.quantity ?? amount,
+    });
+  };
   const original = view.products.find((product) => product.key === 'demo-original');
   const requested = scaled(amount, 3);
   const stock = original?.stock === null || !original ? null : scaled(original.stock, 3);

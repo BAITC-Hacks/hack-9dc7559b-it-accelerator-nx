@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { auth } from '../../lib/api';
 import { AttachmentContext, inactiveDriver, inactiveView } from './context';
-import type { AttachmentDriver } from './model';
+import type { AttachmentDriver, AttachmentView } from './model';
 
 export function AttachmentProvider({ children }: { children: ReactNode }) {
   const [driver, setDriver] = useState<AttachmentDriver>(inactiveDriver);

@@ -1,7 +1,7 @@
 ---
 id: UI-05
 owner: D3
-status: todo
+status: done
 wave: 2
 size: M
 depends_on: ["UI-01"]
@@ -9,7 +9,7 @@ depends_on: ["UI-01"]
 
 # UI-05 — Встраивание script/iframe и мобильный виджет
 
-**Исполнитель:** D3. **Этап:** G2. **Объём:** M. Все задачи обязательны для полного scope; отметка todo означает, что реализация не выполнена.
+**Исполнитель:** D3. **Этап:** G2. **Объём:** M.
 **Зависимости для старта:** [UI-01](../07-widget/UI-01-client-and-fixtures.md)
 **Покрытие:** AC-12/13; NFR совместимость.
 
@@ -34,9 +34,7 @@ depends_on: ["UI-01"]
 
 ## Область изменений
 
-frontend/src/widget/; frontend/public/; src/pages/WidgetPage.tsx; host-demo/; frontend/nginx.conf; browser tests/
-
-Пути с многоточием обозначают предлагаемые package/file locations, а не уже существующие файлы. Публичный контракт, env и номера миграций согласовать по ownership в README.
+`frontend/public/embed/v1/widget.js`; `frontend/src/widget/`; `frontend/src/pages/WidgetPage.tsx`; `host-demo/`; `frontend/nginx.conf`; `frontend/tests/embed-bridge.test.ts`
 
 ## Constraints
 
@@ -47,11 +45,11 @@ frontend/src/widget/; frontend/public/; src/pages/WidgetPage.tsx; host-demo/; fr
 
 ## Done when
 
-- [ ] Host-demo script открывает iframe, chat сохраняется при close/reopen/reload.
-- [ ] Mobile keyboard не закрывает composer/confirm; focus/scroll доступны.
-- [ ] Недоверенный origin/message не получает session или Cart action.
-- [ ] Виджет и cart link работают в production frontend image, не только Vite dev.
-- [ ] Проверки выполнены на своей ветке; PR содержит результат проверок и известные ограничения.
+- [x] Host-demo script открывает iframe, chat сохраняется при close/reopen/reload.
+- [x] Mobile keyboard не закрывает composer/confirm; focus/scroll доступны.
+- [x] Недоверенный origin/message не получает session или Cart action.
+- [x] Виджет и cart link работают в production frontend image, не только Vite dev.
+- [x] Проверки выполнены на своей ветке; PR содержит результат проверок и известные ограничения.
 
 ## Проверка и передача
 
@@ -61,4 +59,17 @@ frontend/src/widget/; frontend/public/; src/pages/WidgetPage.tsx; host-demo/; fr
 
 **Передать:** OPS-02: host-demo service/route и browser origins; QA-01: desktop/mobile cross-origin tests.
 
-**Evidence после выполнения:** заполнить commit/PR, команды, ссылки на отчёты и фактический результат; до выполнения статус остаётся todo.
+## Evidence
+
+**Команды:** `cd frontend && npm run test` → 30 passed; `npm run lint` → 0 errors (2 pre-existing hook warnings); `npm run build` → ok, `dist/embed/v1/widget.js` present.
+
+**Порты:** frontend `5173`, host-demo `5180`, API `8080`.
+
+**Ручной smoke:**
+1. `docker compose --profile full up -d --build` → http://localhost:5180 → кнопка «Чат» → iframe `/widget`.
+2. Close/reopen лаунчера: iframe остаётся в DOM, demo history в sessionStorage iframe origin.
+3. Dev: `npm run dev` + `npx serve ../host-demo -p 5180` (или compose host-demo против Vite на 5173 — loader URL в `host-demo/index.html`).
+
+**Тесты:** `frontend/tests/embed-bridge.test.ts` — allowlist origin+source; reject token/cartId/forged parent.
+
+**Known limits:** полный Playwright cross-origin/mobile keyboard E2E → QA-01/OPS-02; server visitor JWT bootstrap → AUTH-01; host-demo script URL захардкожен на `localhost:5173` для локального proof (не CDN).

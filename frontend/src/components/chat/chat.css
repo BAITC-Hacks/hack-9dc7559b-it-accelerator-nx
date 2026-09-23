@@ -4,9 +4,10 @@
   --chat-line: #e7eae3;
   --chat-lime: #d1ed95;
   --chat-paper: #fcfcf9;
+  --vvh: 100dvh;
   display: grid;
   grid-template-columns: 254px minmax(0, 1fr);
-  height: 100dvh;
+  height: var(--vvh, 100dvh);
   min-height: 400px;
   overflow: hidden;
   color: var(--chat-ink);
@@ -14,6 +15,25 @@
   font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
+.chat-shell-embed {
+  min-height: 0;
+  height: var(--vvh, 100dvh);
+  max-height: var(--vvh, 100dvh);
+}
+.header-cart-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 10px;
+  border: 1px solid #dce3d2;
+  border-radius: 8px;
+  background: #f7f9f2;
+  color: #486441;
+  font-size: 10px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+button.header-cart-link { font: inherit; }
+.header-cart-link:hover { background: #eef3e5; }
 .chat-shell *, .chat-shell *::before, .chat-shell *::after { box-sizing: border-box; }
 .chat-shell button, .chat-shell textarea, .chat-shell select { font: inherit; }
 .chat-shell button, .chat-shell a { -webkit-tap-highlight-color: transparent; }
@@ -223,6 +243,7 @@
   .chat-header-title > .header-muted, .chat-header-title > svg { display: none; }
   .chat-header-actions { gap: 4px; }
   .mode-badge { padding: 6px 8px; font-size: 9px; }
+  .header-cart-link { padding: 6px 8px; font-size: 9px; }
   .demo-strip { align-items: flex-start; flex-direction: column; gap: 6px; padding: 8px 20px; font-size: 9px; }
   .demo-strip select { padding: 2px 5px; font-size: 9px; }
   .demo-strip label { font-size: 9px; gap: 8px; }
@@ -250,12 +271,24 @@
   .chat-message.customer { margin-left: 25px; }
   .reply-status, .reply-recovery, .followup-chips { margin-left: 36px; }
   .reply-recovery { font-size: 11px; padding: 11px; }
-  .composer-area { padding: 10px 16px max(9px, env(safe-area-inset-bottom)); }
+  .composer-area {
+    padding: 10px 16px max(9px, env(safe-area-inset-bottom));
+    position: sticky;
+    bottom: 0;
+    background: var(--chat-paper);
+  }
   .chat-composer { border-radius: 13px; padding: 12px 12px 8px; }
   .chat-composer textarea { font-size: 16px; line-height: 1.5; }
   .composer-help { font-size: 8px; margin-top: 7px !important; }
   .composer-attachments { font-size: 9px; }
   .selection-context.context-open { width: min(280px, 85vw); }
+}
+/* Explicit phone fixture used by AC-12 (390×844). */
+@media (max-width: 390px) {
+  .chat-shell-embed .demo-strip > span { display: none; }
+  .chat-shell-embed .mode-badge { display: none; }
+  .chat-shell-embed .chat-header { height: 52px; }
+  .starter-grid { grid-template-columns: 1fr; }
 }
 @media (max-height: 580px) {
   .chat-header { height: 48px; }

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Host demo · сторонний сайт</title>
+  <style>
+    :root { color-scheme: light; }
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      font-family: Georgia, "Times New Roman", serif;
+      color: #1f2430;
+      background:
+        linear-gradient(180deg, #f7f3ea 0%, #efe6d4 48%, #e7dcc6 100%);
+    }
+    main {
+      max-width: 42rem;
+      margin: 0 auto;
+      padding: 4rem 1.5rem 8rem;
+    }
+    h1 { font-size: clamp(2rem, 5vw, 3rem); line-height: 1.15; margin: 0 0 1rem; }
+    p { font-size: 1.05rem; line-height: 1.7; color: #4a5160; }
+    code { font-family: ui-monospace, monospace; font-size: 0.9em; }
+    .note {
+      margin-top: 2rem;
+      padding: 1rem 1.1rem;
+      border-left: 3px solid #8a6a3b;
+      background: rgba(255, 255, 255, 0.55);
+      font-size: 0.95rem;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Страница магазина (отдельный origin)</h1>
+    <p>
+      Это учебный host на порту <code>5180</code>. Виджет грузится script’ом с
+      frontend (<code>5173</code>) и открывается в iframe — без правок «сайта».
+    </p>
+    <div class="note">
+      Сессия чата хранится в first-party storage iframe. Закрытие лаунчера не
+      уничтожает iframe, поэтому история переживает reopen. Токен и cartId
+      через postMessage/URL не передаются.
+    </div>
+  </main>
+  <!-- Origin виджета берётся из src скрипта; секреты в query запрещены. -->
+  <script src="http://localhost:5173/embed/v1/widget.js" async></script>
+</body>
+</html>
