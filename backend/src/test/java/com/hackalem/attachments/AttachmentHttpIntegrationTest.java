@@ -80,4 +80,41 @@ class AttachmentHttpIntegrationTest {
         attachments.delete(a,accepted.attachmentId());attachments.delete(a,accepted.attachmentId());assertThat(files.publish(next,List.of(),List.of(),null)).isFalse();
         assertThatThrownBy(()->attachments.status(a,accepted.attachmentId())).hasMessage("resource_not_found");assertThat(db.queryForObject("SELECT original_bytes IS NULL FROM attachments WHERE id=?",Boolean.class,accepted.attachmentId())).isTrue();
     }
+    @Test void reprocessIsOwnedVersionedAndRetainsExplicitReviewAfterReload()throws Exception{
+        var accepted=upload();worker.processOne();var before=attachments.status(a,accepted.attachmentId());
+        String row=before.rows().stream().filter(r->"000001".equals(r.extracted().article())).findFirst().orElseThrow().extracted().id();
+        attachments.review(a,accepted.attachmentId(),new AttachmentModels.ReviewRequest(before.version(),List.of(new AttachmentModels.Selection(row,"1001","7","pcs","main",true))));
+        var request=new AttachmentModels.ReprocessRequest("3");
+        mvc.perform(post("/api/attachments/"+accepted.attachmentId()+"/reprocess").header("Authorization","Bearer "+tokenB.accessToken()).contentType("application/json").content(json.write(request))).andExpect(status().isNotFound());
+        mvc.perform(post("/api/attachments/"+accepted.attachmentId()+"/reprocess").header("Authorization","Bearer "+tokenA.accessToken()).contentType("application/json").content(json.write(request))).andExpect(status().isAccepted()).andExpect(jsonPath("$.version").value("4"));
+        assertThatThrownBy(()->attachments.reprocess(a,accepted.attachmentId(),request)).hasMessage("stale_attachment");
+        assertThatThrownBy(()->attachments.reviewed(accepted.attachmentId(),"4",a)).hasMessage("attachment_not_ready");
+        worker.processOne();var after=attachments.status(a,accepted.attachmentId());assertThat(after.version()).isEqualTo("5");
+        assertThat(after.rows()).hasSize(before.rows().size());assertThat(after.warnings()).contains("REVIEWED_ROWS_PRESERVED");
+        assertThat(attachments.reviewed(accepted.attachmentId(),"5",a).items()).containsExactly(new Selection("000001","pcs","main","7"));
+        assertThat(db.queryForObject("SELECT count(*) FROM attachment_reviews WHERE attachment_id=?",Integer.class,accepted.attachmentId())).isEqualTo(1);
+    }
+    @Test void replacingInFlightJobFencesOldDesiredVersion()throws Exception{
+        var accepted=upload();var old=files.claim().orElseThrow();var retry=attachments.reprocess(a,accepted.attachmentId(),new AttachmentModels.ReprocessRequest("1"));
+        assertThat(files.publish(old,List.of(),List.of(),null)).isFalse();assertThat(retry.version()).isEqualTo("2");
+        worker.processOne();assertThat(attachments.status(a,accepted.attachmentId()).version()).isEqualTo("3");
+    }
+    @Test void changedOcrRowsCannotRebindAnExistingUserSelection()throws Exception{
+        var accepted=upload();worker.processOne();var before=attachments.status(a,accepted.attachmentId());
+        var original=before.rows().stream().filter(r->"000001".equals(r.extracted().article())).findFirst().orElseThrow();
+        attachments.review(a,accepted.attachmentId(),new AttachmentModels.ReviewRequest(before.version(),List.of(new AttachmentModels.Selection(original.extracted().id(),"1001","7","pcs","main",true))));
+        attachments.reprocess(a,accepted.attachmentId(),new AttachmentModels.ReprocessRequest("3"));var job=files.claim().orElseThrow();
+        var changed=new AttachmentModels.ExtractedRow("row-changed","different OCR product","999999",null,null,original.extracted().source(),List.of("ARTICLE_UNCERTAIN"));
+        assertThat(files.publish(job,List.of(new AttachmentModels.MatchedRow(changed,"unmatched",List.of())),List.of(),null)).isTrue();
+        var after=attachments.status(a,accepted.attachmentId());assertThat(after.rows()).anySatisfy(row->assertThat(row.extracted()).isEqualTo(original.extracted()));
+        assertThat(attachments.reviewed(accepted.attachmentId(),after.version(),a).items()).containsExactly(new Selection("000001","pcs","main","7"));
+    }
+    @Test void unsupportedTypeReturns415AndOwnerCanRetryFailedParser()throws Exception{
+        var invalid=new MockMultipartFile("file","file.exe","application/octet-stream",new byte[]{1,2,3});
+        mvc.perform(multipart("/api/conversations/"+conversation+"/attachments").file(invalid).header("Authorization","Bearer "+tokenA.accessToken())).andExpect(status().isUnsupportedMediaType());
+        var accepted=upload();var claim=files.claim().orElseThrow();files.publish(claim,List.of(),List.of(),"TRANSIENT_OCR_FAILURE");
+        var retry=attachments.reprocess(a,accepted.attachmentId(),new AttachmentModels.ReprocessRequest("2"));worker.processOne();
+        assertThat(attachments.status(a,accepted.attachmentId()).status()).isNotEqualTo("FAILED");assertThat(retry.version()).isEqualTo("3");
+    }
+
 }

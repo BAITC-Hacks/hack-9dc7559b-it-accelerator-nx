@@ -25,9 +25,9 @@ public class AttachmentValidator {
         if(safe.isBlank() || safe.length()>255 || !safe.contains(".")) throw AttachmentException.invalid("INVALID_FILENAME");
         String ext=safe.substring(safe.lastIndexOf('.')+1).toLowerCase(Locale.ROOT);
         String expected=MIMES.get(ext);
-        if(expected==null) throw AttachmentException.invalid("UNSUPPORTED_EXTENSION");
+        if(expected==null) throw new AttachmentException(org.springframework.http.HttpStatus.UNSUPPORTED_MEDIA_TYPE,"UNSUPPORTED_EXTENSION");
         String declared=mime==null?"":mime.toLowerCase(Locale.ROOT).split(";")[0].trim();
-        if(!expected.equals(declared)) throw AttachmentException.invalid("MIME_MISMATCH");
+        if(!expected.equals(declared)) throw new AttachmentException(org.springframework.http.HttpStatus.UNSUPPORTED_MEDIA_TYPE,"MIME_MISMATCH");
         try {
             switch(ext) {
                 case "pdf" -> { if(!new String(bytes,0,Math.min(5,bytes.length),StandardCharsets.US_ASCII).equals("%PDF-")) throw AttachmentException.invalid("SIGNATURE_MISMATCH"); }
@@ -39,7 +39,7 @@ public class AttachmentValidator {
                         if(!valid) throw AttachmentException.invalid("SIGNATURE_MISMATCH");
                     }
                 }
-                default -> throw AttachmentException.invalid("UNSUPPORTED_EXTENSION");
+                default -> throw new AttachmentException(org.springframework.http.HttpStatus.UNSUPPORTED_MEDIA_TYPE,"UNSUPPORTED_EXTENSION");
             }
         } catch(AttachmentException e) { throw e; }
         catch(Exception e) { throw AttachmentException.invalid("CORRUPT_OR_ENCRYPTED_FILE"); }

@@ -62,7 +62,18 @@ class AttachmentExtractionTest {
         String extension=filename.substring(filename.lastIndexOf('.')+1);
         var result=extractor.extract(Files.readAllBytes(Path.of("../data/attachments/"+filename)),extension);
         assertThat(result.warnings()).anyMatch(warning->warning.contains("REQUIRES_REVIEW"));
-        assertThat(result.rows()).anySatisfy(row->assertThat(row.article()).isEqualTo("000001"));
+        assertThat(result.rows()).anySatisfy(row->{assertThat(row.article()).isEqualTo("000001");assertThat(row.source().words()).isNotEmpty();
+            assertThat(row.source().words()).allSatisfy(word->{assertThat(word.x()).isGreaterThanOrEqualTo(0);assertThat(word.y()).isGreaterThanOrEqualTo(0);assertThat(word.x()+word.width()).isLessThanOrEqualTo(word.imageWidth());assertThat(word.y()+word.height()).isLessThanOrEqualTo(word.imageHeight());});});
+    }
+
+    @Test void productOnlyPhotoCallsVisionAndPreservesVisibleEvidence()throws Exception{
+        var beans=new DefaultListableBeanFactory();var called=new java.util.concurrent.atomic.AtomicBoolean();
+        beans.registerSingleton("ocr",new OcrGateway(){public boolean available(){return true;}public String recognize(byte[] bytes,long deadline){return "";}});
+        beans.registerSingleton("vision",new VisionGateway(){public boolean available(){return true;}public Observation inspect(byte[] bytes,long deadline){called.set(true);return new Observation("","circuit breaker",java.util.List.of(),java.util.Map.of("visibleLevers","1"),java.util.List.of("RATING_NOT_VISIBLE"));}});
+        var extractor=new AttachmentExtractor(beans.getBeanProvider(OcrGateway.class),beans.getBeanProvider(VisionGateway.class));
+        var result=extractor.extract(Files.readAllBytes(Path.of("../data/attachments/images/product-only.jpg")),"jpg");
+        assertThat(called).isTrue();assertThat(result.warnings()).contains("VISUAL_CANDIDATES_REQUIRE_REVIEW","RATING_NOT_VISIBLE");
+        assertThat(result.rows()).anySatisfy(row->{assertThat(row.article()).isNull();assertThat(row.visualEvidence().category()).isEqualTo("circuit breaker");assertThat(row.visualEvidence().observedAttributes()).doesNotContainKey("currentA");});
     }
 
 }

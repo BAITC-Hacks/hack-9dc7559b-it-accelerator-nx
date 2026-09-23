@@ -1,7 +1,7 @@
 ---
 id: ATT-02
 owner: D2
-status: todo
+status: in_progress
 wave: 2
 size: M
 depends_on: ["ATT-01", "DATA-01"]
@@ -47,11 +47,11 @@ backend/…/ai/attachments/office/; backend/build.gradle; data/attachments/offic
 
 ## Done when
 
-- [ ] Валидные xls/xlsx/doc/docx fixtures дают ожидаемые rows и provenance.
-- [ ] 00123 и fractional quantity сохраняются без округления/потери нулей.
-- [ ] Corrupt/oversize/ambiguous document даёт failure либо review, не пустой success.
+- [x] Валидные xls/xlsx/doc/docx fixtures дают ожидаемые rows и provenance.
+- [x] 00123 и fractional quantity сохраняются без округления/потери нулей.
+- [x] Corrupt/oversize/ambiguous document даёт failure либо review, не пустой success.
 - [ ] Работает в backend image без установленного Office на host.
-- [ ] Проверки выполнены на своей ветке; PR содержит результат проверок и известные ограничения.
+- [x] Проверки выполнены на своей ветке; PR содержит результат проверок и известные ограничения.
 
 ## Проверка и передача
 
@@ -62,3 +62,12 @@ backend/…/ai/attachments/office/; backend/build.gradle; data/attachments/offic
 **Передать:** ATT-04: normalised extraction rows; D3: row warnings/source coordinates; QA: four extension regression fixtures.
 
 **Evidence после выполнения:** заполнить commit/PR, команды, ссылки на отчёты и фактический результат; до выполнения статус остаётся todo.
+
+
+## Evidence реализации D2 — 2026-09-23
+
+Код: `49ad17e` и follow-up на ветке `codex/d2-attachment-services`. Handoff: [API, лимиты и оставшиеся gates](../../docs/api/attachments-handoff.md). Фактически выполнено: focused Gradle suite `--tests 'com.hackalem.attachments.*'` (22 tests, PostgreSQL/Redis Testcontainers, реальные D1 JWT двух visitors, реальные XLS/XLSX/DOC/DOCX/PDF/JPEG fixtures, локальный Tesseract). Общую demo-БД тесты не изменяют. Зависимости POI/PDFBox при изолированной проверке подставлены init script; основной build/config принадлежит интеграционному коммиту root. PR не создавался: пользователь запросил commit.
+
+Reprocess API защищён ACL + `expectedVersion`; новая desired version отзывает старые claims. Review и исходное evidence сохраняются отдельно; изменившийся OCR не перепривязывает выбранный товар по номеру строки. OCR возвращает word boxes в координатах исходного JPEG или 144-DPI PDF page, с ограниченным размером provenance.
+
+Статус остаётся `in_progress` до общей интеграционной проверки образа/SDK и применимых внешних gates: container-only OCR, live vision quality. Проверка scripted vision подтверждает маршрутизацию и uncertainty, не качество реальной модели. Жёсткая изоляция POI/PDFBox в отдельном процессе не реализована: есть лимиты input/ZIP/pages/rows/text/pixels и cooperative deadline, а зависшая операция библиотеки требует отдельного worker container/process для жёсткого прерывания. Этот предел явно отражён в handoff, а не выдан за пройденный gate.

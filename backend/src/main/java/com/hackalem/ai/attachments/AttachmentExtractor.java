@@ -104,7 +104,7 @@ public class AttachmentExtractor {
             var stripper=new PDFTextStripper();stripper.setSortByPosition(true);
             for(int p=1;p<=pdf.getNumberOfPages();p++) {
                 check(deadline);stripper.setStartPage(p);stripper.setEndPage(p);
-                String text=stripper.getText(pdf);
+                String text=stripper.getText(pdf);List<WordBox> boxes=List.of();
                 if(text.strip().length()<8) {
                     if(!ocrAvailable()) {warnings.add("OCR_UNAVAILABLE_PAGE_"+p);continue;}
                     var box=pdf.getPage(p-1).getCropBox();
@@ -112,21 +112,22 @@ public class AttachmentExtractor {
                     var rendered=new PDFRenderer(pdf).renderImageWithDPI(p-1,144);
                     try(var buffer=new ByteArrayOutputStream()) {
                         ImageIO.write(rendered,"png",buffer);
-                        text=ocr.getObject().recognize(buffer.toByteArray(),deadline);
+                        var recognized=ocr.getObject().recognizeWithRegions(buffer.toByteArray(),deadline);text=recognized.text();boxes=recognized.words();
                         warnings.add("OCR_TEXT_REQUIRES_REVIEW_PAGE_"+p);
                     } finally {rendered.flush();}
                 }
-                out.text(text,new Location("page",null,null,null,p,null));
+                out.text(text,new Location("page",null,null,null,p,null,boxes));
             }
         }
     }
     private void photo(byte[] bytes,DocumentRows out,List<String> warnings,long deadline) throws IOException {
         AttachmentValidator.validateJpeg(bytes);
-        String text="";
-        if(ocrAvailable()) {text=ocr.getObject().recognize(bytes,deadline);warnings.add("OCR_TEXT_REQUIRES_REVIEW");}
+        String text="";List<WordBox> boxes=List.of();
+        if(ocrAvailable()) {var recognized=ocr.getObject().recognizeWithRegions(bytes,deadline);text=recognized.text();boxes=recognized.words();warnings.add("OCR_TEXT_REQUIRES_REVIEW");}
         else warnings.add("OCR_UNAVAILABLE");
         check(deadline);
-        if(text!=null&&text.strip().length()>=4) out.text(text,new Location("image",null,null,null,1,null));
+        boolean usable=text!=null&&text.strip().length()>=4&&(boxes.isEmpty()||boxes.stream().anyMatch(word->word.confidence()>=40&&word.text().matches(".*[\\p{L}0-9]{3,}.*")));
+        if(usable) out.text(text,new Location("image",null,null,null,1,null,boxes));
         else if(visionAvailable()) {
             var observation=vision.getObject().inspect(bytes,deadline);
             warnings.addAll(observation.qualityFlags());warnings.add("VISUAL_CANDIDATES_REQUIRE_REVIEW");

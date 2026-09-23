@@ -25,6 +25,8 @@ public class AttachmentController {
     }
     @GetMapping("/attachments/{id}") public Snapshot status(@AuthenticationPrincipal TrustedScope scope,@PathVariable UUID id){return attachments.status(scope,id.toString());}
     @PostMapping("/attachments/{id}/review") public Snapshot review(@AuthenticationPrincipal TrustedScope scope,@PathVariable UUID id,@Valid @RequestBody ReviewRequest request){return attachments.review(scope,id.toString(),request);}
+    @PostMapping("/attachments/{id}/reprocess") @ResponseStatus(HttpStatus.ACCEPTED)
+    public Accepted reprocess(@AuthenticationPrincipal TrustedScope scope,@PathVariable UUID id,@Valid @RequestBody ReprocessRequest request){return attachments.reprocess(scope,id.toString(),request);}
     @DeleteMapping("/attachments/{id}") @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@AuthenticationPrincipal TrustedScope scope,@PathVariable UUID id){attachments.delete(scope,id.toString());}
     @GetMapping("/attachments/{id}/source") public ResponseEntity<byte[]> source(@AuthenticationPrincipal TrustedScope scope,@PathVariable UUID id){

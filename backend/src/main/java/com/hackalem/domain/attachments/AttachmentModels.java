@@ -9,7 +9,10 @@ import java.util.Map;
 /** Decimal quantities and identifiers cross the HTTP boundary as strings. */
 public final class AttachmentModels {
     private AttachmentModels() {}
-    public record Location(String kind, String sheet, Integer row, String cell, Integer page, Integer paragraph) {}
+    public record WordBox(String text, int x, int y, int width, int height, int imageWidth, int imageHeight, double confidence, String lineId) {}
+    public record Location(String kind, String sheet, Integer row, String cell, Integer page, Integer paragraph, List<WordBox> words) {
+        public Location(String kind,String sheet,Integer row,String cell,Integer page,Integer paragraph){this(kind,sheet,row,cell,page,paragraph,List.of());}
+    }
     public record VisualEvidence(String category, List<String> visibleMarkings, Map<String,String> observedAttributes, List<String> qualityFlags) {}
     public record ExtractedRow(String id, String rawText, String article, String quantity, String unit,
                                Location source, List<String> warnings, VisualEvidence visualEvidence) {
@@ -21,6 +24,7 @@ public final class AttachmentModels {
     public record Selection(@NotBlank String rowId, @NotBlank String productId,
                             @NotBlank @Pattern(regexp="[0-9]+(?:\\.[0-9]{1,6})?") String quantity,
                             @NotBlank String unit, @NotBlank String warehouse, boolean selected) {}
+    public record ReprocessRequest(@NotBlank @Pattern(regexp="[1-9][0-9]*") String expectedVersion) {}
     public record ReviewRequest(@NotBlank @Pattern(regexp="[1-9][0-9]*") String expectedVersion, @NotNull @Size(max=1000) List<@Valid Selection> selections) {}
     public record Snapshot(String attachmentId, String conversationId, String version, String status, String stage,
                            String filename, String mimeType, List<MatchedRow> rows,

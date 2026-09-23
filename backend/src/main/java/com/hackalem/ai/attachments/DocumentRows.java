@@ -11,6 +11,7 @@ public class DocumentRows {
     private static final Pattern NUMBER=Pattern.compile("[0-9]+(?:[,.][0-9]{1,6})?");
     private final List<ExtractedRow> rows=new ArrayList<>();
     private int article=-1,quantity=-1,unit=-1; private int chars;
+    private final Map<String,Integer> occurrences=new HashMap<>();
     public void visual(VisualEvidence evidence) {
         for(int i=0;i<rows.size();i++){var r=rows.get(i);rows.set(i,new ExtractedRow(r.id(),r.rawText(),r.article(),r.quantity(),r.unit(),r.source(),r.warnings(),evidence));}
     }
@@ -52,11 +53,22 @@ public class DocumentRows {
         if(sku==null) warnings.add("ARTICLE_UNCERTAIN");
         if(formula) warnings.add("CACHED_FORMULA_REQUIRES_REVIEW");
         if(rows.size()>=AttachmentLimits.ROWS) throw AttachmentException.invalid("ROW_LIMIT");
-        rows.add(new ExtractedRow("row-"+(rows.size()+1),raw,sku,qty,units,source,List.copyOf(warnings)));
+        String identity=source.kind()+"|"+source.sheet()+"|"+source.row()+"|"+source.cell()+"|"+source.page()+"|"+source.paragraph()+"|"+raw;
+        String key=com.hackalem.domain.Json.hash(identity).substring(0,24);int occurrence=occurrences.merge(key,1,Integer::sum);
+        rows.add(new ExtractedRow("row-"+key+"-"+occurrence,raw,sku,qty,units,source,List.copyOf(warnings)));
     }
     public void text(String text,Location location) {
+        Map<String,List<WordBox>> groups=new LinkedHashMap<>();
+        if(location.words()!=null)for(WordBox word:location.words())groups.computeIfAbsent(word.lineId(),ignored->new ArrayList<>()).add(word);
         for(String line:text.split("\\R")) {
-            if(!line.isBlank()) add(Arrays.stream(line.split("\\t|\\s{2,}|\\|",-1)).map(String::strip).toList(),location,false);
+            if(!line.isBlank()) {
+                String normalized=line.replaceAll("\\s","");String match=null;
+                for(var group:groups.entrySet())if(group.getValue().stream().map(WordBox::text).collect(java.util.stream.Collectors.joining()).equals(normalized)){match=group.getKey();break;}
+                // Each OCR word belongs to at most one row, bounding provenance size.
+                List<WordBox> boxes=match==null?List.of():List.copyOf(groups.remove(match));
+                Location source=new Location(location.kind(),location.sheet(),location.row(),location.cell(),location.page(),location.paragraph(),boxes);
+                add(Arrays.stream(line.split("\\t|\\s{2,}|\\|",-1)).map(String::strip).toList(),source,false);
+            }
         }
     }
     private static String value(List<String> row,int i) {return i<0||i>=row.size()||row.get(i).isBlank()?null:row.get(i).strip();}

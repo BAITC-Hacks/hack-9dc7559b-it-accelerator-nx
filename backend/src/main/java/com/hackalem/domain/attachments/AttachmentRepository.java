@@ -65,6 +65,19 @@ public class AttachmentRepository {
             db.update("DELETE FROM attachment_reviews WHERE attachment_id=?",id);db.update("DELETE FROM attachment_rows WHERE attachment_id=?",id);
         });
     }
+    public Accepted reprocess(String id,TrustedScope scope,long expected){
+        return tx.execute(s->{
+            db.queryForList("SELECT id FROM attachment_queue_guard WHERE id=1 FOR UPDATE");
+            Stored current=find(id,scope,true);
+            if(current.version()!=expected)throw ApiException.conflict("stale_attachment");
+            if(db.queryForObject("SELECT count(*) FROM attachment_jobs WHERE attachment_id<>? AND status IN ('QUEUED','RUNNING')",Integer.class,id)>=AttachmentLimits.QUEUE || db.queryForObject("SELECT count(*) FROM attachments WHERE id<>? AND owner_subject=? AND status IN ('QUEUED','PROCESSING') AND deleted=false",Integer.class,id,scope.principalId())>=AttachmentLimits.OWNER_QUEUE)throw new ApiException(429,"attachment_queue_full");
+            int desired=Math.addExact(current.desiredVersion(),1);String job=UUID.randomUUID().toString();
+            db.update("UPDATE attachment_jobs SET status='CANCELLED',epoch=epoch+1,lease_until=NULL WHERE attachment_id=? AND status IN ('QUEUED','RUNNING')",id);
+            db.update("UPDATE attachments SET revision=revision+1,desired_version=?,status='QUEUED',stage='queued',error_code=NULL WHERE id=?",desired,id);
+            db.update("INSERT INTO attachment_jobs(id,attachment_id,desired_version) VALUES (?,?,?)",job,id,desired);
+            return new Accepted(id,job,Long.toString(current.version()+1),"QUEUED",false);
+        });
+    }
     public Optional<Job> claim(){
         return tx.execute(s->{
             // Lock attachment first everywhere (publish/delete/claim), preventing deadlocks.
@@ -85,10 +98,13 @@ public class AttachmentRepository {
             if(current.isEmpty()||current.getFirst().deleted()||current.getFirst().desiredVersion()!=job.version())return false;
             int updated=db.update("UPDATE attachment_jobs SET status=?,lease_until=NULL WHERE id=? AND epoch=? AND status='RUNNING' AND lease_until>now()",error==null?"COMPLETED":"FAILED",job.id(),job.epoch());
             if(updated==0)return false;
-            // Publishing a new extraction never deletes/replaces an explicit user review.
-            for(int i=0;i<rows.size();i++)db.update("INSERT INTO attachment_rows(attachment_id,row_id,extraction_version,row_order,payload) VALUES (?,?,?,?,?) ON CONFLICT(attachment_id,row_id) DO UPDATE SET extraction_version=EXCLUDED.extraction_version,row_order=EXCLUDED.row_order,payload=EXCLUDED.payload",job.attachmentId(),rows.get(i).extracted().id(),job.version(),i,json.write(rows.get(i)));
-            boolean needsReview=!warnings.isEmpty()||rows.isEmpty()||rows.stream().anyMatch(r->!r.status().equals("matched"));
-            db.update("UPDATE attachments SET status=?,stage=?,warnings=?,error_code=?,revision=revision+1 WHERE id=?",error!=null?"FAILED":needsReview?"NEEDS_REVIEW":"READY",error!=null?"failed":"review",json.write(warnings),error,job.attachmentId());
+            // Retain reviewed original evidence. OCR changes must never bind an old selection
+            // to a different row merely because its ordinal stayed the same.
+            db.update("DELETE FROM attachment_rows r WHERE r.attachment_id=? AND NOT EXISTS (SELECT 1 FROM attachment_reviews v WHERE v.attachment_id=r.attachment_id AND v.row_id=r.row_id)",job.attachmentId());
+            for(int i=0;i<rows.size();i++)db.update("INSERT INTO attachment_rows(attachment_id,row_id,extraction_version,row_order,payload) VALUES (?,?,?,?,?) ON CONFLICT(attachment_id,row_id) DO UPDATE SET extraction_version=EXCLUDED.extraction_version,row_order=EXCLUDED.row_order,payload=EXCLUDED.payload WHERE NOT EXISTS (SELECT 1 FROM attachment_reviews v WHERE v.attachment_id=attachment_rows.attachment_id AND v.row_id=attachment_rows.row_id)",job.attachmentId(),rows.get(i).extracted().id(),job.version(),i,json.write(rows.get(i)));
+            List<String> publishedWarnings=new ArrayList<>(warnings);if(db.queryForObject("SELECT count(*) FROM attachment_reviews WHERE attachment_id=?",Integer.class,job.attachmentId())>0)publishedWarnings.add("REVIEWED_ROWS_PRESERVED");
+            boolean needsReview=!publishedWarnings.isEmpty()||rows.isEmpty()||rows.stream().anyMatch(r->!r.status().equals("matched"));
+            db.update("UPDATE attachments SET status=?,stage=?,warnings=?,error_code=?,revision=revision+1 WHERE id=?",error!=null?"FAILED":needsReview?"NEEDS_REVIEW":"READY",error!=null?"failed":"review",json.write(publishedWarnings),error,job.attachmentId());
             return true;
         }));
     }

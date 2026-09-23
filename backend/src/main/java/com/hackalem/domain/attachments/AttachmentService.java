@@ -27,6 +27,11 @@ public class AttachmentService {
     public void delete(TrustedScope scope,String id){
         requireScope(scope);var current=files.ownedIncludingDeleted(id,scope);chat.conversation(scope,UUID.fromString(current.conversationId()),false);files.delete(id,scope);
     }
+    public Accepted reprocess(TrustedScope scope,String id,ReprocessRequest request){
+        access(scope,id,false);long expected;
+        try{expected=Long.parseLong(request.expectedVersion());if(expected<=0)throw new NumberFormatException();}catch(Exception e){throw new ApiException(400,"invalid_version");}
+        return files.reprocess(id,scope,expected);
+    }
     public Snapshot review(TrustedScope scope,String id,ReviewRequest request){
         return tx.execute(s->{
             var current=access(scope,id,true);
@@ -45,6 +50,7 @@ public class AttachmentService {
         return tx.execute(s->{
             var current=access(scope,id,true);
             if(!Long.toString(current.version()).equals(version))throw ApiException.conflict("stale_attachment");
+            if(!List.of("READY","NEEDS_REVIEW").contains(current.status()))throw ApiException.conflict("attachment_not_ready");
             List<Contracts.Selection> selected=new ArrayList<>();List<Contracts.SourceRef> sources=new ArrayList<>();
             Map<String,ExtractedRow> rows=new HashMap<>();files.rows(id).forEach(r->rows.put(r.extracted().id(),r.extracted()));
             for(var selection:files.selections(id))if(selection.selected()){

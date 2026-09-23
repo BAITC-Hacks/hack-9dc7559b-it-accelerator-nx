@@ -1,7 +1,7 @@
 ---
 id: ATT-01
 owner: D2
-status: todo
+status: in_progress
 wave: 1
 size: M
 depends_on: ["FOUND-01"]
@@ -50,11 +50,11 @@ backend/…/domain/attachments/; web/attachments/; ai/attachments/; db/migration
 
 ## Done when
 
-- [ ] Все поддержанные семейства принимаются валидатором, остальные дают415, oversize413.
-- [ ] Два visitors не читают чужой attachment/job/source; checksum не раскрывает наличие чужих файлов.
-- [ ] Restart/retry не дублирует rows, delete-during-processing не публикует результат.
+- [x] Все поддержанные семейства принимаются валидатором, остальные дают415, oversize413.
+- [x] Два visitors не читают чужой attachment/job/source; checksum не раскрывает наличие чужих файлов.
+- [x] Restart/retry не дублирует rows, delete-during-processing не публикует результат.
 - [ ] Не требуются host parser binaries: путь storage/worker описан для Compose.
-- [ ] Проверки выполнены на своей ветке; PR содержит результат проверок и известные ограничения.
+- [x] Проверки выполнены на своей ветке; PR содержит результат проверок и известные ограничения.
 
 ## Проверка и передача
 
@@ -65,3 +65,12 @@ backend/…/domain/attachments/; web/attachments/; ai/attachments/; db/migration
 **Передать:** D1: AttachmentPort и статусы; D3: upload/progress/review contract; ATT-02/03: safe extraction job context.
 
 **Evidence после выполнения:** заполнить commit/PR, команды, ссылки на отчёты и фактический результат; до выполнения статус остаётся todo.
+
+
+## Evidence реализации D2 — 2026-09-23
+
+Код: `49ad17e` и follow-up на ветке `codex/d2-attachment-services`. Handoff: [API, лимиты и оставшиеся gates](../../docs/api/attachments-handoff.md). Фактически выполнено: focused Gradle suite `--tests 'com.hackalem.attachments.*'` (22 tests, PostgreSQL/Redis Testcontainers, реальные D1 JWT двух visitors, реальные XLS/XLSX/DOC/DOCX/PDF/JPEG fixtures, локальный Tesseract). Общую demo-БД тесты не изменяют. Зависимости POI/PDFBox при изолированной проверке подставлены init script; основной build/config принадлежит интеграционному коммиту root. PR не создавался: пользователь запросил commit.
+
+Reprocess API защищён ACL + `expectedVersion`; новая desired version отзывает старые claims. Review и исходное evidence сохраняются отдельно; изменившийся OCR не перепривязывает выбранный товар по номеру строки. OCR возвращает word boxes в координатах исходного JPEG или 144-DPI PDF page, с ограниченным размером provenance.
+
+Статус остаётся `in_progress` до общей интеграционной проверки образа/SDK и применимых внешних gates: container-only OCR, live vision quality. Проверка scripted vision подтверждает маршрутизацию и uncertainty, не качество реальной модели. Жёсткая изоляция POI/PDFBox в отдельном процессе не реализована: есть лимиты input/ZIP/pages/rows/text/pixels и cooperative deadline, а зависшая операция библиотеки требует отдельного worker container/process для жёсткого прерывания. Этот предел явно отражён в handoff, а не выдан за пройденный gate.
