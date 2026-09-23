@@ -26,7 +26,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 @SpringBootTest(properties={"spring.ai.model.chat=none","spring.ai.model.embedding=none","spring.ai.openai.api-key=offline-no-calls","app.catalog.embedding.mode=fake","app.catalog.seed.enabled=false","app.worker.enabled=false","app.visitor-enabled=true"})
 @org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
-@ActiveProfiles("d2") @Testcontainers
+@ActiveProfiles({"d2","catalog-test"}) @Testcontainers
 @org.springframework.test.annotation.DirtiesContext
 class CatalogServicesIntegrationTest {
     @Container static PostgreSQLContainer<?> postgres=new PostgreSQLContainer<>(DockerImageName.parse("pgvector/pgvector:pg16").asCompatibleSubstituteFor("postgres"));

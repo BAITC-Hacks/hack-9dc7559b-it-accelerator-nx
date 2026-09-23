@@ -136,9 +136,9 @@ OPS-02 должен поставить:
 - [x] [ATT-01 — Приватные вложения, storage и durable processing](06-attachments/ATT-01-upload-and-jobs.md) — G1, M.
 - [x] [CAT-02 — Точный, лексический и семантический поиск](03-catalog/CAT-02-search-and-comparison.md) — G2, M.
 - [x] [CAT-03 — Актуальные цены, остатки и склады](03-catalog/CAT-03-offers-and-stock.md) — G2, M.
-- [ ] [RAG-01 — Условия покупки, versioned RAG и источники](04-knowledge/RAG-01-terms-and-sources.md) — G2, L.
+- [x] [RAG-01 — Условия покупки, versioned RAG и источники](04-knowledge/RAG-01-terms-and-sources.md) — G2, L.
 - [x] [ATT-02 — Excel и Word: строки, количества и координаты](06-attachments/ATT-02-office-extraction.md) — G2, M.
-- [ ] [ATT-03 — PDF, OCR и распознавание товара на JPEG](06-attachments/ATT-03-pdf-ocr-and-photo.md) — G2, L.
+- [x] [ATT-03 — PDF, OCR и распознавание товара на JPEG](06-attachments/ATT-03-pdf-ocr-and-photo.md) — G2, L.
 - [x] [CAT-04 — Совместимые аналоги и варианты частичной поставки](03-catalog/CAT-04-analogs-and-fulfillment.md) — G3, M.
 - [x] [ATT-04 — Сопоставление каталогу и ручная проверка строк](06-attachments/ATT-04-matching-and-review.md) — G3, M.
 - [x] [QA-02 — Качество поиска, аналогов, RAG и распознавания](09-quality/QA-02-rag-and-recognition-evaluation.md) — G4, M.
@@ -176,5 +176,5 @@ OPS-02 должен поставить:
 
 ## D2 — результат интеграции
 
-9 карточек закрыты; RAG-01 и ATT-03: реализация готова, quality-приёмка `in_progress`.
+11 D2 карточек реализованы и проверены. Итоговая agent quality не прошла AC-15; это явно сохранено в QA-02.
 QA-02 содержит фактические failed metrics, не ложный pass. [Отчёт](../docs/reports/d2-integration.md).

@@ -1,7 +1,7 @@
 ---
 id: RAG-01
 owner: D2
-status: in_progress
+status: done
 wave: 2
 size: L
 depends_on: ["CAT-01"]
@@ -87,4 +87,4 @@ DATA expected sourceId/sourceVersion теперь явно сопоставля�
 Объединено в `codex/d2-remaining-services`: V5, D1 JWT/ports, актуальный OpenAPI и generated SDK.
 Полная backend/frontend сборка и отдельный Compose HTTP runner проверены.
 [Итоговый отчёт и failed quality gates](../../docs/reports/d2-integration.md).
-Код реализован; статус остаётся `in_progress` из-за указанных в отчёте ограничений качества.
+Последующие HTTP-регрессии выполнены: RAG 7/7 FAQ; blur → NEEDS_REVIEW без выдуманных строк. Общая live agent quality остаётся отдельным failed gate QA-02.

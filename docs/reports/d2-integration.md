@@ -6,10 +6,10 @@ DATA-01/CAT-01 теперь интегрированы с D1 JWT/ports. Конф
 
 ## Проверки
 
-- Backend: полный `./gradlew build --no-daemon` — 123 теста, 0 failures/skips; PostgreSQL/Redis Testcontainers,
+- Backend: полный `./gradlew build --no-daemon` — 125 тестов, 0 failures/skips; PostgreSQL/Redis Testcontainers,
   обе истории V3 → V4 → V5, реальные Office/PDF/JPEG fixtures.
-- Frontend: `npm run build`, `npm test` (12 PASS), `npm run lint` (0 errors,
-  одно прежнее предупреждение ChatPage.tsx:45), `npm run gen:check` PASS.
+- Frontend: `npm run build`, `npm test` (23 PASS), `npm run lint` (0 errors,
+  два предупреждения ref cleanup в ChatPage/AttachmentPanel, пришедшие из main), `npm run gen:check` PASS.
 - DATA validator: 36 товаров, 4 документа, 13 файлов, 54 вопроса — PASS.
 - `docker compose -p hackalem-quality -f scripts/d2-quality-compose.yml ...`:
   отдельный чистый volume, Postgres/Redis/backend healthy; реальные D2 ports,
@@ -67,8 +67,8 @@ late worker fencing и отказ старой cart proposal после импо
 
 **QA-02 выполнена как воспроизводимая оценка с конкретными failed metrics, как
 допускает карточка. Качество продукта по AC-15 не принято; зелёная сборка не меняет
-этот результат.** RAG-01/ATT-03 остаются `in_progress` по итоговой quality-приёмке;
-остальные D2 реализации переданы. Повторно принимать качество после исправлений D1.
+этот результат.** D2 реализации переданы; после исправлений RAG и blur guard выполнены отдельные
+регрессии. Повторно принимать полное agent качество после исправлений D1.
 
 ## Артефакты и воспроизведение
 
@@ -83,3 +83,20 @@ late worker fencing и отказ старой cart proposal после импо
 Файлы db/drafts используются изолированными тестами; runtime применяет только общую
 V5. Shared demo containers не обновлялись этой веткой; опубликованное исправление
 main и новые изменения D2 — разные коммиты/ветки.
+
+## Последующие исправления и актуальный main
+
+- [RAG HTTP regression](qa02-rag-regression.json): **7/7 FAQ** после нормализации
+  общих слов запроса. Цифры, отрицания и характеристики сохраняются; порог не снижен.
+  Эти уже наблюдавшиеся вопросы стали regression-набором: это не новый blind held-out
+  результат. Исходная таблица выше относится к прогонам до исправлений.
+- [Blur HTTP regression](qa02-blur-regression.json): NEEDS_REVIEW, rows=[],
+  IMAGE_BLURRED_RETAKE; выдуманный model-only SKU/quantity больше не принимается.
+- Ветка включает новый `origin/main` `610fc2b` с UI-03/UI-04. Исправлены две
+  входящие ошибки TypeScript: отсутствующий type import и дубли default selection.
+  Итог: **125 backend tests + 23 frontend tests PASS**, SDK drift check PASS.
+- Новые SourcePage/AttachmentProvider пока работают с mock driver; D3 нужно
+  подключить опубликованные generated endpoints и string revisions. Это не скрыто
+  за fake backend и не выдано за готовую live frontend интеграцию.
+- Карточки D2 закрыты по доставленным сервисам/проверкам. QA-02, согласно своей
+  формулировке, допускает конкретную failed metric; **AC-15/release остаётся FAILED**.
