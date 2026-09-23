@@ -52,6 +52,35 @@ for i in range(1, 37):
                      "synthetic": True, "warehouses": [{"warehouseId": "ALA", "availableQuantity": qty,
                        "status": "UNKNOWN" if qty is None else "OUT_OF_STOCK" if qty == "0" else "IN_STOCK", "eligible": True}]})
 products[0]["warehouses"].append({"warehouseId": "CLOSED", "availableQuantity": "999", "status": "IN_STOCK", "eligible": False})
+
+# Extra filler SKUs (IDs 1037+) to bulk out the demo catalog. Products 1001-1036
+# above are load-bearing fixtures for data/expected/scenarios.json and must not
+# be touched; these just repeat the same category/spec/warehouse shape with
+# fresh IDs and articles so the catalog looks populated in demos.
+CATALOG_BLOCKS = 9  # 9 * 36 = 324 extra products; 36 + 324 = 360 total
+for block in range(1, CATALOG_BLOCKS + 1):
+    for j in range(1, 37):
+        i = 36 * block + j
+        category = "breakers" if j <= 12 else "cables" if j <= 24 else "lamps"
+        specs = ({"poles": "1", "currentA": str(((j - 1) % 6 + 1) * 10), "voltageV": "230", "curve": "C", "breakingCapacityKa": "6"}
+                 if category == "breakers" else
+                 {"cores": "3", "crossSectionMm2": str((j - 13) % 10 + 1), "material": "copper", "voltageV": "660", "insulation": "PVC"}
+                 if category == "cables" else
+                 {"voltageV": "230", "base": "E27", "powerW": str((j - 25) % 15 + 5), "colorTemperatureK": "4000"})
+        article = f"{i:06d}"
+        unit = "m" if category == "cables" else "pcs"
+        label = (f"Автомат SYN C{specs['currentA']} 1P {i:03d}" if category == "breakers" else
+                 f"Кабель SYN ВВГ 3x{specs['crossSectionMm2']} {i:03d}" if category == "cables" else
+                 f"Лампа SYN LED E27 {specs['powerW']}W {i:03d}")
+        qty = str(20 + (i % 80))
+        products.append({"id": 1000+i, "article": article, "name": label, "brand": "SYNTHETIC", "category": category,
+                         "unit": unit, "minimum": "0.5" if unit == "m" else "1", "step": "0.5" if unit == "m" else "1",
+                         "price": f"{1500+(i-1)*100}.00", "currency": "KZT", "specs": specs,
+                         "certificates": [{"id": f"SYN-CERT-{category}", "url": f"https://example.invalid/certificates/{category}", "file": "data/sample_catalog/certificates/synthetic-certificate.pdf", "version":"1", "synthetic":True}],
+                         "sourceUrl": f"https://example.invalid/products/{article}", "sourceVersion": "synthetic-v1",
+                         "synthetic": True, "warehouses": [{"warehouseId": "ALA", "availableQuantity": qty,
+                           "status": "IN_STOCK", "eligible": True}]})
+
 write("data/sample_catalog/products.json", {"schemaVersion": 1, "synthetic": True, "version": "synthetic-v1", "products": products})
 write("data/sample_catalog/compatibility-rules.json", {"synthetic": True, "version": "synthetic-v1", "rules": {
     "breakers": ["poles", "currentA", "voltageV", "curve", "breakingCapacityKa"],
