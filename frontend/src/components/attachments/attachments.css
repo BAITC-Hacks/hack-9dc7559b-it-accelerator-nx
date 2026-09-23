@@ -26,3 +26,14 @@
 .attachment-review-footer { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin: 12px 0; font-size: 12px; }
 .attachment-drawer :is(button, input, select):focus-visible { outline: 3px solid #8cb05a; outline-offset: 2px; }
 @media (max-width: 540px) { .attachment-drawer { padding: 16px; } .attachment-fields { grid-template-columns: 1fr 1fr; } .attachment-fields label:last-child { grid-column: 1 / -1; } .attachment-review-footer { flex-direction: column; align-items: stretch; } }
+.attachment-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+.attachment-actions button, .attachment-search button, .attachment-conversation button { min-height: 40px; }
+.attachment-workspace > p { font-size: 14px; line-height: 1.6; }
+.attachment-search, .attachment-conversation { display: flex; align-items: end; gap: 12px; margin: 12px 0; }
+.attachment-search label, .attachment-conversation label { display: flex; flex: 1; flex-direction: column; gap: 6px; font-size: 13px; }
+.attachment-search input, .attachment-conversation select { min-width: 0; padding: 10px; border: 1px solid #ccd7c8; border-radius: 6px; background: white; color: #22382d; }
+.attachment-row details { font-size: 12px; line-height: 1.5; margin: 12px 0; }
+.attachment-row summary, .attachments-page summary { cursor: pointer; }
+.attachments-page { max-width: 1020px; }
+.attachments-page .attachment-fields { grid-template-columns: 100px 100px minmax(140px, 1fr) 150px; }
+@media (max-width: 650px) { .attachments-page .attachment-fields { grid-template-columns: 1fr 1fr; } .attachment-search, .attachment-conversation { align-items: stretch; flex-direction: column; } }
