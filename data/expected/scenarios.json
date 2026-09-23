@@ -1,0 +1,108 @@
+{
+  "synthetic": true,
+  "version": "synthetic-v1",
+  "scenarios": [
+    {
+      "id": "AC-1",
+      "article": "000001",
+      "productId": "1001",
+      "quantity": "12",
+      "price": "1500.00"
+    },
+    {
+      "id": "AC-2",
+      "article": "000005",
+      "compatibleIds": [
+        "1001",
+        "1002",
+        "1003"
+      ],
+      "excludedIds": [
+        "1004",
+        "1007"
+      ]
+    },
+    {
+      "id": "AC-3",
+      "sourceIds": [
+        "payment",
+        "delivery",
+        "minimum"
+      ]
+    },
+    {
+      "id": "AC-4",
+      "productId": "1001",
+      "addQuantity": "2",
+      "requiresSeparateConfirmation": true
+    },
+    {
+      "id": "AC-5",
+      "productId": "1001",
+      "existingQuantity": "3",
+      "addQuantity": "2",
+      "expectedQuantity": "5",
+      "requiresSeparateConfirmation": true
+    },
+    {
+      "id": "AC-6",
+      "productId": "1001",
+      "requestedQuantity": "20",
+      "snapshot": "stock12-to7",
+      "expected": "NEW_PROPOSAL_REQUIRED_NO_SILENT_TRUNCATION"
+    },
+    {
+      "id": "AC-7",
+      "cartId": "synthetic-cart-1",
+      "expectedSnapshot": "data/expected/cart-snapshots.json",
+      "linkPath": "/cart/synthetic-cart-1"
+    },
+    {
+      "id": "AC-8",
+      "article": "999999",
+      "expected": "NOT_FOUND"
+    },
+    {
+      "id": "AC-9",
+      "productId": "1001",
+      "requestedQuantity": "20",
+      "split": [
+        {
+          "productId": "1001",
+          "quantity": "12"
+        },
+        {
+          "productId": "1002",
+          "quantity": "8"
+        }
+      ],
+      "whole": [
+        {
+          "productId": "1003",
+          "quantity": "20"
+        }
+      ],
+      "requiresSeparateConfirmation": true
+    },
+    {
+      "id": "AC-10",
+      "orderedProductIds": [
+        "1001",
+        "1002",
+        "1003"
+      ],
+      "ordinals": [
+        1,
+        2
+      ],
+      "expectedIds": [
+        "1001",
+        "1002"
+      ]
+    },
+    {
+      "id": "AC-11",
+      "manifest": "data/attachments/manifest.json"
+    }
+  ]
+}

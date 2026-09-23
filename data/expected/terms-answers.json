@@ -1,0 +1,45 @@
+{
+  "synthetic": true,
+  "cases": [
+    {
+      "query": "Как оплатить?",
+      "sourceId": "payment",
+      "sourceVersion": "1",
+      "expectedFacts": [
+        "банковский перевод",
+        "100% предоплата"
+      ]
+    },
+    {
+      "query": "Доставка по Алматы?",
+      "sourceId": "delivery",
+      "sourceVersion": "1",
+      "expectedFacts": [
+        "2 рабочих дня",
+        "2000 KZT"
+      ]
+    },
+    {
+      "query": "Минимальная партия кабеля?",
+      "sourceId": "minimum",
+      "sourceVersion": "1",
+      "expectedFacts": [
+        "0,5 метра"
+      ]
+    },
+    {
+      "query": "Срок возврата?",
+      "sourceId": "returns",
+      "sourceVersion": "1",
+      "expectedFacts": [
+        "не указан"
+      ],
+      "expected": "NO_CONFIRMED_DEADLINE"
+    },
+    {
+      "query": "Гарантия десять лет?",
+      "sourceId": null,
+      "expected": "NO_ANSWER"
+    }
+  ]
+}

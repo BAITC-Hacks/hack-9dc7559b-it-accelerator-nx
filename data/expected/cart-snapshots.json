@@ -1,0 +1,22 @@
+{
+  "synthetic": true,
+  "fixtureOnly": true,
+  "cartId": "synthetic-cart-1",
+  "ownerId": "synthetic-visitor-1",
+  "unit": "pcs",
+  "currency": "KZT",
+  "productId": "1001",
+  "before": {
+    "version": "1",
+    "quantity": "3",
+    "price": "1500.00",
+    "total": "4500.00"
+  },
+  "after": {
+    "version": "2",
+    "quantity": "5",
+    "price": "1500.00",
+    "total": "7500.00"
+  },
+  "operationId": "synthetic-confirm-1"
+}
