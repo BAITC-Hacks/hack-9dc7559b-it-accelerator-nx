@@ -45,6 +45,7 @@ class CoreIntegrationTest {
     @Autowired AgentTools tools;@Autowired AgentWorker worker;@Autowired EventJournal events;@Autowired Limits limits;
     @Autowired JdbcTemplate db;@Autowired StringRedisTemplate cache;@Autowired MockMvc mvc;@Autowired Json json;
     @MockitoSpyBean SampleCartAdapter adapter;
+    @MockitoSpyBean KnowledgePort knowledge;
     TrustedScope a,b;SessionToken tokenA,tokenB;
     @BeforeEach void reset(){
         db.execute("TRUNCATE visitor_sessions CASCADE");
@@ -200,6 +201,12 @@ class CoreIntegrationTest {
     @Test void unknownToolsCannotMutate(){
         var claim=claim(conversation());for(String name:List.of("cart_add","confirm","sql","delete_all"))assertThatThrownBy(()->tools.execute(claim,new LlmGateway.ToolCall("x",name,"{}"))).hasMessage("tool_not_allowed");
         assertThat(carts.cart(a).lines()).isEmpty();
+    }
+    @Test void repeatedKnowledgeCallCannotReplayARevokedSource(){
+        var claim=claim(conversation());var call=new LlmGateway.ToolCall("knowledge-replay","search_purchase_terms","{\"query\":\"доставка\"}");
+        assertThat(tools.execute(claim,call)).isNotBlank();
+        doThrow(ApiException.missing()).when(knowledge).retrieve(anyString(),any(),anyInt());
+        assertThatThrownBy(()->tools.execute(claim,call)).isInstanceOf(ApiException.class);
     }
     @Test void agentUsesTypedProductsAndFinishesOffline()throws Exception{
         var claim=claim(conversation());worker.execute(claim);assertThat(chat.run(a,claim.id()).status()).isEqualTo("completed");
