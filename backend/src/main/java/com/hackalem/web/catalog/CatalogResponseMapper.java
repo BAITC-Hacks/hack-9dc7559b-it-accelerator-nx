@@ -46,7 +46,7 @@ public class CatalogResponseMapper {
                 Decimals.quantity(product.minimumQuantity()),
                 Decimals.quantity(product.stepQuantity()),
                 product.specs() == null ? Map.of() : product.specs(),
-                toCertificates(product.certificates()),
+                product.certificates().stream().map(c -> new CertificateResponse(c.id(),com.hackalem.domain.catalog.CatalogCertificates.url(product,c),c.version(),c.synthetic())).toList(),
                 product.sourceUrl(),
                 product.sourceVersion(),
                 product.synthetic(),

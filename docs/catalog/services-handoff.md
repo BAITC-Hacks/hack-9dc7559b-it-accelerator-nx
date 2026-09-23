@@ -42,3 +42,11 @@ Units and categories must match. Missing hard attributes require clarification; 
 Append `backend/src/main/resources/db/drafts/catalog.sql` to the next common migration after both supported V3/V4 histories. Do not change the existing histories. The draft augments stock-source metadata and adds initialization/read-snapshot tables.
 
 Verification: `DOCKER_HOST=unix:///Users/zubanyszarylkasynov/.docker/run/docker.sock TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=/var/run/docker.sock ./gradlew test --tests 'com.hackalem.catalog.*'`. Testcontainers use isolated volumes; the shared demo database is untouched.
+
+## Publication and certificate follow-up
+
+Catalog publication now projects synthetic source rows into `sample_offers` **inside the same transaction** as the active-version switch. An already prepared proposal cannot confirm against an old stock/minimum/unit after a newly published import, even when no catalog read occurs between import and confirmation. Existing source versions advance; newly unknown, removed, or ineligible buckets are removed from the authoritative source. The cart implementation remains unchanged.
+
+`GET /api/products/{article}/certificates/{certificateId}` serves the actual synthetic certificate PDF only for an authenticated visitor and a certificate belonging to that active product. File resolution uses the configured seed resource and an allowlisted fixture; arbitrary imported paths/URLs are never opened. Synthetic `ProductResponse.certificates[].url` and `SourceRef.id` contain this catalog route. Citation consumers must recognize `/api/products/.../certificates/...` and fetch it with the session bearer token; KB UUID references keep the separate KB source route.
+
+Focused verification: catalog integration suite **10 tests passed**, including prepared-cart rejection immediately after a stock-changing import, PDF bytes for an authorized product certificate, and rejected unauthenticated/unrelated-certificate access.

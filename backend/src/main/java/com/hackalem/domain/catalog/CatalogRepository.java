@@ -105,6 +105,7 @@ public class CatalogRepository {
      */
     @Transactional
     public void publishVersion(long versionId) {
+        publishSyntheticSource(versionId);
         jdbc.update("UPDATE catalog_versions SET status = 'SUPERSEDED', superseded_at = now() WHERE status = 'ACTIVE'");
         int updated = jdbc.update("""
                 UPDATE catalog_versions SET status = 'ACTIVE', published_at = now()
@@ -114,6 +115,47 @@ public class CatalogRepository {
             throw new CatalogConflictException("CATALOG_PUBLISH_CONFLICT",
                     "Версия " + versionId + " не в состоянии READY: публикацию выполнил другой импорт");
         }
+    }
+
+    /** D1 confirmation reads sample_offers directly: projection must publish atomically, never lazily alone. */
+    private void publishSyntheticSource(long versionId) {
+        // CAT-01 can still run before the later D2 service migration is installed.
+        if (!Boolean.TRUE.equals(jdbc.queryForObject("SELECT to_regclass('catalog_offer_seed') IS NOT NULL",Boolean.class))) return;
+        jdbc.update("""
+            DELETE FROM sample_offers so WHERE so.catalog_version_id IS NOT NULL AND NOT EXISTS (
+              SELECT 1 FROM product_versions pv JOIN products p ON p.id=pv.product_id
+              JOIN warehouse_stock w ON w.catalog_version_id=pv.catalog_version_id AND w.product_id=p.id
+              JOIN product_offers o ON o.catalog_version_id=pv.catalog_version_id AND o.product_id=p.id
+              WHERE pv.catalog_version_id=? AND pv.synthetic AND w.eligible
+                AND w.status IN ('IN_STOCK','OUT_OF_STOCK') AND w.available_quantity IS NOT NULL
+                AND p.article=so.article AND pv.unit=so.unit AND w.warehouse_id=so.warehouse)
+            """,versionId);
+        var rows=jdbc.queryForList("""
+            SELECT p.article,pv.unit,w.warehouse_id,o.price,o.currency,w.available_quantity,
+                   pv.step_quantity,pv.minimum_quantity,pv.source_version
+            FROM product_versions pv JOIN products p ON p.id=pv.product_id
+            JOIN warehouse_stock w ON w.catalog_version_id=pv.catalog_version_id AND w.product_id=p.id
+            JOIN product_offers o ON o.catalog_version_id=pv.catalog_version_id AND o.product_id=p.id
+            WHERE pv.catalog_version_id=? AND pv.synthetic AND w.eligible
+              AND w.status IN ('IN_STOCK','OUT_OF_STOCK') AND w.available_quantity IS NOT NULL
+            """,versionId);
+        for(var row:rows) jdbc.update("""
+            INSERT INTO sample_offers(article,unit,warehouse,bucket,price,currency,available,step,
+                version,catalog_version_id,source_version,minimum_quantity)
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(article,unit,warehouse) DO UPDATE SET
+                price=EXCLUDED.price,currency=EXCLUDED.currency,available=EXCLUDED.available,
+                step=EXCLUDED.step,version=sample_offers.version+1,catalog_version_id=EXCLUDED.catalog_version_id,
+                source_version=EXCLUDED.source_version,minimum_quantity=EXCLUDED.minimum_quantity,observed_at=now()
+            """,row.get("article"),row.get("unit"),row.get("warehouse_id"),
+                CatalogOfferService.bucket((String)row.get("article"),(String)row.get("unit"),(String)row.get("warehouse_id")),
+                row.get("price"),row.get("currency"),row.get("available_quantity"),row.get("step_quantity"),
+                versionId,versionId,row.get("source_version"),row.get("minimum_quantity"));
+        jdbc.update("""
+            INSERT INTO catalog_offer_seed(product_id,catalog_version_id,source_version)
+            SELECT product_id,catalog_version_id,source_version FROM product_versions
+            WHERE catalog_version_id=? AND synthetic
+            ON CONFLICT(product_id) DO UPDATE SET catalog_version_id=EXCLUDED.catalog_version_id,source_version=EXCLUDED.source_version
+            """,versionId);
     }
 
     /** Чистка вытесненных версий; идентичность товаров при этом не удаляется. */

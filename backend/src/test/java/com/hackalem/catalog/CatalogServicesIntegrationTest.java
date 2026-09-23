@@ -25,6 +25,7 @@ import javax.sql.DataSource;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 @SpringBootTest(properties={"spring.ai.model.chat=none","spring.ai.model.embedding=none","spring.ai.openai.api-key=offline-no-calls","app.catalog.embedding.mode=fake","app.catalog.seed.enabled=false","app.worker.enabled=false","app.visitor-enabled=true"})
+@org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 @ActiveProfiles("d2") @Testcontainers
 @org.springframework.test.annotation.DirtiesContext
 class CatalogServicesIntegrationTest {
@@ -34,15 +35,17 @@ class CatalogServicesIntegrationTest {
     @Autowired DataSource dataSource;@Autowired JdbcTemplate db;@Autowired ObjectMapper json;@Autowired CatalogImportService imports;
     @Autowired CatalogRepository catalog;@Autowired CatalogSearchService search;@Autowired CatalogOfferService offers;@Autowired CatalogAnalogsService analogs;
     @Autowired CatalogDataAdapter adapter;@Autowired SessionService sessions;
+    @Autowired com.hackalem.domain.chat.ChatService chat;@Autowired com.hackalem.domain.cart.CartService carts;
+    @Autowired org.springframework.test.web.servlet.MockMvc mvc;
     @MockitoSpyBean CatalogEmbeddingProvider embeddings;
     @org.springframework.test.context.bean.override.mockito.MockitoBean com.hackalem.domain.port.LlmGateway unusedLlm;
-    TrustedScope owner,other;
+    TrustedScope owner,other;String ownerToken;
     void schemaAndCatalog()throws Exception{
         if(Boolean.FALSE.equals(db.queryForObject("SELECT to_regclass('catalog_read_snapshots') IS NOT NULL",Boolean.class)))new ResourceDatabasePopulator(new ClassPathResource("db/drafts/catalog.sql")).execute(dataSource);
         var document=json.readValue(new File("../data/sample_catalog/products.json"),CatalogImportDocument.class);
-        assertThat(imports.importNow(document,"catalog-services-test","tests").status()).isEqualTo(ImportJobStatus.SUCCEEDED);
+        assertThat(imports.importNow(document,catalog.findActiveVersion().map(v->v.sourceVersion().equals(document.version())).orElse(false)?"catalog-services-test":null,"tests").status()).isEqualTo(ImportJobStatus.SUCCEEDED);
     }
-    @BeforeEach void reset()throws Exception{schemaAndCatalog();db.execute("TRUNCATE visitor_sessions CASCADE");db.execute("TRUNCATE catalog_offer_seed,sample_offers");owner=sessions.verify(sessions.create().accessToken());other=sessions.verify(sessions.create().accessToken());clearInvocations(embeddings);}
+    @BeforeEach void reset()throws Exception{schemaAndCatalog();db.execute("TRUNCATE visitor_sessions CASCADE");db.execute("TRUNCATE catalog_offer_seed,sample_offers");ownerToken=sessions.create().accessToken();owner=sessions.verify(ownerToken);other=sessions.verify(sessions.create().accessToken());clearInvocations(embeddings);}
     SearchCriteria query(String text){return new SearchCriteria(text,20,null,null,null,null,null,Map.of(),false);}
     @Test void exactAndMissingSkuNeverCallEmbedding(){
         assertThat(search.search(query("000001")).products()).extracting(CatalogProduct::article).containsExactly("000001");
@@ -76,6 +79,28 @@ class CatalogServicesIntegrationTest {
         var saved=adapter.searchSnapshot(query("автомат"),owner);var first=saved.resultSet().products().getFirst();adapter.searchSnapshot(query("000003"),owner);
         assertThat(adapter.compare(UUID.fromString(saved.resultSet().id()),List.of(0,1),owner).resultSet().products().getFirst()).isEqualTo(first);
         assertThatThrownBy(()->adapter.saved(UUID.fromString(saved.resultSet().id()),other)).isInstanceOf(ApiException.class);
+    }
+    @Test void catalogPublicationInvalidatesPreparedCartWithoutAnyInterveningCatalogRead()throws Exception{
+        UUID conversation=UUID.fromString(chat.create(owner).id());
+        chat.submit(owner,conversation,"prepare-race",new TurnRequest("000001",null,null));var claim=chat.claim().orElseThrow();
+        var results=chat.saveResults(claim,adapter.search(new SearchQuery("000001",Map.of(),null,null,null),owner));chat.finish(claim,"completed",null);
+        var proposal=carts.propose(owner,new ProposalRequest(conversation,chat.state(owner,conversation).version(),results.id(),List.of(new Selection("000001","pcs","ALA","12"))),"proposal-race");
+        var data=(com.fasterxml.jackson.databind.node.ObjectNode)json.readTree(new File("../data/sample_catalog/products.json"));data.put("version","publication-race-v2");
+        ((com.fasterxml.jackson.databind.node.ObjectNode)data.get("products").get(0).get("warehouses").get(0)).put("availableQuantity","7");
+        assertThat(imports.importNow(json.treeToValue(data,CatalogImportDocument.class),null,"tests").status()).isEqualTo(ImportJobStatus.SUCCEEDED);
+        assertThat(db.queryForObject("SELECT available FROM sample_offers WHERE article='000001' AND warehouse='ALA'",BigDecimal.class)).isEqualByComparingTo("7");
+        var outcome=carts.confirm(owner,UUID.fromString(proposal.id()),"confirm-race",new ConfirmRequest(proposal.revision(),proposal.digest(),ConsentOrigin.button,null));
+        assertThat(outcome.status()).isEqualTo("failed");assertThat(carts.cart(owner).lines()).isEmpty();
+    }
+    @Test void certificateHasAuthenticatedProductRouteAndCannotReadUnrelatedCertificate()throws Exception{
+        var product=adapter.getProduct("000001",owner);String url=product.certificates().getFirst().id();
+        assertThat(url).isEqualTo("/api/products/000001/certificates/SYN-CERT-breakers");
+        mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get(url)).andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isUnauthorized());
+        var response=mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get(url).header("Authorization","Bearer "+ownerToken))
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isOk()).andReturn().getResponse();
+        assertThat(response.getContentAsByteArray()).startsWith("%PDF".getBytes(java.nio.charset.StandardCharsets.US_ASCII));
+        mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get("/api/products/000001/certificates/SYN-CERT-cables").header("Authorization","Bearer "+ownerToken))
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isNotFound());
     }
     @Test void sourceTimeoutIsUnavailableAndNeverZero()throws Exception{
         var p=catalog.findActiveByArticle("000001").orElseThrow();offers.quotes(p);

@@ -47,5 +47,5 @@ public class CatalogDataAdapter implements CatalogPort,StockPort,AnalogsPort {
         return new SearchCriteria(query.query(),20,query.category(),null,null,max,query.maxPrice()==null?null:query.maxPrice().currency(),query.hardConstraints(),false);
     }
     public static ProductDetails details(CatalogProduct p){return new ProductDetails(String.valueOf(p.id()),p.article(),p.name(),Map.copyOf(p.specs()),
-            p.certificates().stream().map(c->new SourceRef(c.id(),c.version(),c.url(),null,null,null)).toList());}
+            p.certificates().stream().map(c->new SourceRef(p.synthetic()&&Boolean.TRUE.equals(c.synthetic())?CatalogCertificates.url(p,c):c.id(),c.version(),"Сертификат "+c.id(),null,null,null)).toList());}
 }
