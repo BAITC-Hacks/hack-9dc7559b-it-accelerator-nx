@@ -159,11 +159,18 @@ public class ChatService {
     public DialogueState updateState(TrustedScope scope,UUID id,UpdateDialogue req) {
         return tx.execute(s->{conversation(scope,id,true);var old=state(scope,id);
             if(!old.version().equals(req.expectedVersion()))throw ApiException.conflict("stale_dialogue");
+            Set<String> clear=validatePatch(req);
             String resultId=req.resultSetId()==null?old.lastResultSetId():req.resultSetId();List<String> selected=old.selectedArticles();
+            String fulfillment=old.fulfillmentOptionId(),attachment=old.attachmentId(),attachmentVersion=old.attachmentVersion();
             ProductResultSet explicit=selections.explicit(req,scope);
             if(explicit!=null)resultId=bindSelection(scope,id,explicit);
             else if(req.resultSetId()!=null && !Boolean.TRUE.equals(db.queryForObject("SELECT EXISTS(SELECT 1 FROM result_sets WHERE id=? AND conversation_id=? AND owner_id=?)",Boolean.class,uuid(req.resultSetId()),id,scope.principalId())))
                 resultId=bindSelection(scope,id,selections.saved(req.resultSetId(),scope));
+            // A new source replaces its associated selection; a filter-only PATCH retains it.
+            if(explicit!=null || req.resultSetId()!=null) {
+                fulfillment=req.fulfillmentOptionId();attachment=req.attachmentId();attachmentVersion=req.attachmentVersion();
+                if(!Objects.equals(resultId,old.lastResultSetId()))selected=List.of();
+            }
             if(req.selectedIndices()!=null) {
                 if(resultId==null)throw ApiException.conflict("result_set_required");
                 var results=resultSet(scope,id,uuid(resultId));
@@ -171,8 +178,40 @@ public class ChatService {
                 selected=req.selectedIndices().stream().map(i->results.products().get(i).article()).distinct().toList();
             }
             supersede(id);
-            return writeState(id,new DialogueState(old.version(),req.category()==null?old.category():req.category(),req.budget()==null?old.budget():req.budget(),req.hardConstraints()==null?old.hardConstraints():Map.copyOf(req.hardConstraints()),req.quantity()==null?old.quantity():req.quantity(),resultId,selected,req.fulfillmentOptionId(),null,req.attachmentId(),req.attachmentVersion()));
+            return writeState(id,new DialogueState(old.version(),
+                    clear.contains("category")?null:req.category()==null?old.category():req.category(),
+                    clear.contains("budget")?null:req.budget()==null?old.budget():req.budget(),
+                    clear.contains("hardConstraints")?Map.of():req.hardConstraints()==null?old.hardConstraints():Map.copyOf(req.hardConstraints()),
+                    clear.contains("quantity")?null:req.quantity()==null?old.quantity():req.quantity(),
+                    resultId,selected,fulfillment,null,attachment,attachmentVersion));
         });
+    }
+    private static Set<String> validatePatch(UpdateDialogue req) {
+        var allowed=Set.of("category","budget","quantity","hardConstraints");
+        Set<String> clear=new HashSet<>();
+        if(req.clearFields()!=null)for(String field:req.clearFields()) {
+            if(field==null || !allowed.contains(field))throw new ApiException(400,"invalid_dialogue_patch");
+            clear.add(field);
+        }
+        if(clear.contains("category")&&req.category()!=null || clear.contains("budget")&&req.budget()!=null
+                || clear.contains("quantity")&&req.quantity()!=null || clear.contains("hardConstraints")&&req.hardConstraints()!=null
+                || req.attachmentVersion()!=null&&req.attachmentId()==null
+                || req.attachmentId()!=null&&req.fulfillmentOptionId()!=null)
+            throw new ApiException(400,"invalid_dialogue_patch");
+        if(req.budget()!=null) {
+            String amount=req.budget().amount();
+            if(amount==null || !amount.matches("[0-9]+(\\.[0-9]+)?"))throw new ApiException(400,"invalid_price_range");
+            var value=new java.math.BigDecimal(amount);
+            if(value.scale()>6 || value.precision()>18)throw new ApiException(400,"invalid_price_range");
+            if(req.budget().currency()==null || !req.budget().currency().matches("[A-Z]{3}"))throw new ApiException(400,"invalid_currency");
+        }
+        if(req.quantity()!=null) {
+            var value=com.hackalem.domain.cart.CartService.positive(req.quantity().value());
+            var step=com.hackalem.domain.cart.CartService.positive(req.quantity().step());
+            if(req.quantity().unit()==null || req.quantity().unit().isBlank())throw new ApiException(400,"invalid_quantity_unit");
+            if(value.remainder(step).signum()!=0)throw new ApiException(400,"invalid_quantity_step");
+        }
+        return clear;
     }
     private String bindSelection(TrustedScope scope,UUID conversation,ProductResultSet source){
         UUID id=UUID.randomUUID();

@@ -56,7 +56,17 @@ public final class Contracts {
     public record UpdateDialogue(@NotBlank String expectedVersion, String category, Money budget,
                                   Map<String,String> hardConstraints, Quantity quantity, String resultSetId,
                                   List<Integer> selectedIndices, String fulfillmentOptionId,
-                                  String attachmentId, String attachmentVersion) {}
+                                  String attachmentId, String attachmentVersion,
+                                  @Schema(description="Parameters to reset. Omitted fields otherwise retain their saved value. Allowed: category, budget, quantity, hardConstraints.")
+                                  List<String> clearFields) {
+        public UpdateDialogue(String expectedVersion, String category, Money budget,
+                              Map<String,String> hardConstraints, Quantity quantity, String resultSetId,
+                              List<Integer> selectedIndices, String fulfillmentOptionId,
+                              String attachmentId, String attachmentVersion) {
+            this(expectedVersion,category,budget,hardConstraints,quantity,resultSetId,selectedIndices,
+                    fulfillmentOptionId,attachmentId,attachmentVersion,null);
+        }
+    }
     public record ProposalRequest(@NotNull UUID conversationId, @NotBlank String expectedStateVersion,
                                    @NotBlank String resultSetId, @NotEmpty @Size(max=50) List<@Valid Selection> lines) {}
     public record ConfirmRequest(@NotBlank String revision, @NotBlank String digest,
