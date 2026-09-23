@@ -11,6 +11,10 @@ spring:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/hackalem}
     username: ${SPRING_DATASOURCE_USERNAME:hackalem}
     password: ${SPRING_DATASOURCE_PASSWORD:hackalem}
+    hikari:
+      maximum-pool-size: ${DB_POOL_MAX_SIZE:30}
+      minimum-idle: ${DB_POOL_MIN_IDLE:5}
+      connection-timeout: ${DB_POOL_CONNECTION_TIMEOUT_MS:2000}
 
   jpa:
     open-in-view: false
@@ -33,6 +37,9 @@ spring:
         options:
           model: ${OPENAI_MODEL:gpt-4o-mini}
           temperature: 0.2
+      embedding:
+        options:
+          model: ${OPENAI_EMBEDDING_MODEL:text-embedding-3-small}
 
 app:
   cors:

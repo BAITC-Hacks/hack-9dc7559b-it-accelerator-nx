@@ -50,6 +50,10 @@ services:
       # Не задан → приложение упадёт на старте с понятной ошибкой. Заполни .env.
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
       OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4o-mini}
+      OPENAI_EMBEDDING_MODEL: ${OPENAI_EMBEDDING_MODEL:-text-embedding-3-small}
+      DB_POOL_MAX_SIZE: ${DB_POOL_MAX_SIZE:-30}
+      DB_POOL_MIN_IDLE: ${DB_POOL_MIN_IDLE:-5}
+      DB_POOL_CONNECTION_TIMEOUT_MS: ${DB_POOL_CONNECTION_TIMEOUT_MS:-2000}
       JWT_SECRET: ${JWT_SECRET:-dev-only-secret-change-me-min-32-chars-long}
       JWT_TTL_MINUTES: ${JWT_TTL_MINUTES:-1440}
       CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:5173}
