@@ -37,3 +37,11 @@
 .attachments-page { max-width: 1020px; }
 .attachments-page .attachment-fields { grid-template-columns: 100px 100px minmax(140px, 1fr) 150px; }
 @media (max-width: 650px) { .attachments-page .attachment-fields { grid-template-columns: 1fr 1fr; } .attachment-search, .attachment-conversation { align-items: stretch; flex-direction: column; } }
+
+.attachment-drawer { background: #f4f7f8; color: #173f52; }
+.attachment-disclosure { color: #5f7885; background: #eaf3f6; }
+.attachment-job, .attachment-fields input, .attachment-fields select { border-color: #d2e1e6; }
+.attachment-job { background: #fff; }
+.attachment-job progress { accent-color: #246783; }
+.attachment-row blockquote { border-color: #f5b632; }
+.attachment-drawer :is(button, input, select):focus-visible { outline-color: #e3a51e; }

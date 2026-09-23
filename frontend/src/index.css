@@ -5,25 +5,26 @@
 
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
+  /* EKT.kz: deep electric blue, warm catalogue yellow, cool neutral surfaces. */
+  --background: oklch(0.985 0.006 220);
+  --foreground: oklch(0.29 0.055 220);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  --card-foreground: oklch(0.29 0.055 220);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
+  --popover-foreground: oklch(0.29 0.055 220);
+  --primary: oklch(0.43 0.105 228);
+  --primary-foreground: oklch(0.985 0.006 220);
+  --secondary: oklch(0.95 0.018 220);
+  --secondary-foreground: oklch(0.35 0.07 220);
+  --muted: oklch(0.95 0.012 220);
+  --muted-foreground: oklch(0.52 0.035 220);
+  --accent: oklch(0.78 0.16 82);
+  --accent-foreground: oklch(0.28 0.055 220);
+  --destructive: oklch(0.58 0.19 28);
   --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --border: oklch(0.9 0.018 220);
+  --input: oklch(0.9 0.018 220);
+  --ring: oklch(0.62 0.12 78);
 }
 
 .dark {

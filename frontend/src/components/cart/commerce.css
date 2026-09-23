@@ -83,3 +83,17 @@
 .catalog-table-scroll table { width: 100%; border-collapse: collapse; font-size: 12px; }
 .catalog-table-scroll th, .catalog-table-scroll td { padding: 10px; text-align: left; vertical-align: top; border-bottom: 1px solid #dce3d9; min-width: 120px; }
 @media (max-width: 650px) { .catalog-filters { grid-template-columns: 1fr; } }
+
+/* Keep commerce surfaces aligned with the EKT.kz storefront. */
+.commerce-panel, .commerce-page { color: #173f52; }
+.commerce-panel a, .commerce-page a, .header-cart-link { color: #246783; }
+.commerce-primary { background: #246783; border-color: #246783; }
+.commerce-primary:hover { background: #1b5873; border-color: #1b5873; }
+.commerce-secondary { color: #246783; border-color: #c9dce3; }
+.product-card.is-selected, .commerce-choice[aria-pressed="true"] { border-color: #246783; box-shadow: 0 0 0 1px #246783; }
+.offer-status { background: #e6f2f0; color: #24736c; }
+.commerce-choice[aria-pressed="true"] { background: #eaf3f6; }
+.commerce-page { background: #f4f7f8; }
+.commerce-notice { background: #fff6dc; color: #765b1c; }
+.commerce-panel :is(button, input, select, a):focus-visible, .commerce-page :is(button, a):focus-visible { outline-color: #e3a51e; }
+.product-price, .commerce-total strong { color: #173f52; }

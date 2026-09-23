@@ -301,3 +301,42 @@ button.header-cart-link { font: inherit; }
 @media (prefers-reduced-motion: reduce) {
   .chat-shell *, .chat-shell *::before, .chat-shell *::after { animation-duration: .01ms !important; transition: none !important; scroll-behavior: auto !important; }
 }
+
+/* EKT.kz brand layer: blue navigation, yellow action colour, cool catalogue neutrals. */
+.chat-shell { --chat-ink: #173f52; --chat-muted: #71828b; --chat-line: #e1e8eb; --chat-lime: #f5b632; --chat-paper: #fbfcfd; }
+.conversation-sidebar { color: #eaf2f5; background: #246783; }
+.ekt-wordmark span, .sidebar-version { color: #ffd05a; }
+.brand-caption, .sidebar-heading, .history-heading, .sidebar-empty { color: #c0d4dc; }
+.sidebar-version { border-color: #78a3b4; }
+.new-conversation { border-color: #f5b632; color: #173f52; background: #f5b632; }
+.new-conversation:hover:not(:disabled) { background: #ffd05a; }
+.conversation-list { scrollbar-color: #73a0b2 transparent; }
+.conversation-item { color: #d4e3e8; }
+.conversation-item small { color: #b5cbd4; }
+.conversation-item.selected, .conversation-item:hover { background: #1b5873; border-color: #397d98; }
+.conversation-item.selected strong { color: #fff; }
+.conversation-busy { background: #f5b632; }
+.sidebar-note { color: #ffe09a; }
+.sidebar-note p, .sidebar-note strong, .clear-history { color: #c8dbe2; }
+.catalog-link { border-color: #4b8399; }
+.sidebar-footnote { color: #a9c2cc; }
+.mode-badge.demo { background: #eaf3f6; color: #246783; }
+.mode-badge.demo i { background: #f5b632; }
+.demo-strip { background: #f1f6f8; color: #5f7885; }
+.demo-strip select { border-color: #d5e2e7; color: #246783; background: #fff; }
+.welcome-mark, .assistant-avatar { background: #e6f0f3; color: #246783; }
+.welcome-mark > span { background: #246783; color: #ffd05a; }
+.welcome-eyebrow, .chat-welcome h1 span { color: #2f7895; }
+.starter-card:hover:not(:disabled), .followup-chips button:hover { background: #edf5f7; border-color: #9fc4d1; }
+.starter-card > svg, .starter-card .starter-arrow { color: #6f9caf; }
+.starter-card strong { color: #24556a; }
+.customer .message-content { border-color: #d7e6eb; background: #eaf3f6; }
+.customer .message-text { color: #24556a; }
+.send-button { background: #246783; }
+.send-button:hover:not(:disabled) { background: #1b5873; }
+.send-button:disabled { background: #d8e5e9; color: #7894a0; }
+.chat-composer:focus-within { border-color: #82adbd; box-shadow: 0 0 0 3px #e7f0f3; }
+.selection-context { background: #f6f9fa; }
+.context-heading, .context-fields dd { color: #2d6b83; }
+.context-empty p { color: #356f84; }
+.chat-shell button:focus-visible, .chat-shell a:focus-visible, .chat-shell select:focus-visible { outline-color: #e3a51e; }
