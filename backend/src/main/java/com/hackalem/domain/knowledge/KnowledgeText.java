@@ -13,7 +13,7 @@ public final class KnowledgeText {
             "(?is)(ignore.{0,60}(instruction|previous|system)|system\\s*prompt|developer\\s*message|"
             + "игнориру[йя].{0,60}(инструкц|правил)|раскрой.{0,40}(секрет|ключ)|"
             + "(add|confirm|подтверд|добавь).{0,50}(cart|корзин)|<\\|(?:system|assistant))");
-    private static final Set<String> STOP = Set.of("как", "какие", "какой", "какая", "условия", "условий", "ли", "есть", "для", "при", "про", "расскажи", "мне", "можно", "что", "это", "the", "is", "are", "a", "of", "and", "how", "what", "terms", "purchase", "покупки", "товара", "товаров", "заказа", "заказ", "или", "по", "на", "в", "с", "и", "о", "об", "у", "до", "вы", "вас");
+    private static final Set<String> STOP = Set.of("сколько", "как", "какие", "какой", "какая", "условия", "условий", "ли", "есть", "для", "при", "про", "расскажи", "мне", "можно", "что", "это", "the", "is", "are", "a", "of", "and", "how", "what", "terms", "purchase", "покупки", "товара", "товаров", "заказа", "заказ", "или", "по", "на", "в", "с", "и", "о", "об", "у", "до", "вы", "вас");
     public record ParsedChunk(int ordinal, int page, String heading, String text, boolean suspicious) {}
     public static List<ParsedChunk> chunks(String raw) {
         if (raw == null || raw.isBlank() || raw.length() > 200_000)
@@ -55,6 +55,8 @@ public final class KnowledgeText {
                 .filter(word -> word.length() > 1).collect(Collectors.toCollection(LinkedHashSet::new));
     }
     private static String stem(String word) {
+        if (word.matches("стоимост.*|стоит|цен[аыуе]|cost")) return "cost";
+        if (word.matches("день|дня|дней|дни|day|days")) return "day";
         if (word.matches("достав.*|delivery|shipping|доставить")) return "delivery";
         if (word.matches("оплат.*|платеж.*|платить|payment|pay")) return "payment";
         if (word.matches("миним.*|парт.*|minimum|batch")) return "minimum";
@@ -67,8 +69,12 @@ public final class KnowledgeText {
         return word;
     }
     public static boolean asksCatalog(String query) {
-        if (tokens(query).contains("delivery") && !query.matches(".*[A-ZА-Я]{2,}[-\\d].*")) return false;
-        return Pattern.compile("(?iu)(цен[аыуе]|стоимост|остат[окки]+|наличи|сколько\\s+стоит|price|stock)").matcher(query).find();
+        // Delivery words must never bypass authoritative stock/availability lookup.
+        if (Pattern.compile("(?iu)(остат[окки]+|наличи|stock|availability)").matcher(query).find()) return true;
+        boolean price = Pattern.compile("(?iu)(цен[аыуе]|стоимост|сколько\\s+стоит|price)").matcher(query).find();
+        if (!price) return false;
+        boolean product = Pattern.compile("(?iu)(товар|артикул|sku|\\b[0-9]{4,}\\b)").matcher(query).find();
+        return product || !tokens(query).contains("delivery");
     }
     public static double relevance(Set<String> query, Set<String> content) {
         if (query.isEmpty()) return 0;

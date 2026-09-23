@@ -104,6 +104,39 @@ class KnowledgeIntegrationTest {
         assertThat(port.retrieve("Как оплатить?",visitor,6000).getFirst().source().version()).matches("[0-9a-f-]{36}");
         verify(embeddings,never()).embed(anyList());
     }
+    @Test void fixtureSourceKeysAndLabelsMapToImmutableRuntimeIds() throws Exception {
+        new KnowledgeSeed(service,repository,json,new DefaultResourceLoader(),true,"file:../data/purchase_terms/terms.json").run(null);
+        var expected=json.readTree(java.nio.file.Path.of("../data/expected/terms-answers.json").toFile());
+        for (var example:expected.path("cases")) {
+            var result=service.search(example.path("query").asText(),visitor,6000);
+            if (example.path("sourceId").isNull()) {
+                assertThat(result.answerability()).isEqualTo(NO_ANSWER); continue;
+            }
+            var source=result.chunks().stream().filter(c->c.sourceKey().equals(example.path("sourceId").asText())).findFirst().orElseThrow();
+            assertThat(source.versionLabel()).isEqualTo(example.path("sourceVersion").asText());
+            for (var fact:example.path("expectedFacts")) assertThat(source.text()).contains(fact.asText());
+            assertThat(service.source(source.documentId(),source.versionId(),visitor.principalId()).text()).isEqualTo(source.text());
+        }
+        assertThat(service.search("Сколько стоит доставка?",visitor,6000).answerability()).isEqualTo(ANSWERABLE);
+        assertThat(service.search("Наличие и доставка товара",visitor,6000).answerability()).isEqualTo(CATALOG_REQUIRED);
+    }
+    @Test void staleReindexPreparationCannotResurrectDeletedDocument() {
+        var active=publish("delivery","1","PUBLIC","Доставка 2 дня.",false);
+        var stale=repository.reindexSource(active.documentId()).orElseThrow();
+        service.revoke(active.documentId());
+        assertThatThrownBy(()->repository.prepareReindex(stale.document(),stale.versionId())).hasMessage("knowledge_reindex_stale");
+        assertThat(db.queryForObject("SELECT tombstoned FROM documents WHERE id=?",Boolean.class,active.documentId())).isTrue();
+        assertThat(db.queryForObject("SELECT count(*) FROM document_versions",Integer.class)).isEqualTo(1);
+    }
+    @Test void staleReindexPreparationCannotSupersedeNewerDesiredVersion() {
+        var active=publish("delivery","1","PUBLIC","Доставка 2 дня.",false);
+        var stale=repository.reindexSource(active.documentId()).orElseThrow();
+        var newer=service.enqueue(doc("delivery","2","PUBLIC","Доставка 5 дней.",false),owner.principalId());
+        assertThatThrownBy(()->repository.prepareReindex(stale.document(),stale.versionId())).hasMessage("knowledge_reindex_stale");
+        assertThat(db.queryForObject("SELECT desired_version_id FROM documents WHERE id=?",UUID.class,active.documentId())).isEqualTo(newer.versionId());
+        service.process(newer.id());
+        assertThat(port.retrieve("Доставка",visitor,6000).getFirst().source().version()).isEqualTo(newer.versionId().toString());
+    }
     @Test void actualJwtAdminAndPrivateOwnerAccessAreEnforced() throws Exception {
         String body=json.writeValueAsString(doc("private","1","PRIVATE","Доставка секретного заказа 7 дней.",false));
         mvc.perform(post("/api/admin/knowledge/documents").contentType("application/json").content(body)).andExpect(status().isUnauthorized());

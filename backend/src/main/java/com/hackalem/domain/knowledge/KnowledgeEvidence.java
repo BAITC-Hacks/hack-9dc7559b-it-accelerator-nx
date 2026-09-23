@@ -8,7 +8,7 @@ import java.util.*;
 public final class KnowledgeEvidence {
     private KnowledgeEvidence() {}
     public enum Answerability { ANSWERABLE, NO_ANSWER, CONFLICT, SOURCE_UNAVAILABLE, CATALOG_REQUIRED }
-    public record Chunk(UUID citationId, UUID documentId, UUID versionId, String title,
+    public record Chunk(UUID citationId, UUID documentId, UUID versionId, String sourceKey, String title,
                         String versionLabel, int page, String heading, String text, String sourcePath,
                         String sha256, boolean synthetic, boolean untrusted, double score) {
         public SourceChunk toPort() {

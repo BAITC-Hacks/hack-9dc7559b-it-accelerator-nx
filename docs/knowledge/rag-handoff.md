@@ -9,7 +9,7 @@
 ## Runtime и API
 
 - `GET /api/knowledge/search?query=…&characterBudget=6000` возвращает `answerability`,
-  `chunks` с SHA-256, `synthetic`, `untrusted`, page/heading, version UUID и
+  `chunks` с SHA-256, `sourceKey` (DATA fixture id), `synthetic`, `untrusted`, page/heading, version UUID и
   `citationAllowlist`. Все endpoints требуют проверенную visitor session.
 - `GET /api/sources/{documentId}/versions/{versionId}` скачивает immutable plain
   text с повторной проверкой текущего ACL. Версия в `SourceRef.version` — UUID;
@@ -45,7 +45,9 @@ Seed создаёт только отсутствующие PUBLIC synthetic д�
 
 Original хранится один раз в `document_versions`, object key указывает на
 immutable DB row; SHA-256 считается по UTF-8. Новая версия заменяет desired,
-active остаётся прежней до атомарной ready публикации. Lease epoch, текущая
+active остаётся прежней до атомарной ready публикации. Reindex проверяет
+прочитанную active/desired версию под row lock; параллельный delete или новый
+import даёт 409 `knowledge_reindex_stale`, не воскрешает удалённый документ. Lease epoch, текущая
 lease и CAS desired/tombstone защищают публикацию от позднего worker. Failed
 reindex сохраняет старую ready версию. Chunks/old originals сохраняются для
 старых citations; неиспользуемые vectors освобождаются при reindex/delete.
@@ -81,8 +83,12 @@ source text остаются untrusted, D1 system policy и server tool/confirm 
 `./gradlew test --tests 'com.hackalem.knowledge.*' --no-daemon` — отдельный
 PostgreSQL pgvector Testcontainer, реальные JWT/HTTP/admin/owner checks:
 FAQ/no-answer, budget, citation allowlist, private leakage denial, immutable
-v1→v2, ACL revoke, late job/delete, lease fencing, failed reindex, injection
+v1→v2, ACL revoke, late job/delete, stale reindex prepare, lease fencing, failed reindex, injection
 без provider/cart side effects, conflicts, idempotent seed и chunk coordinates.
+После audit исправлений PASS 15 RAG tests. Отдельный тест читает все cases из
+`data/expected/terms-answers.json`: `sourceId` сопоставляется с `chunk.sourceKey`,
+`sourceVersion` с `chunk.versionLabel`; `documentId` и `versionId` остаются
+серверными UUID. Проверяются expected facts и скачивание того же immutable text.
 
 `./gradlew build --no-daemon` — PASS: 81 tests, 0 failures (в том числе 12 RAG).
 Объединённый D1 tool/API smoke проверяется при интеграции.

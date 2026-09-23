@@ -47,9 +47,9 @@ backend/…/domain/documents/; ai/rag/; web/sources/; db/migration/; data/purcha
 
 ## Done when
 
-- [ ] FAQ payment/delivery/minimum отвечает по fixture source; absent fact даёт честный no-answer.
+- [x] FAQ payment/delivery/minimum отвечает по fixture source; absent fact даёт честный no-answer.
 - [ ] Несанкционированные chunks не попадут в prompt, cache или source endpoint.
-- [ ] Late job не публикует старую/удалённую версию; reindex не теряет предыдущую ready.
+- [x] Late job не публикует старую/удалённую версию; reindex не теряет предыдущую ready.
 - [ ] Citation ID существует в retrieval allowlist, а groundedness отдельно проверяется QA-02.
 - [ ] Проверки выполнены на своей ветке; PR содержит результат проверок и известные ограничения.
 
@@ -72,3 +72,11 @@ route, D1 KnowledgePort, bounded lexical retrieval и opt-in versioned embedding
 (12 tests). Полный `./gradlew build --no-daemon`: PASS, 81 tests/0 failures. Описание API, настройки и ограничения: [handoff](../../docs/knowledge/rag-handoff.md).
 Статус остаётся in_progress до объединённой V5/SDK/QA-02 проверки; реальная LLM
 groundedness и deployed E2E не утверждаются на основании offline тестов.
+
+Audit follow-up: PASS 15 focused RAG tests (13 PostgreSQL/JWT + 2 text parser).
+Закрыта гонка stale reindex preparation с delete/new desired version.
+DATA expected sourceId/sourceVersion теперь явно сопоставляются с
+`chunks.sourceKey`/`versionLabel`, UUID source download и все expected facts
+проверены из `terms-answers.json`. Mixed availability+delivery query направляется
+в каталог. Общая проверка D1 tool replay/cache ACL и итоговый QA-02 остаются
+за root интеграцией; это не основание заранее закрывать весь RAG gate.

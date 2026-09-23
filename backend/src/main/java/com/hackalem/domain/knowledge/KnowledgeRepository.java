@@ -4,6 +4,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.context.annotation.Profile;
 import com.hackalem.domain.port.Contracts.TrustedScope;
+import com.hackalem.web.ApiException;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.sql.ResultSet;
@@ -22,9 +23,10 @@ public class KnowledgeRepository {
     public record Job(UUID id, UUID documentId, UUID versionId, String state, String errorCode, long epoch) {}
     public record Work(Job job, String text, String model, int dimensions) {}
     public record IndexedChunk(KnowledgeText.ParsedChunk chunk, String vector) {}
-    public record Candidate(UUID chunkId, UUID documentId, UUID versionId, String title, String version,
+    public record Candidate(UUID chunkId, UUID documentId, UUID versionId, String sourceKey, String title, String version,
                             String tags, int page, String heading, String text, String sha256,
                             boolean synthetic, String model, String vector) {}
+    public record ReindexSource(ImportData document, UUID versionId) {}
     public record Source(UUID documentId, UUID versionId, String title, String version,
                          String text, String sha256, boolean synthetic) {}
 
@@ -32,6 +34,12 @@ public class KnowledgeRepository {
         return Boolean.TRUE.equals(jdbc.queryForObject("SELECT EXISTS(SELECT 1 FROM documents WHERE external_id=?)", Boolean.class, externalId));
     }
     public Job prepare(ImportData input, boolean forceReindex) {
+        return prepare(input, forceReindex, null);
+    }
+    public Job prepareReindex(ImportData input, UUID expectedActiveVersion) {
+        return prepare(input, true, Objects.requireNonNull(expectedActiveVersion));
+    }
+    private Job prepare(ImportData input, boolean forceReindex, UUID expectedActiveVersion) {
         return tx.execute(status -> {
             UUID docId = UUID.randomUUID();
             jdbc.update("""
@@ -39,6 +47,11 @@ public class KnowledgeRepository {
                     ON CONFLICT(external_id) DO NOTHING
                     """, docId, input.externalId(), input.title(), input.visibility(), input.ownerId());
             docId = jdbc.queryForObject("SELECT id FROM documents WHERE external_id=? FOR UPDATE", UUID.class, input.externalId());
+            if (expectedActiveVersion != null && !Boolean.TRUE.equals(jdbc.queryForObject("""
+                    SELECT NOT tombstoned AND active_version_id=? AND desired_version_id=?
+                    FROM documents WHERE id=?
+                    """, Boolean.class, expectedActiveVersion, expectedActiveVersion, docId)))
+                throw ApiException.conflict("knowledge_reindex_stale");
             if (!forceReindex) {
                 List<Job> existing = jdbc.query("""
                     SELECT j.* FROM ingestion_jobs j JOIN document_versions v ON v.id=j.version_id
@@ -147,7 +160,7 @@ public class KnowledgeRepository {
     }
     public List<Candidate> candidates(TrustedScope scope) {
         String sql = """
-                SELECT c.id AS chunk_id,c.document_id,c.version_id,v.title,v.version_label,v.tags,
+                SELECT c.id AS chunk_id,c.document_id,c.version_id,d.external_id,v.title,v.version_label,v.tags,
                        c.page_number,c.heading,c.content,v.source_sha256,v.synthetic,v.embedding_model,
                        CAST(c.embedding AS text) AS vector_text
                 FROM document_chunks c JOIN documents d ON d.id=c.document_id
@@ -160,7 +173,7 @@ public class KnowledgeRepository {
         sql += " ORDER BY c.document_id,c.ordinal LIMIT 2000";
         return jdbc.query(sql, (rs, row) -> new Candidate(rs.getObject("chunk_id", UUID.class),
                 rs.getObject("document_id", UUID.class), rs.getObject("version_id", UUID.class),
-                rs.getString("title"), rs.getString("version_label"), rs.getString("tags"),
+                rs.getString("external_id"), rs.getString("title"), rs.getString("version_label"), rs.getString("tags"),
                 rs.getInt("page_number"), rs.getString("heading"), rs.getString("content"),
                 rs.getString("source_sha256"), rs.getBoolean("synthetic"), rs.getString("embedding_model"),
                 rs.getString("vector_text")), args.toArray());
@@ -174,15 +187,15 @@ public class KnowledgeRepository {
                 rs.getString("original_text"), rs.getString("source_sha256"), rs.getBoolean("synthetic")),
                 docId, versionId, principal).stream().findFirst();
     }
-    public Optional<ImportData> reindexSource(UUID documentId) {
+    public Optional<ReindexSource> reindexSource(UUID documentId) {
         return jdbc.query("""
                 SELECT d.external_id,d.visibility,d.owner_id,v.* FROM documents d
                 JOIN document_versions v ON v.id=d.active_version_id WHERE d.id=? AND NOT d.tombstoned
-                """, (rs, row) -> new ImportData(rs.getString("external_id"), rs.getString("title"),
+                """, (rs, row) -> new ReindexSource(new ImportData(rs.getString("external_id"), rs.getString("title"),
                 rs.getString("version_label"), rs.getString("visibility"), rs.getObject("owner_id", UUID.class), rs.getString("source_url"),
                 rs.getString("original_text"), rs.getString("tags"), rs.getBoolean("synthetic"),
                 rs.getString("embedding_model"), rs.getInt("embedding_dimensions"), rs.getString("source_sha256")),
-                documentId).stream().findFirst();
+                rs.getObject("id", UUID.class)), documentId).stream().findFirst();
     }
     public void revoke(UUID documentId) {
         tx.executeWithoutResult(status -> {

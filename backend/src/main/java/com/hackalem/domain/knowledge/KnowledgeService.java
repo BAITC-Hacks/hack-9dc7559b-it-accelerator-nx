@@ -49,13 +49,14 @@ public class KnowledgeService implements KnowledgePort {
         } catch (com.fasterxml.jackson.core.JsonProcessingException e) { throw new IllegalStateException(e); }
     }
     public Job reindex(UUID documentId) {
-        var old = repository.reindexSource(documentId).orElseThrow(ApiException::missing);
+        var source = repository.reindexSource(documentId).orElseThrow(ApiException::missing);
+        var old = source.document();
         var refreshed = new ImportData(old.externalId(), old.title(), old.version(), old.visibility(), old.ownerId(),
                 old.sourceUrl(), old.text(), old.tags(), old.synthetic(), old.dimensions() == 0 ? "lexical-v1" : embeddings.vectorSpace(),
                 old.dimensions() == 0 ? 0 : embeddings.dimensions(), old.sha256());
         if (refreshed.dimensions() != 0 && refreshed.dimensions() != 1536)
             throw new ApiException(400, "knowledge_embedding_dimensions_mismatch");
-        return repository.prepare(refreshed, true);
+        return repository.prepareReindex(refreshed, source.versionId());
     }
     /** Provider work is outside transactions. Publish is one fenced CAS transaction. */
     public void process(UUID jobId) {
@@ -141,7 +142,7 @@ public class KnowledgeService implements KnowledgePort {
             // Do not cut a sentence or omit a negation to make a chunk fit the context budget.
             if (c.text().length() > remaining) continue;
             UUID citationId = UUID.randomUUID();
-            chunks.add(new Chunk(citationId, c.documentId(), c.versionId(), c.title(), c.version(), c.page(), c.heading(),
+            chunks.add(new Chunk(citationId, c.documentId(), c.versionId(), c.sourceKey(), c.title(), c.version(), c.page(), c.heading(),
                     c.text(), "/api/sources/" + c.documentId() + "/versions/" + c.versionId(), c.sha256(), c.synthetic(), true, entry.score()));
             citationChunks.put(citationId, c.chunkId()); remaining -= c.text().length();
         }
