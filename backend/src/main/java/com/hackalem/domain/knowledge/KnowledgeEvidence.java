@@ -8,6 +8,7 @@ import java.util.*;
 public final class KnowledgeEvidence {
     private KnowledgeEvidence() {}
     public enum Answerability { ANSWERABLE, NO_ANSWER, CONFLICT, SOURCE_UNAVAILABLE, CATALOG_REQUIRED }
+    @io.swagger.v3.oas.annotations.media.Schema(name="KnowledgeChunk")
     public record Chunk(UUID citationId, UUID documentId, UUID versionId, String sourceKey, String title,
                         String versionLabel, int page, String heading, String text, String sourcePath,
                         String sha256, boolean synthetic, boolean untrusted, double score) {
@@ -16,6 +17,7 @@ public final class KnowledgeEvidence {
                     title + " (v" + versionLabel + (synthetic ? ", synthetic" : "") + ")", page, null, null), text);
         }
     }
+    @io.swagger.v3.oas.annotations.media.Schema(name="KnowledgeSearchResult")
     public record Result(UUID retrievalId, Answerability answerability, String explanation,
                          String retrievalMode, List<Chunk> chunks, Set<UUID> citationAllowlist) {
         public Result { chunks = List.copyOf(chunks); citationAllowlist = Set.copyOf(citationAllowlist); }
