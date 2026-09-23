@@ -17,6 +17,28 @@ depends_on: ["UI-02"]
 
 Дать выбрать товар/комплектацию и отдельно подтвердить точный состав.
 
+## Подготовительная реализация D3 (не принята, проверки отложены)
+
+В ветке `codex/ui-01-client-transport`, worktree `/private/tmp/hackalem-ui01.NF4q1E`,
+подготовлены карточки каталога/аналогов, immutable proposal UI, confirm/reject,
+страницы `/cart` и `/sources/:key`, безопасное ограниченное Markdown-отображение.
+Демо-данные синтетические; simulator загружается только в dev mock-режиме.
+Реальных partner writes нет, новые HTTP DTO и generated файлы не написаны вручную.
+
+Локальный simulator поддерживает separate selection/consent, stable operation key,
+duplicate click guard, expiry/version checks, stock12→7 с новой карточкой 7+13,
+price change, unknown outcome → lookup, сохранение корзины/операций в sessionStorage
+и очистку при смене auth. Это подготовка UI, не доказательство серверных гарантий.
+
+Подготовлены тестовые сценарии `frontend/tests/commerce-demo.test.ts`.
+**Build/lint/test/browser не запускались по указанию пользователя.**
+Commit/PR: пока нет. Acceptance checklist не отмечен, статус оставлен `todo`.
+
+Для завершения нужны generated DTO/snapshot и endpoints от D1/D2; затем typed
+HTTP/SSE fixtures, natural yes с `replyToProposalId` (пока только явная кнопка),
+server-authorized источники/корзина и browser acceptance на реальном backend.
+Фактические цены/остатки и expected values AC-1…9 на синтетических записях не подтверждены.
+
 ## Context
 
 Цена/stock/cert/source — серверные DTO, cart result нельзя подменить optimistic state.
