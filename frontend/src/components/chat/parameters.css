@@ -1,0 +1,40 @@
+.context-panel-inner.parameters-panel { padding: 25px 18px; color: var(--chat-ink, var(--foreground)); }
+.parameters-panel .context-heading h2 { font-size: 15px; }
+.parameters-panel .parameters-caption { margin: 8px 0 14px; color: var(--muted-foreground); font-size: 12px; line-height: 1.55; }
+.parameters-form, .parameters-form fieldset { display: grid; gap: 14px; min-width: 0; }
+.parameters-form fieldset { border: 0; margin: 0; padding: 0; }
+.parameters-form label { display: grid; gap: 6px; min-width: 0; font-size: 12px; line-height: 1.5; font-weight: 500; }
+.parameters-panel .parameters-form input, .parameters-panel .parameters-form select { min-width: 0; width: 100%; min-height: 40px; padding: 8px; border: 1px solid var(--input); border-radius: 7px; color: var(--foreground); background: var(--card); font-size: 12px; }
+.parameters-panel .parameters-form input::placeholder { color: var(--muted-foreground); }
+.parameters-panel :focus-visible { outline: 3px solid var(--ring); outline-offset: 2px; }
+.chat-shell .parameters-panel button { cursor: pointer; min-height: 40px; border: 1px solid var(--border); border-radius: 7px; padding: 8px; font-size: 12px; line-height: 1.4; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.chat-shell .parameters-panel button:disabled { opacity: .55; cursor: not-allowed; }
+.chat-shell .parameters-panel button:hover:not(:disabled) { filter: brightness(.96); }
+.parameters-row { display: grid; grid-template-columns: minmax(0, 1fr) 72px; gap: 8px; }
+.parameters-panel .parameters-save { background: var(--chat-lime, var(--accent)); color: var(--accent-foreground); border-color: var(--chat-lime, var(--accent)); font-weight: 600; width: 100%; min-height: 44px; }
+.parameters-secondary, .parameters-results-toggle { background: var(--card); color: var(--primary); width: 100%; }
+.parameters-constraints { border-top: 1px solid var(--border); padding-top: 12px; }
+.parameters-constraints summary { cursor: pointer; font-size: 12px; font-weight: 600; padding: 4px 0; }
+.parameters-constraint { margin: 10px 0; padding: 10px; border: 1px solid var(--border); border-radius: 8px; display: grid; gap: 8px; }
+.parameters-constraint-heading { display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
+.parameters-panel .parameters-remove { width: 36px; min-height: 36px; padding: 7px; background: var(--card); }
+.parameters-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.parameters-panel .parameters-actions button { border: 0; padding: 3px 0; min-height: 32px; text-decoration: underline; text-underline-offset: 3px; background: transparent; color: var(--muted-foreground); }
+.parameters-message, .parameters-error, .parameters-warning, .parameters-success { padding: 10px; border-radius: 7px; font-size: 12px; line-height: 1.6; overflow-wrap: anywhere; }
+.parameters-error { color: var(--destructive); background: var(--card); border: 1px solid var(--destructive); }
+.parameters-warning { background: var(--secondary); border: 1px solid var(--border); color: var(--foreground); }
+.parameters-warning button { margin-top: 10px; background: var(--card); }
+.parameters-success { display: flex; align-items: center; gap: 6px; color: var(--primary); background: var(--secondary); }
+.parameters-summary { margin-top: 20px; border-top: 1px solid var(--border); padding-top: 16px; font-size: 12px; line-height: 1.6; overflow-wrap: anywhere; }
+.parameters-summary h3 { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; font-size: 12px; font-weight: 600; }
+.parameters-panel .parameters-summary a { color: var(--primary); text-decoration: underline; text-underline-offset: 3px; display: inline-block; margin-top: 8px; }
+.parameters-summary ul { list-style: none; padding: 0; }
+.parameters-products { display: grid; gap: 10px; margin-top: 12px; }
+.parameters-products li { display: grid; gap: 4px; padding: 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--card); overflow-wrap: anywhere; }
+.parameters-products li > span { color: var(--muted-foreground); font-size: 11px; }
+.parameters-products dl { margin: 5px 0 0; font-size: 11px; }
+.parameters-products dl div { display: flex; justify-content: space-between; gap: 8px; }
+.parameters-products dd { margin: 0; text-align: right; }
+.parameters-panel .cart-assurance { padding-top: 22px; color: var(--primary); }
+.parameters-panel .cart-assurance p, .parameters-panel .cart-assurance strong { color: var(--muted-foreground); font-size: 11px; }
+@media (max-width: 1230px) { .context-open .parameters-panel { padding-top: 55px; } }
