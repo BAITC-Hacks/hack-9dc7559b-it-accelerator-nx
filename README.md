@@ -62,3 +62,10 @@ curl -s localhost:8080/v3/api-docs | head -c 200
 - [AGENTS.md](AGENTS.md) — правила монорепо, контракт docker compose, env, troubleshooting
 - [backend/AGENTS.md](backend/AGENTS.md) — Spring Boot API
 - [frontend/AGENTS.md](frontend/AGENTS.md) — React SPA
+
+## План AI-чата с RAG
+
+- [Архитектура](docs/ai-chat-architecture.md) — текущее состояние, API, хранение истории и документов, streaming, RAG и расчёт нагрузки 1–5 тыс. суммарных API RPS.
+- [Задачи](docs/ai-chat-backlog.md) — 22 задачи с приоритетами, зависимостями и критериями приёмки; отдельный сокращённый demo-план на 5 часов.
+
+Это план реализации. Производительность под указанной нагрузкой пока не подтверждена.
