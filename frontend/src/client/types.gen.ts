@@ -406,6 +406,10 @@ export type UpdateDialogue = {
     fulfillmentOptionId?: string;
     attachmentId?: string;
     attachmentVersion?: string;
+    /**
+     * Parameters to reset. Omitted fields otherwise retain their saved value. Allowed: category, budget, quantity, hardConstraints.
+     */
+    clearFields?: Array<string>;
 };
 
 export type DialogueState = {
