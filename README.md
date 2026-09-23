@@ -34,8 +34,9 @@ docker compose --profile full up -d --build
 - `config/OpenApiConfig` — springdoc, `/v3/api-docs` + `/swagger-ui.html`, схема авторизации `bearerAuth`;
 - `security/SecurityConfig` — stateless, CORS из `CORS_ALLOWED_ORIGINS`, `PasswordEncoder`; пока всё открыто, место под JWT-фильтр помечено комментарием;
 - `web/PingController` — `GET /api/ping`, чтобы проверять связку и чтобы `npm run gen` имел хотя бы одну операцию;
-- `db/migration/V1__init.sql` — только `CREATE EXTENSION vector`, таблицы добавляет команда;
-- пустые пакеты `domain/`, `web/`, `ai/` под слои из [backend/AGENTS.md](backend/AGENTS.md);
+- `db/migration/V1__init.sql` включает `vector`; `V2__products_vector_search.sql` создаёт `products` и HNSW-индекс;
+- `web/ProductSearchController` / `ProductSearchService` — начальный семантический поиск и upsert продуктов; количественные остатки, чат и корзина ещё требуют реализации;
+- пакеты `domain/`, `web/`, `ai/` под слои из [backend/AGENTS.md](backend/AGENTS.md);
 - зависимости уже подключены: JPA, Flyway, Validation, Actuator, Security, springdoc, Spring AI (OpenAI), jjwt, Lombok + MapStruct (в правильном порядке процессоров).
 
 **frontend/** — Vite SPA, собирается и линтуется:
@@ -46,7 +47,7 @@ docker compose --profile full up -d --build
 - Tailwind v4 + токены shadcn/ui и `components.json` — `npx shadcn@latest add button` работает сразу;
 - ESLint + Prettier настроены (`npm run lint`, `npm run format`).
 
-Демо-пользователей и бизнес-сущностей намеренно нет — это каркас.
+Демо-пользователей, истории чата и корзины пока нет; начальная таблица товаров уже добавлена.
 
 ## Проверка, что всё живо
 
@@ -63,9 +64,10 @@ curl -s localhost:8080/v3/api-docs | head -c 200
 - [backend/AGENTS.md](backend/AGENTS.md) — Spring Boot API
 - [frontend/AGENTS.md](frontend/AGENTS.md) — React SPA
 
-## План AI-чата с RAG
+## План продукта ekt.kz
 
-- [Архитектура](docs/ai-chat-architecture.md) — текущее состояние, API, хранение истории и документов, streaming, RAG и расчёт нагрузки 1–5 тыс. суммарных API RPS.
-- [Задачи](docs/ai-chat-backlog.md) — 22 задачи с приоритетами, зависимостями и критериями приёмки; отдельный сокращённый demo-план на 5 часов.
+- [Единое ТЗ и архитектура](docs/ekt-assistant-spec.md) — каталог, RAG, chat agent, подтверждаемая корзина, вложения и требования 1–5 тыс. суммарных API RPS.
+- [Задачи для трёх разработчиков](tasks/README.md) — 32 подробные карточки по функциональным папкам, порядок параллельной работы и приёмка через Docker Compose.
+- [Исходное ТЗ партнёра](docs/ТЗ_ИИ-ассистент_ekt.kz.md) — исходные требования, сохранённые как источник.
 
-Это план реализации. Производительность под указанной нагрузкой пока не подтверждена.
+Это план реализации. Готовность продукта и производительность подтверждаются будущими функциональными и нагрузочными проверками.
