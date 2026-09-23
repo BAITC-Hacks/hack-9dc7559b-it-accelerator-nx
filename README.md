@@ -6,58 +6,39 @@ Hackathon team repository for TechnoHorizon.
 Стек: Spring Boot 3.5 (Java 21, Gradle) + PostgreSQL/pgvector + Flyway + Spring AI ·
 React 19 + Vite + TypeScript + Tailwind + TanStack Query.
 
-## Быстрый старт
+## Быстрый старт D1 (offline backend demo)
+
+Java 21 и Docker обязательны. Из корня запустить изолированные PostgreSQL + Redis:
 
 ```bash
-cp .env.example .env     # заполнить OPENAI_API_KEY
-docker compose up -d     # Postgres + pgvector
+docker compose -p hackalem-d1 -f scripts/d1-compose.yml up -d --wait
+cd backend
+SPRING_PROFILES_ACTIVE=contract SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:55432/hackalem REDIS_PORT=56379 PORT=18080 ./gradlew bootRun
 ```
 
-Dev-режим (hot reload):
+В другом терминале:
 
 ```bash
-cd backend && ./gradlew bootRun     # http://localhost:8080  (Swagger: /swagger-ui.html)
-cd frontend && npm install && npm run dev   # http://localhost:5173
+curl --fail http://localhost:18080/actuator/health
+curl --fail -X POST http://localhost:18080/auth/visitor-session
+cd frontend
+npm run gen -- --input ../docs/api/openapi.json
+npm run build
+npm run lint
 ```
 
-Всё в контейнерах (проверка перед демо):
+`contract` не требует платного key, использует два test SKU и stateful sample cart. D1 dependency stack не поднимает frontend. API/сценарий proposal→confirm→cart: [D1 handoff](docs/api/d1-handoff.md); schema: [OpenAPI](docs/api/openapi.json). Frontend пока содержит исходный shell, полный widget интегрирует D3.
 
-```bash
-docker compose --profile full up -d --build
-```
+Общий Compose-контракт сохраняется: `docker compose up -d` — зависимости, `docker compose --profile full up -d --build` — контейнерный запуск. Live требует `OPENAI_API_KEY` и настроенных data/identity adapters. `.env.example` — единый шаблон; `bootRun` сам по себе `.env` не загружает, переменные передаются окружением процесса. Общую demo-БД не сбрасывать. Остановить только D1 dependencies без потери данных: `docker compose -p hackalem-d1 -f scripts/d1-compose.yml down`.
 
-Полный ресет БД: `docker compose down -v && docker compose up -d`
+## Что реализовано в D1
 
-## Что уже есть в каркасе
+- Visitor JWT/session ACL, durable conversations/history/runs и idempotent submit.
+- Ограниченный agent/tool loop, typed events, SSE replay и versioned dialogue/result sets.
+- Immutable proposals, отдельное подтверждение, atomic sample cart и reconciliation неизвестного исхода.
+- PostgreSQL V3 baseline, Redis budgets, метрики и [planning load profiles](docs/performance/workload.md).
 
-**backend/** — Spring Boot приложение, стартует на пустой БД:
-- `config/OpenApiConfig` — springdoc, `/v3/api-docs` + `/swagger-ui.html`, схема авторизации `bearerAuth`;
-- `security/SecurityConfig` — stateless, CORS из `CORS_ALLOWED_ORIGINS`, `PasswordEncoder`; пока всё открыто, место под JWT-фильтр помечено комментарием;
-- `web/PingController` — `GET /api/ping`, чтобы проверять связку и чтобы `npm run gen` имел хотя бы одну операцию;
-- `db/migration/V1__init.sql` включает `vector`; `V2__products_vector_search.sql` создаёт `products` и HNSW-индекс;
-- `web/ProductSearchController` / `ProductSearchService` — начальный семантический поиск и upsert продуктов; количественные остатки, чат и корзина ещё требуют реализации;
-- пакеты `domain/`, `web/`, `ai/` под слои из [backend/AGENTS.md](backend/AGENTS.md);
-- зависимости уже подключены: JPA, Flyway, Validation, Actuator, Security, springdoc, Spring AI (OpenAI), jjwt, Lombok + MapStruct (в правильном порядке процессоров).
-
-**frontend/** — Vite SPA, собирается и линтуется:
-- `src/lib/api.ts` — единственное место с адресом API (`VITE_API_URL`), axios-инстанс, хранилище токена;
-- `src/lib/query.ts` — общий `QueryClient`;
-- `src/client/` — **сгенерированный** клиент (`npm run gen`), руками не править;
-- `src/pages/HomePage.tsx` — страница-пример: дергает `/api/ping` через сгенерированный клиент, рендерит loading / error / ok;
-- Tailwind v4 + токены shadcn/ui и `components.json` — `npx shadcn@latest add button` работает сразу;
-- ESLint + Prettier настроены (`npm run lint`, `npm run format`).
-
-Демо-пользователей, истории чата и корзины пока нет; начальная таблица товаров уже добавлена.
-
-## Проверка, что всё живо
-
-```bash
-curl -s localhost:8080/actuator/health   # {"status":"UP"}
-curl -s localhost:8080/api/ping          # {"app":"hackalem-backend","status":"ok",...}
-curl -s localhost:8080/v3/api-docs | head -c 200
-```
-
-Открыть http://localhost:5173 — на странице должен быть блок «Состояние API» со `status: ok`.
+Локально проходят **43 backend-теста**, HTTP smoke, frontend build/lint. Статус полной приёмки — **in_progress**: [evidence и ограничения](docs/api/d1-handoff.md#evidence). Real D2 data/RAG/parsers, partner identity/cart, полный widget, live OpenAI и high-load не считаются проверенными на основании backend-кода.
 
 ## Документация для агентов
 - [AGENTS.md](AGENTS.md) — правила монорепо, контракт docker compose, env, troubleshooting

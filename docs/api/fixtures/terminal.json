@@ -1,0 +1,23 @@
+{
+  "eventId": "1:5",
+  "runId": "02b542e3-4b8d-45e6-a320-b4b9b94b9e19",
+  "seq": "5",
+  "epoch": "1",
+  "type": "run.completed",
+  "schemaVersion": "1",
+  "payload": {
+    "kind": "terminal",
+    "snapshot": {
+      "id": "02b542e3-4b8d-45e6-a320-b4b9b94b9e19",
+      "conversationId": "f9c6ca77-f4da-4c8f-b205-e2aac740a1b1",
+      "status": "completed",
+      "epoch": "1",
+      "sequence": "5",
+      "text": "Проверенные результаты показаны в карточках. Для добавления выберите товары и подтвердите отдельное предложение.",
+      "errorCode": null,
+      "createdAt": "2026-09-23T10:44:58.211516Z",
+      "finishedAt": "2026-09-23T10:44:58.374080Z"
+    },
+    "replayUnavailable": false
+  }
+}

@@ -1,0 +1,214 @@
+{
+  "schemaVersion": "1",
+  "status": "planning_not_executed",
+  "approvalRequiredBeforeLiveRun": true,
+  "arrivalModel": "open",
+  "warmupSeconds": 300,
+  "sustainedSeconds": 900,
+  "soakSecondsAt5000": 3600,
+  "overload": {
+    "multiplier": 1.2,
+    "seconds": 60,
+    "capacityGate": false
+  },
+  "mix": [
+    {
+      "name": "history",
+      "percent": 28,
+      "method": "GET",
+      "path": "/api/conversations/{id}/messages"
+    },
+    {
+      "name": "status",
+      "percent": 25,
+      "method": "GET",
+      "path": "/api/runs/{id}"
+    },
+    {
+      "name": "createTurn",
+      "percent": 10,
+      "method": "POST",
+      "path": "/api/conversations/{id}/messages"
+    },
+    {
+      "name": "sseOpen",
+      "percent": 15,
+      "method": "GET",
+      "path": "/api/runs/{id}/events"
+    },
+    {
+      "name": "resultOffer",
+      "percent": 5,
+      "method": "GET",
+      "path": "/api/conversations/{id}/results/{resultId}"
+    },
+    {
+      "name": "proposal",
+      "percent": 5,
+      "method": "POST",
+      "path": "/api/cart/proposals"
+    },
+    {
+      "name": "cartRead",
+      "percent": 6,
+      "method": "GET",
+      "path": "/api/cart"
+    },
+    {
+      "name": "confirm",
+      "percent": 3,
+      "method": "POST",
+      "path": "/api/cart/proposals/{id}/confirm"
+    },
+    {
+      "name": "operationStatus",
+      "percent": 1,
+      "method": "GET",
+      "path": "/api/cart/operations/{id}"
+    },
+    {
+      "name": "upload",
+      "percent": 2,
+      "method": "POST",
+      "path": null,
+      "blockedBy": "D2 ATT-01 endpoint and file SLO"
+    }
+  ],
+  "sessions": {
+    "distribution": "uniform",
+    "conversationsPerPrincipal": 2,
+    "seedMessagesPerConversation": 30,
+    "maxActiveRunPerConversation": 1,
+    "twoTabPercent": 20,
+    "authAndSeedOutsideMeasuredInterval": true,
+    "principalCount": 12000
+  },
+  "corpus": {
+    "sku": 50000,
+    "warehouseOffers": 150000,
+    "kbDocuments": 200,
+    "kbChunks": 20000,
+    "attachmentFiles": 400,
+    "providedBy": "D2 DATA-01, not current contract fixtures"
+  },
+  "queryCharacters": {
+    "mean": 120,
+    "p95": 800,
+    "max": 8000,
+    "searchMax": 2000
+  },
+  "attachments": {
+    "mixPercent": {
+      "xlsx": 40,
+      "docx": 25,
+      "pdf": 25,
+      "jpeg": 10
+    },
+    "bytes": {
+      "mean": 2097152,
+      "p95": 9437184,
+      "max": 10485760
+    },
+    "pages": {
+      "mean": 3,
+      "p95": 20
+    },
+    "ingestionSlo": null
+  },
+  "model": {
+    "rounds": [
+      {
+        "calls": 1,
+        "percent": 25
+      },
+      {
+        "calls": 2,
+        "percent": 55
+      },
+      {
+        "calls": 3,
+        "percent": 15
+      },
+      {
+        "calls": 4,
+        "percent": 5
+      }
+    ],
+    "meanCallsPerTurn": 2,
+    "inputTokensPerCall": {
+      "mean": 1800,
+      "p95": 5000
+    },
+    "outputTokensPerCall": {
+      "mean": 180,
+      "p95": 300,
+      "max": 700
+    },
+    "typicalFinalOutputMaxTokens": 300,
+    "runTotalMaxTokens": 16000,
+    "meanActiveTurnSeconds": 5,
+    "meanIsAssumption": true,
+    "responseCacheHitPercent": 0
+  },
+  "sse": {
+    "meanOpensPerTurn": 1.5,
+    "meanConcurrentStreamsPerActiveTurn": 1.2,
+    "chunksCountAsHttpRequests": false
+  },
+  "toolsPerTurn": {
+    "catalog": 0.8,
+    "stock": 0.5,
+    "knowledge": 0.2,
+    "analogs": 0.15,
+    "reviewedAttachment": 0.1,
+    "proposal": 0.3
+  },
+  "providerPlanning": {
+    "embeddingCallsPerTurn": 0.5,
+    "visionCallsPerUpload": 0.6,
+    "queryCacheHitPercent": 30,
+    "realQuotaRpm": null,
+    "realQuotaTpm": null,
+    "approvedMonetaryBudget": null,
+    "visionAndIngestionTokenBudget": null,
+    "partnerCapacity": null,
+    "instantContractLlmAllowedForCapacity": false
+  },
+  "gates": {
+    "historyStatusP95Ms": 200,
+    "historyStatusP99Ms": 500,
+    "acceptanceP95Ms": 300,
+    "queueP95Ms": 1000,
+    "usefulTextTtftP95Ms": 3000,
+    "typicalCompletionP95Ms": 8000,
+    "unexpected5xxFractionExclusive": 0.001,
+    "admissionRejectionFractionMax": 0.001,
+    "admittedCompletionSuccessFractionMin": 0.99,
+    "droppedArrivalsMax": 0
+  },
+  "requiredEvidence": [
+    "corpus version",
+    "commit and env/replicas",
+    "all offered/admitted/completed/rejected/dropped counters",
+    "latency percentiles",
+    "provider/tool usage",
+    "queue and SSE lifetime",
+    "DB/Redis/LB resource sizing",
+    "crash and reconnect tests",
+    "separate live quota and partner reports"
+  ],
+  "totalHttpRps": 1000,
+  "derivedPlanning": {
+    "turnsPerSecond": 100.0,
+    "generationCallsPerMinute": 12000,
+    "generationTokensPerMinute": 23760000,
+    "activeTurns": 500.0,
+    "activeStreams": 600.0,
+    "embeddingCallsPerSecond": 50.0,
+    "visionCallsPerSecond": 12.0,
+    "catalogCallsPerSecond": 80.0,
+    "stockCallsPerSecond": 130.0,
+    "cartWritesPerSecond": 30.0,
+    "uploadBytesPerSecond": 41943040.0
+  }
+}

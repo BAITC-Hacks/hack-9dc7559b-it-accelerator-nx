@@ -1,7 +1,7 @@
 ---
 id: CHAT-01
 owner: D1
-status: todo
+status: in_progress
 wave: 1
 size: L
 depends_on: ["FOUND-01", "AUTH-01"]
@@ -9,7 +9,7 @@ depends_on: ["FOUND-01", "AUTH-01"]
 
 # CHAT-01 — Разговоры, история, durable runs и идемпотентность
 
-**Исполнитель:** D1. **Этап:** G1. **Объём:** L. Все задачи обязательны для полного scope; отметка todo означает, что реализация не выполнена.
+**Исполнитель:** D1. **Этап:** G1. **Объём:** L. Реализация D1 в работе; непроверенные критерии не считаются выполненными.
 **Зависимости для старта:** [FOUND-01](../00-foundation/FOUND-01-contracts-and-ports.md), [AUTH-01](../01-identity/AUTH-01-session-and-ownership.md)
 **Покрытие:** FR-7; AC-10/14.
 
@@ -61,4 +61,6 @@ backend/…/domain/chat/; web/chat/; src/main/resources/db/migration/; src/test/
 
 **Передать:** D3: working history/send/status/cancel; CHAT-02/03: run lifecycle и события сохранения.
 
-**Evidence после выполнения:** заполнить commit/PR, команды, ссылки на отчёты и фактический результат; до выполнения статус остаётся todo.
+**Evidence после выполнения:** заполнить commit/PR, команды, ссылки на отчёты и фактический результат; до подтверждения всех критериев статус остаётся in_progress.
+
+**Текущий handoff:** [реализация D1 и открытые проверки](../../docs/api/d1-handoff.md). Статус `in_progress`; результаты final integration run пока pending.
