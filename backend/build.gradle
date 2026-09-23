@@ -30,6 +30,15 @@ dependencyManagement {
     }
 }
 
+configurations.configureEach {
+    // springdoc тянет swagger-annotations-jakarta:2.2.29, Spring AI (через victools)
+    // — swagger-annotations:2.2.25. В обоих jar лежит ОДИН пакет
+    // io.swagger.v3.oas.annotations: побеждает тот, что загрузился первым, и
+    // /v3/api-docs падает с NoSuchMethodError Parameter.validationGroups().
+    // Оставляем jakarta-вариант: классы те же, версия новее.
+    exclude group: 'io.swagger.core.v3', module: 'swagger-annotations'
+}
+
 dependencies {
     // ─── Web / persistence / security ────────────────────────────────────────
     implementation 'org.springframework.boot:spring-boot-starter-web'

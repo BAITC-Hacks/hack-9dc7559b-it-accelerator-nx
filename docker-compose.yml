@@ -58,6 +58,21 @@ services:
       JWT_TTL_MINUTES: ${JWT_TTL_MINUTES:-1440}
       CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:5173}
       PORT: "8080"
+      # ─── Каталог (CAT-01) ───────────────────────────────────────────────
+      # Пустой токен выключает /api/admin/**, а не открывает их.
+      ADMIN_API_TOKEN: ${ADMIN_API_TOKEN:-}
+      CATALOG_EMBEDDING_MODE: ${CATALOG_EMBEDDING_MODE:-live}
+      CATALOG_EMBEDDING_BATCH_SIZE: ${CATALOG_EMBEDDING_BATCH_SIZE:-64}
+      CATALOG_SEED_ENABLED: ${CATALOG_SEED_ENABLED:-true}
+      # Путь внутри контейнера: data/ примонтирована ниже, значение с хоста
+      # (../data/...) здесь намеренно не используется.
+      CATALOG_SEED_LOCATION: file:/app/data/sample_catalog/products.json
+      CATALOG_RETAINED_VERSIONS: ${CATALOG_RETAINED_VERSIONS:-3}
+      CATALOG_IMPORT_QUEUE_CAPACITY: ${CATALOG_IMPORT_QUEUE_CAPACITY:-8}
+    volumes:
+      # Синтетический каталог не копируется в образ: build context — ./backend.
+      # Монтируем только на чтение, чтобы seed видел тот же файл, что и валидатор.
+      - ./data:/app/data:ro
     ports:
       - "8080:8080"
     healthcheck:

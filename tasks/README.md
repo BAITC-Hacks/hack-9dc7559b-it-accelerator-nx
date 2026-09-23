@@ -52,8 +52,11 @@ Mock fixtures `satisfies GeneratedDto` проходят wire-schema провер
 
 V1 и V2 уже существуют. Следующие назначения **предлагаемые и ещё не созданы**; сначала проверить актуальный git/main, если кто-то уже добавил V3 — сдвинуть весь неприменённый план до выдачи номеров.
 
-- V3: conversation/message/run/identity state — D1 draft.
-- V4: расширение существующего products, offers, stock и catalog import metadata — D2 draft.
+- **V3: применена** — versioned каталог, offers, warehouse stock и метаданные импорта (CAT-01, D2).
+  Номер сдвинут относительно первоначального плана: к моменту merge CAT-01 в `main`
+  миграции D1 ещё не было, а дыра V3 перед применённой V4 сломала бы Flyway у всех.
+  Следующие назначения сдвинуты на единицу.
+- V4: conversation/message/run/identity state — D1 draft.
 - V5: KB versions/chunks/jobs и private attachments/reviews — D2 draft.
 - V6: proposals/cart operations и stateful sample cart — D1 draft.
 - V7: result sets/dialogue state/tool call persistence и необходимые межмодульные constraints — D1, schema review D2.
@@ -131,7 +134,7 @@ OPS-02 должен поставить:
 
 ### D2 — Каталог, RAG и распознавание
 - [ ] [DATA-01 — Синтетические данные и ожидаемые сценарии](00-foundation/DATA-01-sample-data-contract.md) — G0, M.
-- [ ] [CAT-01 — Развитие каталога V2, безопасный импорт и индексация](03-catalog/CAT-01-import-and-schema.md) — G1, L.
+- [ ] [CAT-01 — Развитие каталога V2, безопасный импорт и индексация](03-catalog/CAT-01-import-and-schema.md) — G1, L. Реализация выполнена, V3 применена; закрытие карточки ждёт AUTH-01 (admin identity).
 - [ ] [ATT-01 — Приватные вложения, storage и durable processing](06-attachments/ATT-01-upload-and-jobs.md) — G1, M.
 - [ ] [CAT-02 — Точный, лексический и семантический поиск](03-catalog/CAT-02-search-and-comparison.md) — G2, M.
 - [ ] [CAT-03 — Актуальные цены, остатки и склады](03-catalog/CAT-03-offers-and-stock.md) — G2, M.

@@ -4,11 +4,311 @@ export type ClientOptions = {
     baseURL: 'http://localhost:8080' | (string & {});
 };
 
+/**
+ * Документ импорта каталога
+ */
+export type CatalogImportRequest = {
+    schemaVersion: number;
+    synthetic?: boolean;
+    /**
+     * Версия выгрузки источника
+     */
+    version?: string;
+    products?: Array<ProductRequest>;
+};
+
+export type CertificateRequest = {
+    id?: string;
+    url?: string;
+    file?: string;
+    version?: string;
+    synthetic?: boolean;
+};
+
+/**
+ * Товар выгрузки. id — стабильный ID поставщика, не PK нашей БД
+ */
+export type ProductRequest = {
+    id?: string;
+    article?: string;
+    name?: string;
+    brand?: string;
+    category?: string;
+    unit?: string;
+    /**
+     * Минимальная партия
+     */
+    minimum?: number;
+    /**
+     * Шаг количества
+     */
+    step?: number;
+    price?: number;
+    currency?: string;
+    specs?: {
+        [key: string]: string;
+    };
+    certificates?: Array<CertificateRequest>;
+    sourceUrl?: string;
+    sourceVersion?: string;
+    synthetic?: boolean;
+    warehouses?: Array<WarehouseRequest>;
+};
+
+/**
+ * Остаток на складе; количество обязательно только для точных статусов
+ */
+export type WarehouseRequest = {
+    warehouseId?: string;
+    availableQuantity?: number;
+    status?: 'IN_STOCK' | 'OUT_OF_STOCK' | 'ON_ORDER' | 'UNKNOWN';
+    eligible?: boolean;
+};
+
+/**
+ * Ошибка или замечание импорта со стабильным кодом и путём до поля
+ */
+export type ImportIssueResponse = {
+    code?: string;
+    path?: string;
+    message?: string;
+};
+
+/**
+ * Состояние задания импорта каталога
+ */
+export type ImportJobResponse = {
+    id?: string;
+    jobType?: string;
+    status?: 'PENDING' | 'RUNNING' | 'SUCCEEDED' | 'FAILED';
+    sourceVersion?: string;
+    requestedBy?: string;
+    vectorSpace?: string;
+    catalogVersionId?: string;
+    catalogVersionStatus?: string;
+    embeddingStatus?: string;
+    totalProducts?: number;
+    importedProducts?: number;
+    embeddedProducts?: number;
+    errors?: Array<ImportIssueResponse>;
+    warnings?: Array<ImportIssueResponse>;
+    createdAt?: string;
+    startedAt?: string;
+    finishedAt?: string;
+};
+
+export type CertificateResponse = {
+    id?: string;
+    url?: string;
+    version?: string;
+    synthetic?: boolean;
+};
+
+/**
+ * Цена товара. UNKNOWN — цена неизвестна, это не ноль
+ */
+export type OfferResponse = {
+    price?: string;
+    currency?: string;
+    status?: 'KNOWN' | 'UNKNOWN';
+    sourceVersion?: string;
+    observedAt?: string;
+};
+
+/**
+ * Товар активной версии каталога
+ */
+export type ProductResponse = {
+    /**
+     * Стабильный ID товара
+     */
+    id?: string;
+    /**
+     * ID поставщика, если он известен
+     */
+    supplierId?: string;
+    /**
+     * Артикул как в источнике
+     */
+    article?: string;
+    name?: string;
+    brand?: string;
+    category?: string;
+    /**
+     * Единица измерения
+     */
+    unit?: string;
+    /**
+     * Минимальная партия
+     */
+    minimumQuantity?: string;
+    /**
+     * Шаг количества
+     */
+    stepQuantity?: string;
+    specs?: {
+        [key: string]: string;
+    };
+    certificates?: Array<CertificateResponse>;
+    sourceUrl?: string;
+    /**
+     * Версия данных источника
+     */
+    sourceVersion?: string;
+    /**
+     * Синтетические данные, а не ассортимент партнёра
+     */
+    synthetic?: boolean;
+    catalogVersionId?: string;
+    offer?: OfferResponse;
+    stock?: StockResponse;
+    /**
+     * Близость к запросу; только для поиска
+     */
+    score?: number;
+};
+
+/**
+ * Сводный остаток. Склады не суммируются без политики отгрузки
+ */
+export type StockResponse = {
+    status?: 'IN_STOCK' | 'OUT_OF_STOCK' | 'ON_ORDER' | 'UNKNOWN';
+    /**
+     * Доступное количество; null, когда оно неизвестно
+     */
+    availableQuantity?: string;
+    /**
+     * Почему количество есть или отсутствует
+     */
+    quantityBasis?: 'SINGLE_WAREHOUSE' | 'MULTIPLE_WAREHOUSES_NOT_MERGED' | 'UNKNOWN' | 'NO_ELIGIBLE_WAREHOUSE';
+    warehouses?: Array<WarehouseResponse>;
+};
+
+/**
+ * Остаток на складе; eligible=false — отгрузка с него невозможна
+ */
+export type WarehouseResponse = {
+    warehouseId?: string;
+    status?: string;
+    availableQuantity?: string;
+    eligible?: boolean;
+    observedAt?: string;
+};
+
+/**
+ * Результат поиска вместе с версией каталога, по которой он получен
+ */
+export type ProductSearchResponse = {
+    catalogVersionId?: string;
+    sourceVersion?: string;
+    vectorSpace?: string;
+    total?: number;
+    items?: Array<ProductResponse>;
+};
+
 export type PingResponse = {
     app?: string;
     status?: string;
     time?: string;
 };
+
+export type StartImportData = {
+    body: CatalogImportRequest;
+    headers?: {
+        /**
+         * Ключ идемпотентности повторной отправки
+         */
+        'Idempotency-Key'?: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/api/admin/catalog/imports';
+};
+
+export type StartImportErrors = {
+    /**
+     * Документ не прошёл проверку; каталог не изменён
+     */
+    400: ImportJobResponse;
+    /**
+     * Нет прав администратора
+     */
+    403: ImportJobResponse;
+    /**
+     * Очередь импорта заполнена или доступ не настроен
+     */
+    503: ImportJobResponse;
+};
+
+export type StartImportError = StartImportErrors[keyof StartImportErrors];
+
+export type StartImportResponses = {
+    /**
+     * Задание принято
+     */
+    202: ImportJobResponse;
+};
+
+export type StartImportResponse = StartImportResponses[keyof StartImportResponses];
+
+export type ByArticleData = {
+    body?: never;
+    path: {
+        article: string;
+    };
+    query?: never;
+    url: '/api/products/{article}';
+};
+
+export type ByArticleErrors = {
+    /**
+     * Артикула нет в активном каталоге
+     */
+    404: ProductResponse;
+};
+
+export type ByArticleError = ByArticleErrors[keyof ByArticleErrors];
+
+export type ByArticleResponses = {
+    /**
+     * Карточка товара
+     */
+    200: ProductResponse;
+};
+
+export type ByArticleResponse = ByArticleResponses[keyof ByArticleResponses];
+
+export type SearchData = {
+    body?: never;
+    path?: never;
+    query: {
+        q: string;
+        limit?: number;
+        category?: string;
+        brand?: string;
+        minPrice?: number;
+        maxPrice?: number;
+    };
+    url: '/api/products/search';
+};
+
+export type SearchErrors = {
+    /**
+     * Индекс каталога не готов или построен другой моделью
+     */
+    503: ProductSearchResponse;
+};
+
+export type SearchError = SearchErrors[keyof SearchErrors];
+
+export type SearchResponses = {
+    /**
+     * Результаты поиска
+     */
+    200: ProductSearchResponse;
+};
+
+export type SearchResponse = SearchResponses[keyof SearchResponses];
 
 export type PingData = {
     body?: never;
@@ -25,3 +325,34 @@ export type PingResponses = {
 };
 
 export type PingResponse2 = PingResponses[keyof PingResponses];
+
+export type JobStatusData = {
+    body?: never;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/api/admin/jobs/{id}';
+};
+
+export type JobStatusErrors = {
+    /**
+     * Нет прав администратора
+     */
+    403: ImportJobResponse;
+    /**
+     * Задание не найдено
+     */
+    404: ImportJobResponse;
+};
+
+export type JobStatusError = JobStatusErrors[keyof JobStatusErrors];
+
+export type JobStatusResponses = {
+    /**
+     * Состояние задания
+     */
+    200: ImportJobResponse;
+};
+
+export type JobStatusResponse = JobStatusResponses[keyof JobStatusResponses];

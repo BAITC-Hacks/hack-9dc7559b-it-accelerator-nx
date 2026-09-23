@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { PingData, PingResponses } from './types.gen';
+import type { ByArticleData, ByArticleErrors, ByArticleResponses, JobStatusData, JobStatusErrors, JobStatusResponses, PingData, PingResponses, SearchData, SearchErrors, SearchResponses, StartImportData, StartImportErrors, StartImportResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -18,4 +18,37 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
     meta?: Record<string, unknown>;
 };
 
+/**
+ * Импортировать выгрузку каталога
+ *
+ * Создаёт новую версию каталога и публикует её только после успешной записи. Повтор с тем же Idempotency-Key возвращает прежнее задание, а не второй импорт.
+ */
+export const startImport = <ThrowOnError extends boolean = false>(options: Options<StartImportData, ThrowOnError>) => (options.client ?? client).post<StartImportResponses, StartImportErrors, ThrowOnError>({
+    url: '/api/admin/catalog/imports',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Карточка товара по точному артикулу
+ *
+ * Ведущие нули значимы. Отсутствующий артикул возвращает 404, похожий товар вместо него не подставляется.
+ */
+export const byArticle = <ThrowOnError extends boolean = false>(options: Options<ByArticleData, ThrowOnError>) => (options.client ?? client).get<ByArticleResponses, ByArticleErrors, ThrowOnError>({ url: '/api/products/{article}', ...options });
+
+/**
+ * Найти товары по смыслу и фильтрам в активной версии каталога
+ *
+ * Требует построенного семантического индекса. Точный артикул ищите через /api/products/{article}.
+ */
+export const search = <ThrowOnError extends boolean = false>(options: Options<SearchData, ThrowOnError>) => (options.client ?? client).get<SearchResponses, SearchErrors, ThrowOnError>({ url: '/api/products/search', ...options });
+
 export const ping = <ThrowOnError extends boolean = false>(options?: Options<PingData, ThrowOnError>) => (options?.client ?? client).get<PingResponses, unknown, ThrowOnError>({ url: '/api/ping', ...options });
+
+/**
+ * Статус задания импорта
+ */
+export const jobStatus = <ThrowOnError extends boolean = false>(options: Options<JobStatusData, ThrowOnError>) => (options.client ?? client).get<JobStatusResponses, JobStatusErrors, ThrowOnError>({ url: '/api/admin/jobs/{id}', ...options });
