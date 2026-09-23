@@ -12,16 +12,16 @@ import java.util.List;
 @Service
 public class ProductSearchService {
     private final JdbcTemplate jdbc;
-    private final EmbeddingModel embeddingModel;
+    private final org.springframework.beans.factory.ObjectProvider<EmbeddingModel> embeddingModel;
 
-    public ProductSearchService(JdbcTemplate jdbc, EmbeddingModel embeddingModel) {
+    public ProductSearchService(JdbcTemplate jdbc, org.springframework.beans.factory.ObjectProvider<EmbeddingModel> embeddingModel) {
         this.jdbc = jdbc;
         this.embeddingModel = embeddingModel;
     }
 
     public List<ProductSearchResult> search(String query, int limit, String category,
                                             BigDecimal minPrice, BigDecimal maxPrice) {
-        String vector = vectorLiteral(embeddingModel.embed(query));
+        String vector = vectorLiteral(embeddings().embed(query));
         StringBuilder sql = new StringBuilder("""
                 SELECT id, article, name, brand, category, price, currency, stock, source_url,
                        1 - (embedding <=> CAST(? AS vector)) AS score
@@ -56,7 +56,7 @@ public class ProductSearchService {
         long id = request.id() == null ? Math.abs(request.article().hashCode()) : request.id();
         String searchText = String.join(". ", request.name(), nullToEmpty(request.brand()),
                 nullToEmpty(request.category()), nullToEmpty(request.specs()));
-        String vector = vectorLiteral(embeddingModel.embed(searchText));
+        String vector = vectorLiteral(embeddings().embed(searchText));
         jdbc.update("""
                 INSERT INTO products (id, article, name, brand, category, price, currency, stock,
                                       source_url, specs, search_text, embedding, updated_at)
@@ -88,11 +88,18 @@ public class ProductSearchService {
         return result.append(']').toString();
     }
 
+    private EmbeddingModel embeddings() {
+        var model=embeddingModel.getIfAvailable();
+        if(model==null) throw ApiException.unavailable("embedding_source_unavailable");
+        return model;
+    }
+
     private static String nullToEmpty(String value) {
         return value == null ? "" : value;
     }
 
-    public record ProductSearchResult(Long id, String article, String name, String brand,
+    public record ProductSearchResult(@com.fasterxml.jackson.annotation.JsonFormat(shape=com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING)
+                                      @io.swagger.v3.oas.annotations.media.Schema(type="string") Long id, String article, String name, String brand,
                                       String category, BigDecimal price, String currency,
                                       boolean stock, String sourceUrl, double score) {
     }

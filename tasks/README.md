@@ -1,6 +1,6 @@
 # План реализации ekt.kz: 3 разработчика, 32 задачи
 
-Основной продуктовый и архитектурный документ: [единое ТЗ](../docs/ekt-assistant-spec.md). Исходное партнёрское [ТЗ](../docs/ТЗ_ИИ-ассистент_ekt.kz.md) сохранено без изменений. Здесь — порядок реализации и рабочие карточки; все новые задачи имеют `status: todo`.
+Основной продуктовый и архитектурный документ: [единое ТЗ](../docs/ekt-assistant-spec.md). Исходное партнёрское [ТЗ](../docs/ТЗ_ИИ-ассистент_ekt.kz.md) сохранено без изменений. Здесь — порядок реализации и рабочие карточки; актуальный статус указан в YAML каждой карточки. D1: [implementation handoff и открытые проверки](../docs/api/d1-handoff.md), все 11 карточек пока `in_progress`.
 
 **С чего начать и кого ждать:** [схема зависимостей и пошаговая очередь для D1/D2/D3](DEPENDENCIES.md). В ней все 32 задачи, точки передачи между разработчиками и условия финальной приёмки.
 
@@ -44,21 +44,19 @@ npm run build
 npm run lint
 ```
 
-`docs/api/openapi.json` должен быть получен из springdoc в FOUND-01; сейчас этот будущий файл не создаётся вручную. Обычная генерация остаётся `npm run gen` с запущенным backend. После ЛЮБОГО изменения API автор PR регенерирует SDK; D3 после объединения веток заново генерирует итог, а не разрешает generated конфликт руками.
+`docs/api/openapi.json` — экспортированный springdoc snapshot D1; вручную его не редактировать. Обычная генерация остаётся `npm run gen` с запущенным backend. После ЛЮБОГО изменения API автор PR регенерирует SDK; D3 после объединения веток заново генерирует итог, а не разрешает generated конфликт руками.
 
 Mock fixtures `satisfies GeneratedDto` проходят wire-schema проверки и вызываются через настоящий generated SDK. Финальная QA-01 отключает browser mocks и использует реальный backend; подменяются только внешние gateways по явному test mode.
 
 ## Реестр миграций и порядок merge
 
-V1 и V2 уже существуют. Следующие назначения **предлагаемые и ещё не созданы**; сначала проверить актуальный git/main, если кто-то уже добавил V3 — сдвинуть весь неприменённый план до выдачи номеров.
+V1 и V2 уже существуют и не изменяются. Текущий непрерывный D1 baseline:
 
-- V3: conversation/message/run/identity state — D1 draft.
-- V4: расширение существующего products, offers, stock и catalog import metadata — D2 draft.
-- V5: KB versions/chunks/jobs и private attachments/reviews — D2 draft.
-- V6: proposals/cart operations и stateful sample cart — D1 draft.
-- V7: result sets/dialogue state/tool call persistence и необходимые межмодульные constraints — D1, schema review D2.
+- **V3__identity_chat_cart.sql** — весь D1: identity, conversations/messages/runs/events, result sets/dialogue/tool persistence, immutable proposals, cart operations и stateful sample cart.
+- **V4 (следующая D2, ещё не создана)** — расширение products, offers, stock и catalog import metadata.
+- **V5 (следующая D2, ещё не создана)** — KB versions/chunks/jobs и private attachments/reviews.
 
-D1 интегрирует эту последовательность ранними schema-only PR из CHAT-01/CAT-01/ATT-01/RAG-01/CART-01, включая FK ordering/DTO naming. **Контракт и frontend не ждут полного V3…V7.** Domain-код можно писать и тестировать на ports/fakes параллельно. Перед применением очередной миграции в общем integration DB подхватывается весь непрерывный согласованный prefix; до совместного domain E2E все worktrees используют одинаковый schema baseline. В выделенной одноразовой БД draft-ветки допускается пересоздание только её собственного volume после появления более ранней миграции; shared DB так не исправляется. Изменение плана до применения допустимо; после применения SQL не редактировать. Следующую V8+ выдаёт D1 по фактическому merge order. Не резервировать далёкие диапазоны по разработчикам и не включать Flyway outOfOrder ради обхода конфликтов.
+V6/V7 отдельно под D1 больше не резервируются: их плановый scope включён в V3. После V5 следующий номер выдаётся D1 по фактическому merge order. В общей integration DB применять только непрерывный согласованный prefix: сейчас V1→V2→V3, затем V4→V5. Перед назначением сверить интегрированную ветку, чтобы не было двух SQL с одним номером. Не создавать holes и не включать Flyway outOfOrder. Применённый SQL не редактировать; изменения — новой следующей миграцией. Contract/UI могут использовать ports и snapshot до D2 schema. Подробности: [handoff D1](../docs/api/d1-handoff.md).
 
 Миграции не вызывают OpenAI и не загружают удалённые файлы. Sample business seed/index — отдельный idempotent initializer. Проверять и чистую изолированную БД, и upgrade с существующей V2.
 
@@ -109,7 +107,7 @@ OPS-02 должен поставить:
 ./scripts/test-compose.sh --load-profile 5000 # выделенный load проект и утверждённый mix
 ```
 
-Скриптов и дополнительных test compose файлов пока нет: они являются результатом конкретных задач. Mock режим не требует платного key, default real profile продолжает требовать его. Live AI не включает автоматически реальные partner cart writes.
+`scripts/test-compose.sh` ещё не реализован OPS-02. Уже есть отдельный D1 dependency stack `scripts/d1-compose.yml` (PostgreSQL + Redis); команды в [D1 handoff](../docs/api/d1-handoff.md). Он не является полным продуктовым или нагрузочным runner. Mock режим не требует платного key, default real profile продолжает требовать его. Live AI не включает автоматически реальные partner cart writes.
 
 Продуктовый отчёт различает: (1) functional Compose build AC-1…14/17, (2) качество AC-15 на real providers, (3) partner adapter compatibility, (4) high-load AC-16. При отсутствии API/квот внешние пункты не становятся pass. Заявление «всё ТЗ выполнено» требует evidence по всем обязательным критериям.
 
@@ -117,17 +115,17 @@ OPS-02 должен поставить:
 
 ## Карточки по разработчикам
 ### D1 — Чат, identity, agent и корзина
-- [ ] [FOUND-01 — Первый API-контракт, Java ports и схема handoff](00-foundation/FOUND-01-contracts-and-ports.md) — G0, M.
-- [ ] [NFR-01 — Профиль 1k–5k RPS и измеримые условия релиза](00-foundation/NFR-01-workload-and-release-gates.md) — G0, S.
-- [ ] [AUTH-01 — Visitor/partner identity и изоляция ресурсов](01-identity/AUTH-01-session-and-ownership.md) — G1, M.
-- [ ] [CHAT-01 — Разговоры, история, durable runs и идемпотентность](02-chat/CHAT-01-history-and-runs.md) — G1, L.
-- [ ] [CHAT-02 — OpenAI agent с ограниченным tool loop](02-chat/CHAT-02-agent-tools.md) — G2, L.
-- [ ] [CHAT-03 — SSE, reconnect и защита от устаревших событий](02-chat/CHAT-03-sse-recovery.md) — G2, M.
-- [ ] [CHAT-04 — Продолжение подбора и привязка пользовательского выбора](02-chat/CHAT-04-dialogue-context.md) — G3, M.
-- [ ] [CART-01 — Предложения корзины без изменения корзины](05-cart/CART-01-immutable-proposals.md) — G3, M.
-- [ ] [CART-02 — Отдельный Confirm Gate и проверка явного согласия](05-cart/CART-02-confirmation-gate.md) — G3, L.
-- [ ] [CART-03 — Stateful Cart API, атомарность и неизвестный исход](05-cart/CART-03-cart-adapters-and-reconciliation.md) — G4, L.
-- [ ] [PERF-01 — Общие лимиты, replay нескольких реплик и метрики](08-platform/PERF-01-limits-events-and-metrics.md) — G4, L.
+- [ ] [FOUND-01 — Первый API-контракт, Java ports и схема handoff](00-foundation/FOUND-01-contracts-and-ports.md) — G0, M. `in_progress` — [handoff](../docs/api/d1-handoff.md).
+- [ ] [NFR-01 — Профиль 1k–5k RPS и измеримые условия релиза](00-foundation/NFR-01-workload-and-release-gates.md) — G0, S. `in_progress` — [handoff](../docs/api/d1-handoff.md).
+- [ ] [AUTH-01 — Visitor/partner identity и изоляция ресурсов](01-identity/AUTH-01-session-and-ownership.md) — G1, M. `in_progress` — [handoff](../docs/api/d1-handoff.md).
+- [ ] [CHAT-01 — Разговоры, история, durable runs и идемпотентность](02-chat/CHAT-01-history-and-runs.md) — G1, L. `in_progress` — [handoff](../docs/api/d1-handoff.md).
+- [ ] [CHAT-02 — OpenAI agent с ограниченным tool loop](02-chat/CHAT-02-agent-tools.md) — G2, L. `in_progress` — [handoff](../docs/api/d1-handoff.md).
+- [ ] [CHAT-03 — SSE, reconnect и защита от устаревших событий](02-chat/CHAT-03-sse-recovery.md) — G2, M. `in_progress` — [handoff](../docs/api/d1-handoff.md).
+- [ ] [CHAT-04 — Продолжение подбора и привязка пользовательского выбора](02-chat/CHAT-04-dialogue-context.md) — G3, M. `in_progress` — [handoff](../docs/api/d1-handoff.md).
+- [ ] [CART-01 — Предложения корзины без изменения корзины](05-cart/CART-01-immutable-proposals.md) — G3, M. `in_progress` — [handoff](../docs/api/d1-handoff.md).
+- [ ] [CART-02 — Отдельный Confirm Gate и проверка явного согласия](05-cart/CART-02-confirmation-gate.md) — G3, L. `in_progress` — [handoff](../docs/api/d1-handoff.md).
+- [ ] [CART-03 — Stateful Cart API, атомарность и неизвестный исход](05-cart/CART-03-cart-adapters-and-reconciliation.md) — G4, L. `in_progress` — [handoff](../docs/api/d1-handoff.md).
+- [ ] [PERF-01 — Общие лимиты, replay нескольких реплик и метрики](08-platform/PERF-01-limits-events-and-metrics.md) — G4, L. `in_progress` — [handoff](../docs/api/d1-handoff.md).
 
 ### D2 — Каталог, RAG и распознавание
 - [ ] [DATA-01 — Синтетические данные и ожидаемые сценарии](00-foundation/DATA-01-sample-data-contract.md) — G0, M.

@@ -1,7 +1,7 @@
 ---
 id: CHAT-04
 owner: D1
-status: todo
+status: in_progress
 wave: 3
 size: M
 depends_on: ["CHAT-02"]
@@ -9,7 +9,7 @@ depends_on: ["CHAT-02"]
 
 # CHAT-04 — Продолжение подбора и привязка пользовательского выбора
 
-**Исполнитель:** D1. **Этап:** G3. **Объём:** M. Все задачи обязательны для полного scope; отметка todo означает, что реализация не выполнена.
+**Исполнитель:** D1. **Этап:** G3. **Объём:** M. Реализация D1 в работе; непроверенные критерии не считаются выполненными.
 **Зависимости для старта:** [CHAT-02](../02-chat/CHAT-02-agent-tools.md)
 **Покрытие:** FR-7; AC-9/10.
 
@@ -61,4 +61,6 @@ backend/…/domain/chat/DialogueState…; ai/agent/ContextBuilder…; src/test/�
 
 **Передать:** D3: response state для выбора/сравнения; CAT-02/04: TrustedSearchContext с resultSet references.
 
-**Evidence после выполнения:** заполнить commit/PR, команды, ссылки на отчёты и фактический результат; до выполнения статус остаётся todo.
+**Evidence после выполнения:** заполнить commit/PR, команды, ссылки на отчёты и фактический результат; до подтверждения всех критериев статус остаётся in_progress.
+
+**Текущий handoff:** [реализация D1 и открытые проверки](../../docs/api/d1-handoff.md). Статус `in_progress`; результаты final integration run пока pending.

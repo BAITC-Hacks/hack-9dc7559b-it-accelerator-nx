@@ -1,7 +1,7 @@
 ---
 id: NFR-01
 owner: D1
-status: todo
+status: in_progress
 wave: 0
 size: S
 depends_on: []
@@ -9,7 +9,7 @@ depends_on: []
 
 # NFR-01 — Профиль 1k–5k RPS и измеримые условия релиза
 
-**Исполнитель:** D1. **Этап:** G0. **Объём:** S. Все задачи обязательны для полного scope; отметка todo означает, что реализация не выполнена.
+**Исполнитель:** D1. **Этап:** G0. **Объём:** S. Реализация D1 в работе; непроверенные критерии не считаются выполненными.
 **Зависимости для старта:** Нет — можно начать сразу.
 **Покрытие:** AC-16; NFR производительность.
 
@@ -61,4 +61,6 @@ docs/performance/workload.md; tests/load/profiles/; docs/ekt-assistant-spec.md �
 
 **Передать:** D2: embedding/OCR/search budgets; D3: точный load generator mix; REL-01: external capacity gates.
 
-**Evidence после выполнения:** заполнить commit/PR, команды, ссылки на отчёты и фактический результат; до выполнения статус остаётся todo.
+**Evidence после выполнения:** заполнить commit/PR, команды, ссылки на отчёты и фактический результат; до подтверждения всех критериев статус остаётся in_progress.
+
+**Текущий handoff:** [реализация D1 и открытые проверки](../../docs/api/d1-handoff.md). Статус `in_progress`; результаты final integration run пока pending.

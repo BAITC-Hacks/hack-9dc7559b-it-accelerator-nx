@@ -1,7 +1,7 @@
 ---
 id: AUTH-01
 owner: D1
-status: todo
+status: in_progress
 wave: 1
 size: M
 depends_on: ["FOUND-01"]
@@ -9,7 +9,7 @@ depends_on: ["FOUND-01"]
 
 # AUTH-01 — Visitor/partner identity и изоляция ресурсов
 
-**Исполнитель:** D1. **Этап:** G1. **Объём:** M. Все задачи обязательны для полного scope; отметка todo означает, что реализация не выполнена.
+**Исполнитель:** D1. **Этап:** G1. **Объём:** M. Реализация D1 в работе; непроверенные критерии не считаются выполненными.
 **Зависимости для старта:** [FOUND-01](../00-foundation/FOUND-01-contracts-and-ports.md)
 **Покрытие:** AC-13; FR-4; NFR приватность.
 
@@ -61,4 +61,6 @@ backend/src/main/java/com/hackalem/security/; web/auth/; config/; backend/src/te
 
 **Передать:** D2: TrustedScope и authorization helpers; D3: bootstrap/refresh/logout контракт и origin policy.
 
-**Evidence после выполнения:** заполнить commit/PR, команды, ссылки на отчёты и фактический результат; до выполнения статус остаётся todo.
+**Evidence после выполнения:** заполнить commit/PR, команды, ссылки на отчёты и фактический результат; до подтверждения всех критериев статус остаётся in_progress.
+
+**Текущий handoff:** [реализация D1 и открытые проверки](../../docs/api/d1-handoff.md). Статус `in_progress`; результаты final integration run пока pending.

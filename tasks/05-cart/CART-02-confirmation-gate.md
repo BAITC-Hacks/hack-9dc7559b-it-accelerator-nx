@@ -1,7 +1,7 @@
 ---
 id: CART-02
 owner: D1
-status: todo
+status: in_progress
 wave: 3
 size: L
 depends_on: ["CART-01", "AUTH-01"]
@@ -9,7 +9,7 @@ depends_on: ["CART-01", "AUTH-01"]
 
 # CART-02 — Отдельный Confirm Gate и проверка явного согласия
 
-**Исполнитель:** D1. **Этап:** G3. **Объём:** L. Все задачи обязательны для полного scope; отметка todo означает, что реализация не выполнена.
+**Исполнитель:** D1. **Этап:** G3. **Объём:** L. Реализация D1 в работе; непроверенные критерии не считаются выполненными.
 **Зависимости для старта:** [CART-01](../05-cart/CART-01-immutable-proposals.md), [AUTH-01](../01-identity/AUTH-01-session-and-ownership.md)
 **Покрытие:** FR-4; AC-4/5/6/13.
 
@@ -61,4 +61,6 @@ backend/…/domain/cart/ConfirmGate…; web/cart/; security/; src/test/…/confi
 
 **Передать:** D3: confirmation conflicts/renewed card; CART-03: validated immutable operation request и consent audit.
 
-**Evidence после выполнения:** заполнить commit/PR, команды, ссылки на отчёты и фактический результат; до выполнения статус остаётся todo.
+**Evidence после выполнения:** заполнить commit/PR, команды, ссылки на отчёты и фактический результат; до подтверждения всех критериев статус остаётся in_progress.
+
+**Текущий handoff:** [реализация D1 и открытые проверки](../../docs/api/d1-handoff.md). Статус `in_progress`; результаты final integration run пока pending.

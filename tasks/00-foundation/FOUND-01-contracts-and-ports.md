@@ -1,7 +1,7 @@
 ---
 id: FOUND-01
 owner: D1
-status: todo
+status: in_progress
 wave: 0
 size: M
 depends_on: []
@@ -9,7 +9,7 @@ depends_on: []
 
 # FOUND-01 — Первый API-контракт, Java ports и схема handoff
 
-**Исполнитель:** D1. **Этап:** G0. **Объём:** M. Все задачи обязательны для полного scope; отметка todo означает, что реализация не выполнена.
+**Исполнитель:** D1. **Этап:** G0. **Объём:** M. Реализация D1 в работе; непроверенные критерии не считаются выполненными.
 **Зависимости для старта:** Нет — можно начать сразу.
 **Покрытие:** Все FR; AC-17.
 
@@ -29,7 +29,7 @@ depends_on: []
 2. Опубликовать controller signatures, validation/security и Java ports Catalog/Stock/Analogs/Knowledge/Attachment/Cart/Llm; implementation stubs допустимы только contract/test profile.
 3. Получить springdoc schema с запущенного backend, сохранить snapshot и JSON примеры accepted/delta/products/proposal/terminal/conflict/review. Не писать snapshot руками.
 4. Задать contract compatibility/version policy, tool allowlist и compile-time fakes портов; fake Cart не выполняет реальные side effects.
-5. Зафиксировать V3…V7 registry и владельцев общих файлов. Contract-only PR и завершение FOUND-01 не ждут всех SQL: D1/D2 публикуют schema drafts следующими ранними domain PR с последовательным merge до общего E2E. При следующих миграциях выдавать следующий ещё не применённый номер.
+5. Зафиксировать registry V3 (весь D1 baseline), V4/V5 (следующие D2) и владельцев общих файлов. Contract-only PR и завершение FOUND-01 не ждут всех SQL: D1/D2 публикуют schema drafts следующими ранними domain PR с последовательным merge до общего E2E. При следующих миграциях выдавать следующий ещё не применённый номер.
 6. Перегенерировать SDK; передать D3 snapshot и воспроизводимый contract-profile запуск, D2 — signatures. Зафиксировать SLO/endpoint mix как versioned hypotheses, данные о partner auth/quota — pending если их нет.
 
 ## Область изменений
@@ -61,4 +61,6 @@ backend/src/main/java/com/hackalem/{web,domain,ai}/…; config/OpenApiConfig.jav
 
 **Передать:** D2: Java interfaces/fixtures; D3: OpenAPI snapshot и event examples; всем: первый зелёный contract PR и registry миграций.
 
-**Evidence после выполнения:** заполнить commit/PR, команды, ссылки на отчёты и фактический результат; до выполнения статус остаётся todo.
+**Evidence после выполнения:** заполнить commit/PR, команды, ссылки на отчёты и фактический результат; до подтверждения всех критериев статус остаётся in_progress.
+
+**Текущий handoff:** [реализация D1 и открытые проверки](../../docs/api/d1-handoff.md). Статус `in_progress`; результаты final integration run пока pending.

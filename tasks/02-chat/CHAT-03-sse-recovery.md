@@ -1,7 +1,7 @@
 ---
 id: CHAT-03
 owner: D1
-status: todo
+status: in_progress
 wave: 2
 size: M
 depends_on: ["FOUND-01", "CHAT-01"]
@@ -9,7 +9,7 @@ depends_on: ["FOUND-01", "CHAT-01"]
 
 # CHAT-03 — SSE, reconnect и защита от устаревших событий
 
-**Исполнитель:** D1. **Этап:** G2. **Объём:** M. Все задачи обязательны для полного scope; отметка todo означает, что реализация не выполнена.
+**Исполнитель:** D1. **Этап:** G2. **Объём:** M. Реализация D1 в работе; непроверенные критерии не считаются выполненными.
 **Зависимости для старта:** [FOUND-01](../00-foundation/FOUND-01-contracts-and-ports.md), [CHAT-01](../02-chat/CHAT-01-history-and-runs.md)
 **Покрытие:** AC-14; NFR streaming.
 
@@ -61,4 +61,6 @@ backend/…/web/chat/; domain/chat/events/; config/; src/test/…/streaming/
 
 **Передать:** D3: real SSE endpoints/cursor semantics/error fixtures; PERF-01: publisher abstraction и fencing keys.
 
-**Evidence после выполнения:** заполнить commit/PR, команды, ссылки на отчёты и фактический результат; до выполнения статус остаётся todo.
+**Evidence после выполнения:** заполнить commit/PR, команды, ссылки на отчёты и фактический результат; до подтверждения всех критериев статус остаётся in_progress.
+
+**Текущий handoff:** [реализация D1 и открытые проверки](../../docs/api/d1-handoff.md). Статус `in_progress`; результаты final integration run пока pending.
