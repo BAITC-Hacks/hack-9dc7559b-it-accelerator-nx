@@ -1,0 +1,9 @@
+spring:
+  ai:
+    openai:
+      api-key: offline-tests-no-provider-calls
+    model:
+      chat: none
+      embedding: none
+app:
+  visitor-enabled: true

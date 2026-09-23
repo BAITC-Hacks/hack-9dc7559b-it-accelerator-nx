@@ -5,6 +5,7 @@ status: todo
 wave: 4
 size: L
 depends_on: ["OPS-01", "UI-05", "CAT-01", "RAG-01", "ATT-03"]
+acceptance_depends_on: ["PERF-01", "CHAT-04", "CAT-04", "ATT-04", "UI-03", "UI-04"]
 ---
 
 # OPS-02 — Полный Compose-продукт, seed и containerized test runner
@@ -12,6 +13,8 @@ depends_on: ["OPS-01", "UI-05", "CAT-01", "RAG-01", "ATT-03"]
 **Исполнитель:** D3. **Этап:** G4. **Объём:** L. Все задачи обязательны для полного scope; отметка todo означает, что реализация не выполнена.
 **Зависимости для старта:** [OPS-01](../08-platform/OPS-01-compose-foundation.md), [UI-05](../07-widget/UI-05-embed-and-mobile.md), [CAT-01](../03-catalog/CAT-01-import-and-schema.md), [RAG-01](../04-knowledge/RAG-01-terms-and-sources.md), [ATT-03](../06-attachments/ATT-03-pdf-ocr-and-photo.md)
 **Покрытие:** AC-12/17; весь FR scope.
+
+**Дополнительно для итоговой приёмки:** интегрированы PERF-01, CHAT-04, CAT-04, ATT-04, UI-03 и UI-04 вместе с их зависимостями. Начать упаковку и runner можно раньше; закрыть OPS-02 как полный Compose-продукт — после подключения всех модулей на одном checkout. Ссылки и два типа связей — в [схеме зависимостей](../DEPENDENCIES.md).
 
 ## Goal
 
@@ -52,6 +55,7 @@ docker-compose*.yml; backend/frontend Dockerfiles; .env.example; scripts/test-co
 - [ ] ./scripts/test-compose.sh запускает все mock integration services/tests без LLM network/key, nonzero при failures.
 - [ ] ./scripts/test-compose.sh --live-ai проверяет real model + same backend/Cart mock при заданном budget.
 - [ ] Новый clone требует Docker/Compose и настройки key для live, но не ручной SQL/parser installation.
+- [ ] Все модули из acceptance_depends_on подключены к одному checkout; его commit, schema и конфигурация переданы в QA-01/QA-02.
 - [ ] Проверки выполнены на своей ветке; PR содержит результат проверок и известные ограничения.
 
 ## Проверка и передача

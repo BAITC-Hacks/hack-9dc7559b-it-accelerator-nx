@@ -1,7 +1,7 @@
 ---
 id: PERF-01
 owner: D1
-status: todo
+status: in_progress
 wave: 4
 size: L
 depends_on: ["NFR-01", "CHAT-03", "CART-03"]
@@ -9,7 +9,7 @@ depends_on: ["NFR-01", "CHAT-03", "CART-03"]
 
 # PERF-01 — Общие лимиты, replay нескольких реплик и метрики
 
-**Исполнитель:** D1. **Этап:** G4. **Объём:** L. Все задачи обязательны для полного scope; отметка todo означает, что реализация не выполнена.
+**Исполнитель:** D1. **Этап:** G4. **Объём:** L. Реализация D1 в работе; непроверенные критерии не считаются выполненными.
 **Зависимости для старта:** [NFR-01](../00-foundation/NFR-01-workload-and-release-gates.md), [CHAT-03](../02-chat/CHAT-03-sse-recovery.md), [CART-03](../05-cart/CART-03-cart-adapters-and-reconciliation.md)
 **Покрытие:** AC-14/16; NFR доступность.
 
@@ -62,4 +62,6 @@ backend/…/config/; domain/chat/events/; ai/agent/limits/; integration/; applic
 
 **Передать:** D3 PERF-02: instrumentation и scale profile; QA-01: failure/reconnect scenarios; D2: worker quota isolation.
 
-**Evidence после выполнения:** заполнить commit/PR, команды, ссылки на отчёты и фактический результат; до выполнения статус остаётся todo.
+**Evidence после выполнения:** заполнить commit/PR, команды, ссылки на отчёты и фактический результат; до подтверждения всех критериев статус остаётся in_progress.
+
+**Текущий handoff:** [реализация D1 и открытые проверки](../../docs/api/d1-handoff.md). Статус `in_progress`; результаты final integration run пока pending.

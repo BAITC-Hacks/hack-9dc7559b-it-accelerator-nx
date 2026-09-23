@@ -1,7 +1,7 @@
 ---
 id: CART-03
 owner: D1
-status: todo
+status: in_progress
 wave: 4
 size: L
 depends_on: ["CART-02"]
@@ -9,7 +9,7 @@ depends_on: ["CART-02"]
 
 # CART-03 — Stateful Cart API, атомарность и неизвестный исход
 
-**Исполнитель:** D1. **Этап:** G4. **Объём:** L. Все задачи обязательны для полного scope; отметка todo означает, что реализация не выполнена.
+**Исполнитель:** D1. **Этап:** G4. **Объём:** L. Реализация D1 в работе; непроверенные критерии не считаются выполненными.
 **Зависимости для старта:** [CART-02](../05-cart/CART-02-confirmation-gate.md)
 **Покрытие:** FR-4/5; AC-5/6/7/14.
 
@@ -62,4 +62,6 @@ backend/…/integration/cart/; domain/cart/Operation…; web/cart/; db/migration
 
 **Передать:** D3: GET cart, operation status, checkout link; QA-01: deterministic race/unknown-outcome controls; PERF-01: protected cart metrics.
 
-**Evidence после выполнения:** заполнить commit/PR, команды, ссылки на отчёты и фактический результат; до выполнения статус остаётся todo.
+**Evidence после выполнения:** заполнить commit/PR, команды, ссылки на отчёты и фактический результат; до подтверждения всех критериев статус остаётся in_progress.
+
+**Текущий handoff:** [реализация D1 и открытые проверки](../../docs/api/d1-handoff.md). Статус `in_progress`; результаты final integration run пока pending.

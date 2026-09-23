@@ -15,6 +15,11 @@ backend/bin/
 *.log
 hs_err_pid*
 
+# ─── Python / generated fixture diagnostics ────────────────────────────────
+__pycache__/
+*.py[cod]
+data/**/*.inspect.ndjson
+
 # ─── Node / Vite ──────────────────────────────────────────────────────────────
 node_modules/
 frontend/dist/

@@ -5,6 +5,7 @@ status: todo
 wave: 5
 size: L
 depends_on: ["OPS-02", "UI-02", "UI-03", "UI-04", "CHAT-04", "CART-03", "CAT-04", "ATT-04"]
+acceptance_depends_on: ["CHAT-03", "PERF-01"]
 ---
 
 # QA-01 — Приёмка AC-1…14 и AC-17 через настоящий виджет
@@ -12,6 +13,8 @@ depends_on: ["OPS-02", "UI-02", "UI-03", "UI-04", "CHAT-04", "CART-03", "CAT-04"
 **Исполнитель:** D3. **Этап:** G5. **Объём:** L. Все задачи обязательны для полного scope; отметка todo означает, что реализация не выполнена.
 **Зависимости для старта:** [OPS-02](../08-platform/OPS-02-complete-product-compose.md), [UI-02](../07-widget/UI-02-chat-and-streaming.md), [UI-03](../07-widget/UI-03-products-proposals-and-cart.md), [UI-04](../07-widget/UI-04-attachments-review.md), [CHAT-04](../02-chat/CHAT-04-dialogue-context.md), [CART-03](../05-cart/CART-03-cart-adapters-and-reconciliation.md), [CAT-04](../03-catalog/CAT-04-analogs-and-fulfillment.md), [ATT-04](../06-attachments/ATT-04-matching-and-review.md)
 **Покрытие:** AC-1…14/17; FR-1…7.
+
+**Дополнительно для итоговой приёмки:** [CHAT-03](../02-chat/CHAT-03-sse-recovery.md) и [PERF-01](../08-platform/PERF-01-limits-events-and-metrics.md) должны быть интегрированы в проверяемый checkout. Подготовка и частичные прогоны начинаются раньше; финальные SSE/reconnect/restart/429 проверки выполняются на реализации recovery и общих лимитов. См. [схему зависимостей](../DEPENDENCIES.md).
 
 ## Goal
 
@@ -52,6 +55,7 @@ frontend browser/e2e tests; tests/integration/; data/expected/; reports/ (genera
 - [ ] Проверены все обязательные расширения, а не только один XLSX и текстовыйPDF.
 - [ ] Без согласия0mutations, повторconfirm1mutation, unknown outcome сверяется.
 - [ ] Тестовый runner завершает CI nonzero при нарушении критерия; reports сохранены.
+- [ ] Итоговый прогон включает CHAT-03 и PERF-01; результаты частичного прогона до их интеграции не закрывают AC-14.
 - [ ] Проверки выполнены на своей ветке; PR содержит результат проверок и известные ограничения.
 
 ## Проверка и передача

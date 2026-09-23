@@ -1,0 +1,1404 @@
+{
+  "schemaVersion": 1,
+  "synthetic": true,
+  "version": "synthetic-v1",
+  "products": [
+    {
+      "id": "1001",
+      "article": "000001",
+      "name": "Автомат SYN C16 1P 01",
+      "brand": "SYNTHETIC",
+      "category": "breakers",
+      "unit": "pcs",
+      "minimum": "1",
+      "step": "1",
+      "price": "1500.00",
+      "currency": "KZT",
+      "specs": {
+        "poles": "1",
+        "currentA": "16",
+        "voltageV": "230",
+        "curve": "C",
+        "breakingCapacityKa": "6"
+      },
+      "certificates": [
+        {
+          "id": "SYN-CERT-breakers",
+          "url": "https://example.invalid/certificates/breakers",
+          "file": "data/sample_catalog/certificates/synthetic-certificate.pdf",
+          "version": "1",
+          "synthetic": true
+        }
+      ],
+      "sourceUrl": "https://example.invalid/products/000001",
+      "sourceVersion": "synthetic-v1",
+      "synthetic": true,
+      "warehouses": [
+        {
+          "warehouseId": "ALA",
+          "availableQuantity": "12",
+          "status": "IN_STOCK",
+          "eligible": true
+        },
+        {
+          "warehouseId": "CLOSED",
+          "availableQuantity": "999",
+          "status": "IN_STOCK",
+          "eligible": false
+        }
+      ]
+    },
+    {
+      "id": "1002",
+      "article": "000002",
+      "name": "Автомат SYN C16 1P 02",
+      "brand": "SYNTHETIC",
+      "category": "breakers",
+      "unit": "pcs",
+      "minimum": "1",
+      "step": "1",
+      "price": "1600.00",
+      "currency": "KZT",
+      "specs": {
+        "poles": "1",
+        "currentA": "16",
+        "voltageV": "230",
+        "curve": "C",
+        "breakingCapacityKa": "6"
+      },
+      "certificates": [
+        {
+          "id": "SYN-CERT-breakers",
+          "url": "https://example.invalid/certificates/breakers",
+          "file": "data/sample_catalog/certificates/synthetic-certificate.pdf",
+          "version": "1",
+          "synthetic": true
+        }
+      ],
+      "sourceUrl": "https://example.invalid/products/000002",
+      "sourceVersion": "synthetic-v1",
+      "synthetic": true,
+      "warehouses": [
+        {
+          "warehouseId": "ALA",
+          "availableQuantity": "8",
+          "status": "IN_STOCK",
+          "eligible": true
+        }
+      ]
+    },
+    {
+      "id": "1003",
+      "article": "000003",
+      "name": "Автомат SYN C16 1P 03",
+      "brand": "SYNTHETIC",
+      "category": "breakers",
+      "unit": "pcs",
+      "minimum": "1",
+      "step": "1",
+      "price": "1700.00",
+      "currency": "KZT",
+      "specs": {
+        "poles": "1",
+        "currentA": "16",
+        "voltageV": "230",
+        "curve": "C",
+        "breakingCapacityKa": "6"
+      },
+      "certificates": [
+        {
+          "id": "SYN-CERT-breakers",
+          "url": "https://example.invalid/certificates/breakers",
+          "file": "data/sample_catalog/certificates/synthetic-certificate.pdf",
+          "version": "1",
+          "synthetic": true
+        }
+      ],
+      "sourceUrl": "https://example.invalid/products/000003",
+      "sourceVersion": "synthetic-v1",
+      "synthetic": true,
+      "warehouses": [
+        {
+          "warehouseId": "ALA",
+          "availableQuantity": "20",
+          "status": "IN_STOCK",
+          "eligible": true
+        }
+      ]
+    },
+    {
+      "id": "1004",
+      "article": "000004",
+      "name": "Автомат SYN C32 1P 04",
+      "brand": "SYNTHETIC",
+      "category": "breakers",
+      "unit": "pcs",
+      "minimum": "1",
+      "step": "1",
+      "price": "1800.00",
+      "currency": "KZT",
+      "specs": {
+        "poles": "1",
+        "currentA": "32",
+        "voltageV": "230",
+        "curve": "C",
+        "breakingCapacityKa": "6"
+      },
+      "certificates": [
+        {
+          "id": "SYN-CERT-breakers",
+          "url": "https://example.invalid/certificates/breakers",
+          "file": "data/sample_catalog/certificates/synthetic-certificate.pdf",
+          "version": "1",
+          "synthetic": true
+        }
+      ],
+      "sourceUrl": "https://example.invalid/products/000004",
+      "sourceVersion": "synthetic-v1",
+      "synthetic": true,
+      "warehouses": [
+        {
+          "warehouseId": "ALA",
+          "availableQuantity": "100",
+          "status": "IN_STOCK",
+          "eligible": true
+        }
+      ]
+    },
+    {
+      "id": "1005",
+      "article": "000005",
+      "name": "Автомат SYN C16 1P 05",
+      "brand": "SYNTHETIC",
+      "category": "breakers",
+      "unit": "pcs",
+      "minimum": "1",
+      "step": "1",
+      "price": "1900.00",
+      "currency": "KZT",
+      "specs": {
+        "poles": "1",
+        "currentA": "16",
+        "voltageV": "230",
+        "curve": "C",
+        "breakingCapacityKa": "6"
+      },
+      "certificates": [
+        {
+          "id": "SYN-CERT-breakers",
+          "url": "https://example.invalid/certificates/breakers",
+          "file": "data/sample_catalog/certificates/synthetic-certificate.pdf",
+          "version": "1",
+          "synthetic": true
+        }
+      ],
+      "sourceUrl": "https://example.invalid/products/000005",
+      "sourceVersion": "synthetic-v1",
+      "synthetic": true,
+      "warehouses": [
+        {
+          "warehouseId": "ALA",
+          "availableQuantity": "0",
+          "status": "OUT_OF_STOCK",
+          "eligible": true
+        }
+      ]
+    },
+    {
+      "id": "1006",
+      "article": "000006",
+      "name": "Автомат SYN C16 1P 06",
+      "brand": "SYNTHETIC",
+      "category": "breakers",
+      "unit": "pcs",
+      "minimum": "1",
+      "step": "1",
+      "price": "2000.00",
+      "currency": "KZT",
+      "specs": {
+        "poles": "1",
+        "currentA": "16",
+        "voltageV": "230",
+        "curve": "C",
+        "breakingCapacityKa": "6"
+      },
+      "certificates": [
+        {
+          "id": "SYN-CERT-breakers",
+          "url": "https://example.invalid/certificates/breakers",
+          "file": "data/sample_catalog/certificates/synthetic-certificate.pdf",
+          "version": "1",
+          "synthetic": true
+        }
+      ],
+      "sourceUrl": "https://example.invalid/products/000006",
+      "sourceVersion": "synthetic-v1",
+      "synthetic": true,
+      "warehouses": [
+        {
+          "warehouseId": "ALA",
+          "availableQuantity": null,
+          "status": "UNKNOWN",
+          "eligible": true
+        }
+      ]
+    },
+    {
+      "id": "1007",
+      "article": "000007",
+      "name": "Автомат SYN C16 1P 07",
+      "brand": "SYNTHETIC",
+      "category": "breakers",
+      "unit": "pcs",
+      "minimum": "1",
+      "step": "1",
+      "price": "2100.00",
+      "currency": "KZT",
+      "specs": {
+        "poles": "1",
+        "currentA": "16",
+        "curve": "C",
+        "breakingCapacityKa": "6"
+      },
+      "certificates": [
+        {
+          "id": "SYN-CERT-breakers",
+          "url": "https://example.invalid/certificates/breakers",
+          "file": "data/sample_catalog/certificates/synthetic-certificate.pdf",
+          "version": "1",
+          "synthetic": true
+        }
+      ],
+      "sourceUrl": "https://example.invalid/products/000007",
+      "sourceVersion": "synthetic-v1",
+      "synthetic": true,
+      "warehouses": [
+        {
+          "warehouseId": "ALA",
+          "availableQuantity": "100",
+          "status": "IN_STOCK",
+          "eligible": true
+        }
+      ]
+    },
+    {
+      "id": "1008",
+      "article": "000008",
+      "name": "Автомат SYN C20 1P 08",
+      "brand": "SYNTHETIC",
+      "category": "breakers",
+      "unit": "pcs",
+      "minimum": "1",
+      "step": "1",
+      "price": "2200.00",
+      "currency": "KZT",
+      "specs": {
+        "poles": "1",
+        "currentA": "20",
+        "voltageV": "230",
+        "curve": "C",
+        "breakingCapacityKa": "6"
+      },
+      "certificates": [
+        {
+          "id": "SYN-CERT-breakers",
+          "url": "https://example.invalid/certificates/breakers",
+          "file": "data/sample_catalog/certificates/synthetic-certificate.pdf",
+          "version": "1",
+          "synthetic": true
+        }
+      ],
+      "sourceUrl": "https://example.invalid/products/000008",
+      "sourceVersion": "synthetic-v1",
+      "synthetic": true,
+      "warehouses": [
+        {
+          "warehouseId": "ALA",
+          "availableQuantity": "100",
+          "status": "IN_STOCK",
+          "eligible": true
+        }
+      ]
+    },
+    {
+      "id": "1009",
+      "article": "000009",
+      "name": "Автомат SYN C30 1P 09",
+      "brand": "SYNTHETIC",
+      "category": "breakers",
+      "unit": "pcs",
+      "minimum": "1",
+      "step": "1",
+      "price": "2300.00",
+      "currency": "KZT",
+      "specs": {
+        "poles": "1",
+        "currentA": "30",
+        "voltageV": "230",
+        "curve": "C",
+        "breakingCapacityKa": "6"
+      },
+      "certificates": [
+        {
+          "id": "SYN-CERT-breakers",
+          "url": "https://example.invalid/certificates/breakers",
+          "file": "data/sample_catalog/certificates/synthetic-certificate.pdf",
+          "version": "1",
+          "synthetic": true
+        }
+      ],
+      "sourceUrl": "https://example.invalid/products/000009",
+      "sourceVersion": "synthetic-v1",
+      "synthetic": true,
+      "warehouses": [
+        {
+          "warehouseId": "ALA",
+          "availableQuantity": "100",
+          "status": "IN_STOCK",
+          "eligible": true
+        }
+      ]
+    },
+    {
+      "id": "1010",
+      "article": "000010",
+      "name": "Автомат SYN C40 1P 10",
+      "brand": "SYNTHETIC",
+      "category": "breakers",
+      "unit": "pcs",
+      "minimum": "1",
+      "step": "1",
+      "price": "2400.00",
+      "currency": "KZT",
+      "specs": {
+        "poles": "1",
+        "currentA": "40",
+        "voltageV": "230",
+        "curve": "C",
+        "breakingCapacityKa": "6"
+      },
+      "certificates": [
+        {
+          "id": "SYN-CERT-breakers",
+          "url": "https://example.invalid/certificates/breakers",
+          "file": "data/sample_catalog/certificates/synthetic-certificate.pdf",
+          "version": "1",
+          "synthetic": true
+        }
+      ],
+      "sourceUrl": "https://example.invalid/products/000010",
+      "sourceVersion": "synthetic-v1",
+      "synthetic": true,
+      "warehouses": [
+        {
+          "warehouseId": "ALA",
+          "availableQuantity": "100",
+          "status": "IN_STOCK",
+          "eligible": true
+        }
+      ]
+    },
+    {
+      "id": "1011",
+      "article": "000011",
+      "name": "Автомат SYN C50 1P 11",
+      "brand": "SYNTHETIC",
+      "category": "breakers",
+      "unit": "pcs",
+      "minimum": "1",
+      "step": "1",
+      "price": "2500.00",
+      "currency": "KZT",
+      "specs": {
+        "poles": "1",
+        "currentA": "50",
+        "voltageV": "230",
+        "curve": "C",
+        "breakingCapacityKa": "6"
+      },
+      "certificates": [
+        {
+          "id": "SYN-CERT-breakers",
+          "url": "https://example.invalid/certificates/breakers",
+          "file": "data/sample_catalog/certificates/synthetic-certificate.pdf",
+          "version": "1",
+          "synthetic": true
+        }
+      ],
+      "sourceUrl": "https://example.invalid/products/000011",
+      "sourceVersion": "synthetic-v1",
+      "synthetic": true,
+      "warehouses": [
+        {
+          "warehouseId": "ALA",
+          "availableQuantity": "100",
+          "status": "IN_STOCK",
+          "eligible": true
+        }
+      ]
+    },
+    {
+      "id": "1012",
+      "article": "000012",
+      "name": "Автомат SYN C60 1P 12",
+      "brand": "SYNTHETIC",
+      "category": "breakers",
+      "unit": "pcs",
+      "minimum": "1",
+      "step": "1",
+      "price": "2600.00",
+      "currency": "KZT",
+      "specs": {
+        "poles": "1",
+        "currentA": "60",
+        "voltageV": "230",
+        "curve": "C",
+        "breakingCapacityKa": "6"
+      },
+      "certificates": [
+        {
+          "id": "SYN-CERT-breakers",
+          "url": "https://example.invalid/certificates/breakers",
+          "file": "data/sample_catalog/certificates/synthetic-certificate.pdf",
+          "version": "1",
+          "synthetic": true
+        }
+      ],
+      "sourceUrl": "https://example.invalid/products/000012",
+      "sourceVersion": "synthetic-v1",
+      "synthetic": true,
+      "warehouses": [
+        {
+          "warehouseId": "ALA",
+          "availableQuantity": "100",
+          "status": "IN_STOCK",
+          "eligible": true
+        }
+      ]
+    },
+    {
+      "id": "1013",
+      "article": "000013",
+      "name": "Кабель SYN ВВГ 3x2.5 13",
+      "brand": "SYNTHETIC",
+      "category": "cables",
+      "unit": "m",
+      "minimum": "0.5",
+      "step": "0.5",
+      "price": "2700.00",
+      "currency": "KZT",
+      "specs": {
+        "cores": "3",
+        "crossSectionMm2": "2.5",
+        "material": "copper",
+        "voltageV": "660",
+        "insulation": "PVC"
+      },
+      "certificates": [
+        {
+          "id": "SYN-CERT-cables",
+          "url": "https://example.invalid/certificates/cables",
+          "file": "data/sample_catalog/certificates/synthetic-certificate.pdf",
+          "version": "1",
+          "synthetic": true
+        }
+      ],
+      "sourceUrl": "https://example.invalid/products/000013",
+      "sourceVersion": "synthetic-v1",
+      "synthetic": true,
+      "warehouses": [
+        {
+          "warehouseId": "ALA",
+          "availableQuantity": "37.5",
+          "status": "IN_STOCK",
+          "eligible": true
+        }
+      ]
+    },
+    {
+      "id": "1014",
+      "article": "000014",
+      "name": "Кабель SYN ВВГ 3x2.5 14",
+      "brand": "SYNTHETIC",
+      "category": "cables",
+      "unit": "m",
+      "minimum": "0.5",
+      "step": "0.5",
+      "price": "2800.00",
+      "currency": "KZT",
+      "specs": {
+        "cores": "3",
+        "crossSectionMm2": "2.5",
+        "material": "copper",
+        "voltageV": "660",
+        "insulation": "PVC"
+      },
+      "certificates": [
+        {
+          "id": "SYN-CERT-cables",
+          "url": "https://example.invalid/certificates/cables",
+          "file": "data/sample_catalog/certificates/synthetic-certificate.pdf",
+          "version": "1",
+          "synthetic": true
+        }
+      ],
+      "sourceUrl": "https://example.invalid/products/000014",
+      "sourceVersion": "synthetic-v1",
+      "synthetic": true,
+      "warehouses": [
+        {
+          "warehouseId": "ALA",
+          "availableQuantity": "50",
+          "status": "IN_STOCK",
+          "eligible": true
+        }
+      ]
+    },
+    {
+      "id": "1015",
+      "article": "000015",
+      "name": "Кабель SYN ВВГ 3x4 15",
+      "brand": "SYNTHETIC",
+      "category": "cables",
+      "unit": "m",
+      "minimum": "0.5",
+      "step": "0.5",
+      "price": "2900.00",
+      "currency": "KZT",
+      "specs": {
+        "cores": "3",
+        "crossSectionMm2": "4",
+        "material": "copper",
+        "voltageV": "660",
+        "insulation": "PVC"
+      },
+      "certificates": [
+        {
+          "id": "SYN-CERT-cables",
+          "url": "https://example.invalid/certificates/cables",
+          "file": "data/sample_catalog/certificates/synthetic-certificate.pdf",
+          "version": "1",
+          "synthetic": true
+        }
+      ],
+      "sourceUrl": "https://example.invalid/products/000015",
+      "sourceVersion": "synthetic-v1",
+      "synthetic": true,
+      "warehouses": [
+        {
+          "warehouseId": "ALA",
+          "availableQuantity": "100",
+          "status": "IN_STOCK",
+          "eligible": true
+        }
+      ]
+    },
+    {
+      "id": "1016",
+      "article": "000016",
+      "name": "Кабель SYN ВВГ 3x5 16",
+      "brand": "SYNTHETIC",
+      "category": "cables",
+      "unit": "m",
+      "minimum": "0.5",
+      "step": "0.5",
+      "price": "3000.00",
+      "currency": "KZT",
+      "specs": {
+        "cores": "3",
+        "crossSectionMm2": "5",
+        "material": "copper",
+        "voltageV": "660",
+        "insulation": "PVC"
+      },
+      "certificates": [
+        {
+          "id": "SYN-CERT-cables",
+          "url": "https://example.invalid/certificates/cables",
+          "file": "data/sample_catalog/certificates/synthetic-certificate.pdf",
+          "version": "1",
+          "synthetic": true
+        }
+      ],
+      "sourceUrl": "https://example.invalid/products/000016",
+      "sourceVersion": "synthetic-v1",
+      "synthetic": true,
+      "warehouses": [
+        {
+          "warehouseId": "ALA",
+          "availableQuantity": "100",
+          "status": "IN_STOCK",
+          "eligible": true
+        }
+      ]
+    },
+    {
+      "id": "1017",
+      "article": "000017",
+      "name": "Кабель SYN ВВГ 3x6 17",
+      "brand": "SYNTHETIC",
+      "category": "cables",
+      "unit": "m",
+      "minimum": "0.5",
+      "step": "0.5",
+      "price": "3100.00",
+      "currency": "KZT",
+      "specs": {
+        "cores": "3",
+        "crossSectionMm2": "6",
+        "material": "copper",
+        "voltageV": "660",
+        "insulation": "PVC"
+      },
+      "certificates": [
+        {
+          "id": "SYN-CERT-cables",
+          "url": "https://example.invalid/certificates/cables",
+          "file": "data/sample_catalog/certificates/synthetic-certificate.pdf",
+          "version": "1",
+          "synthetic": true
+        }
+      ],
+      "sourceUrl": "https://example.invalid/products/000017",
+      "sourceVersion": "synthetic-v1",
+      "synthetic": true,
+      "warehouses": [
+        {
+          "warehouseId": "ALA",
+          "availableQuantity": "100",
+          "status": "IN_STOCK",
+          "eligible": true
+        }
+      ]
+    },
+    {
+      "id": "1018",
+      "article": "000018",
+      "name": "Кабель SYN ВВГ 3x7 18",
+      "brand": "SYNTHETIC",
+      "category": "cables",
+      "unit": "m",
+      "minimum": "0.5",
+      "step": "0.5",
+      "price": "3200.00",
+      "currency": "KZT",
+      "specs": {
+        "cores": "3",
+        "crossSectionMm2": "7",
+        "material": "copper",
+        "voltageV": "660",
+        "insulation": "PVC"
+      },
+      "certificates": [
+        {
+          "id": "SYN-CERT-cables",
+          "url": "https://example.invalid/certificates/cables",
+          "file": "data/sample_catalog/certificates/synthetic-certificate.pdf",
+          "version": "1",
+          "synthetic": true
+        }
+      ],
+      "sourceUrl": "https://example.invalid/products/000018",
+      "sourceVersion": "synthetic-v1",
+      "synthetic": true,
+      "warehouses": [
+        {
+          "warehouseId": "ALA",
+          "availableQuantity": "100",
+          "status": "IN_STOCK",
+          "eligible": true
+        }
+      ]
+    },
+    {
+      "id": "1019",
+      "article": "000019",
+      "name": "Кабель SYN ВВГ 3x8 19",
+      "brand": "SYNTHETIC",
+      "category": "cables",
+      "unit": "m",
+      "minimum": "0.5",
+      "step": "0.5",
+      "price": "3300.00",
+      "currency": "KZT",
+      "specs": {
+        "cores": "3",
+        "crossSectionMm2": "8",
+        "material": "copper",
+        "voltageV": "660",
+        "insulation": "PVC"
+      },
+      "certificates": [
+        {
+          "id": "SYN-CERT-cables",
+          "url": "https://example.invalid/certificates/cables",
+          "file": "data/sample_catalog/certificates/synthetic-certificate.pdf",
+          "version": "1",
+          "synthetic": true
+        }
+      ],
+      "sourceUrl": "https://example.invalid/products/000019",
+      "sourceVersion": "synthetic-v1",
+      "synthetic": true,
+      "warehouses": [
+        {
+          "warehouseId": "ALA",
+          "availableQuantity": "100",
+          "status": "IN_STOCK",
+          "eligible": true
+        }
+      ]
+    },
+    {
+      "id": "1020",
+      "article": "000020",
+      "name": "Кабель SYN ВВГ 3x9 20",
+      "brand": "SYNTHETIC",
+      "category": "cables",
+      "unit": "m",
+      "minimum": "0.5",
+      "step": "0.5",
+      "price": "3400.00",
+      "currency": "KZT",
+      "specs": {
+        "cores": "3",
+        "crossSectionMm2": "9",
+        "material": "copper",
+        "voltageV": "660",
+        "insulation": "PVC"
+      },
+      "certificates": [
+        {
+          "id": "SYN-CERT-cables",
+          "url": "https://example.invalid/certificates/cables",
+          "file": "data/sample_catalog/certificates/synthetic-certificate.pdf",
+          "version": "1",
+          "synthetic": true
+        }
+      ],
+      "sourceUrl": "https://example.invalid/products/000020",
+      "sourceVersion": "synthetic-v1",
+      "synthetic": true,
+      "warehouses": [
+        {
+          "warehouseId": "ALA",
+          "availableQuantity": "100",
+          "status": "IN_STOCK",
+          "eligible": true
+        }
+      ]
+    },
+    {
+      "id": "1021",
+      "article": "000021",
+      "name": "Кабель SYN ВВГ 3x10 21",
+      "brand": "SYNTHETIC",
+      "category": "cables",
+      "unit": "m",
+      "minimum": "0.5",
+      "step": "0.5",
+      "price": "3500.00",
+      "currency": "KZT",
+      "specs": {
+        "cores": "3",
+        "crossSectionMm2": "10",
+        "material": "copper",
+        "voltageV": "660",
+        "insulation": "PVC"
+      },
+      "certificates": [
+        {
+          "id": "SYN-CERT-cables",
+          "url": "https://example.invalid/certificates/cables",
+          "file": "data/sample_catalog/certificates/synthetic-certificate.pdf",
+          "version": "1",
+          "synthetic": true
+        }
+      ],
+      "sourceUrl": "https://example.invalid/products/000021",
+      "sourceVersion": "synthetic-v1",
+      "synthetic": true,
+      "warehouses": [
+        {
+          "warehouseId": "ALA",
+          "availableQuantity": "100",
+          "status": "IN_STOCK",
+          "eligible": true
+        }
+      ]
+    },
+    {
+      "id": "1022",
+      "article": "000022",
+      "name": "Кабель SYN ВВГ 3x11 22",
+      "brand": "SYNTHETIC",
+      "category": "cables",
+      "unit": "m",
+      "minimum": "0.5",
+      "step": "0.5",
+      "price": "3600.00",
+      "currency": "KZT",
+      "specs": {
+        "cores": "3",
+        "crossSectionMm2": "11",
+        "material": "copper",
+        "voltageV": "660",
+        "insulation": "PVC"
+      },
+      "certificates": [
+        {
+          "id": "SYN-CERT-cables",
+          "url": "https://example.invalid/certificates/cables",
+          "file": "data/sample_catalog/certificates/synthetic-certificate.pdf",
+          "version": "1",
+          "synthetic": true
+        }
+      ],
+      "sourceUrl": "https://example.invalid/products/000022",
+      "sourceVersion": "synthetic-v1",
+      "synthetic": true,
+      "warehouses": [
+        {
+          "warehouseId": "ALA",
+          "availableQuantity": "100",
+          "status": "IN_STOCK",
+          "eligible": true
+        }
+      ]
+    },
+    {
+      "id": "1023",
+      "article": "000023",
+      "name": "Кабель SYN ВВГ 3x12 23",
+      "brand": "SYNTHETIC",
+      "category": "cables",
+      "unit": "m",
+      "minimum": "0.5",
+      "step": "0.5",
+      "price": "3700.00",
+      "currency": "KZT",
+      "specs": {
+        "cores": "3",
+        "crossSectionMm2": "12",
+        "material": "copper",
+        "voltageV": "660",
+        "insulation": "PVC"
+      },
+      "certificates": [
+        {
+          "id": "SYN-CERT-cables",
+          "url": "https://example.invalid/certificates/cables",
+          "file": "data/sample_catalog/certificates/synthetic-certificate.pdf",
+          "version": "1",
+          "synthetic": true
+        }
+      ],
+      "sourceUrl": "https://example.invalid/products/000023",
+      "sourceVersion": "synthetic-v1",
+      "synthetic": true,
+      "warehouses": [
+        {
+          "warehouseId": "ALA",
+          "availableQuantity": "100",
+          "status": "IN_STOCK",
+          "eligible": true
+        }
+      ]
+    },
+    {
+      "id": "1024",
+      "article": "000024",
+      "name": "Кабель SYN ВВГ 3x13 24",
+      "brand": "SYNTHETIC",
+      "category": "cables",
+      "unit": "m",
+      "minimum": "0.5",
+      "step": "0.5",
+      "price": "3800.00",
+      "currency": "KZT",
+      "specs": {
+        "cores": "3",
+        "crossSectionMm2": "13",
+        "material": "copper",
+        "voltageV": "660",
+        "insulation": "PVC"
+      },
+      "certificates": [
+        {
+          "id": "SYN-CERT-cables",
+          "url": "https://example.invalid/certificates/cables",
+          "file": "data/sample_catalog/certificates/synthetic-certificate.pdf",
+          "version": "1",
+          "synthetic": true
+        }
+      ],
+      "sourceUrl": "https://example.invalid/products/000024",
+      "sourceVersion": "synthetic-v1",
+      "synthetic": true,
+      "warehouses": [
+        {
+          "warehouseId": "ALA",
+          "availableQuantity": "100",
+          "status": "IN_STOCK",
+          "eligible": true
+        }
+      ]
+    },
+    {
+      "id": "1025",
+      "article": "000025",
+      "name": "Лампа SYN LED E27 10W 25",
+      "brand": "SYNTHETIC",
+      "category": "lamps",
+      "unit": "pcs",
+      "minimum": "1",
+      "step": "1",
+      "price": "3900.00",
+      "currency": "KZT",
+      "specs": {
+        "voltageV": "230",
+        "base": "E27",
+        "powerW": "10",
+        "colorTemperatureK": "4000"
+      },
+      "certificates": [
+        {
+          "id": "SYN-CERT-lamps",
+          "url": "https://example.invalid/certificates/lamps",
+          "file": "data/sample_catalog/certificates/synthetic-certificate.pdf",
+          "version": "1",
+          "synthetic": true
+        }
+      ],
+      "sourceUrl": "https://example.invalid/products/000025",
+      "sourceVersion": "synthetic-v1",
+      "synthetic": true,
+      "warehouses": [
+        {
+          "warehouseId": "ALA",
+          "availableQuantity": "100",
+          "status": "IN_STOCK",
+          "eligible": true
+        }
+      ]
+    },
+    {
+      "id": "1026",
+      "article": "000026",
+      "name": "Лампа SYN LED E27 10W 26",
+      "brand": "SYNTHETIC",
+      "category": "lamps",
+      "unit": "pcs",
+      "minimum": "1",
+      "step": "1",
+      "price": "4000.00",
+      "currency": "KZT",
+      "specs": {
+        "voltageV": "230",
+        "base": "E27",
+        "powerW": "10",
+        "colorTemperatureK": "4000"
+      },
+      "certificates": [
+        {
+          "id": "SYN-CERT-lamps",
+          "url": "https://example.invalid/certificates/lamps",
+          "file": "data/sample_catalog/certificates/synthetic-certificate.pdf",
+          "version": "1",
+          "synthetic": true
+        }
+      ],
+      "sourceUrl": "https://example.invalid/products/000026",
+      "sourceVersion": "synthetic-v1",
+      "synthetic": true,
+      "warehouses": [
+        {
+          "warehouseId": "ALA",
+          "availableQuantity": "100",
+          "status": "IN_STOCK",
+          "eligible": true
+        }
+      ]
+    },
+    {
+      "id": "1027",
+      "article": "000027",
+      "name": "Лампа SYN LED E27 12W 27",
+      "brand": "SYNTHETIC",
+      "category": "lamps",
+      "unit": "pcs",
+      "minimum": "1",
+      "step": "1",
+      "price": "4100.00",
+      "currency": "KZT",
+      "specs": {
+        "voltageV": "230",
+        "base": "E27",
+        "powerW": "12",
+        "colorTemperatureK": "4000"
+      },
+      "certificates": [
+        {
+          "id": "SYN-CERT-lamps",
+          "url": "https://example.invalid/certificates/lamps",
+          "file": "data/sample_catalog/certificates/synthetic-certificate.pdf",
+          "version": "1",
+          "synthetic": true
+        }
+      ],
+      "sourceUrl": "https://example.invalid/products/000027",
+      "sourceVersion": "synthetic-v1",
+      "synthetic": true,
+      "warehouses": [
+        {
+          "warehouseId": "ALA",
+          "availableQuantity": "100",
+          "status": "IN_STOCK",
+          "eligible": true
+        }
+      ]
+    },
+    {
+      "id": "1028",
+      "article": "000028",
+      "name": "Лампа SYN LED E27 13W 28",
+      "brand": "SYNTHETIC",
+      "category": "lamps",
+      "unit": "pcs",
+      "minimum": "1",
+      "step": "1",
+      "price": "4200.00",
+      "currency": "KZT",
+      "specs": {
+        "voltageV": "230",
+        "base": "E27",
+        "powerW": "13",
+        "colorTemperatureK": "4000"
+      },
+      "certificates": [
+        {
+          "id": "SYN-CERT-lamps",
+          "url": "https://example.invalid/certificates/lamps",
+          "file": "data/sample_catalog/certificates/synthetic-certificate.pdf",
+          "version": "1",
+          "synthetic": true
+        }
+      ],
+      "sourceUrl": "https://example.invalid/products/000028",
+      "sourceVersion": "synthetic-v1",
+      "synthetic": true,
+      "warehouses": [
+        {
+          "warehouseId": "ALA",
+          "availableQuantity": "100",
+          "status": "IN_STOCK",
+          "eligible": true
+        }
+      ]
+    },
+    {
+      "id": "1029",
+      "article": "000029",
+      "name": "Лампа SYN LED E27 14W 29",
+      "brand": "SYNTHETIC",
+      "category": "lamps",
+      "unit": "pcs",
+      "minimum": "1",
+      "step": "1",
+      "price": "4300.00",
+      "currency": "KZT",
+      "specs": {
+        "voltageV": "230",
+        "base": "E27",
+        "powerW": "14",
+        "colorTemperatureK": "4000"
+      },
+      "certificates": [
+        {
+          "id": "SYN-CERT-lamps",
+          "url": "https://example.invalid/certificates/lamps",
+          "file": "data/sample_catalog/certificates/synthetic-certificate.pdf",
+          "version": "1",
+          "synthetic": true
+        }
+      ],
+      "sourceUrl": "https://example.invalid/products/000029",
+      "sourceVersion": "synthetic-v1",
+      "synthetic": true,
+      "warehouses": [
+        {
+          "warehouseId": "ALA",
+          "availableQuantity": "100",
+          "status": "IN_STOCK",
+          "eligible": true
+        }
+      ]
+    },
+    {
+      "id": "1030",
+      "article": "000030",
+      "name": "Лампа SYN LED E27 15W 30",
+      "brand": "SYNTHETIC",
+      "category": "lamps",
+      "unit": "pcs",
+      "minimum": "1",
+      "step": "1",
+      "price": "4400.00",
+      "currency": "KZT",
+      "specs": {
+        "voltageV": "230",
+        "base": "E27",
+        "powerW": "15",
+        "colorTemperatureK": "4000"
+      },
+      "certificates": [
+        {
+          "id": "SYN-CERT-lamps",
+          "url": "https://example.invalid/certificates/lamps",
+          "file": "data/sample_catalog/certificates/synthetic-certificate.pdf",
+          "version": "1",
+          "synthetic": true
+        }
+      ],
+      "sourceUrl": "https://example.invalid/products/000030",
+      "sourceVersion": "synthetic-v1",
+      "synthetic": true,
+      "warehouses": [
+        {
+          "warehouseId": "ALA",
+          "availableQuantity": "100",
+          "status": "IN_STOCK",
+          "eligible": true
+        }
+      ]
+    },
+    {
+      "id": "1031",
+      "article": "000031",
+      "name": "Лампа SYN LED E27 16W 31",
+      "brand": "SYNTHETIC",
+      "category": "lamps",
+      "unit": "pcs",
+      "minimum": "1",
+      "step": "1",
+      "price": "4500.00",
+      "currency": "KZT",
+      "specs": {
+        "voltageV": "230",
+        "base": "E27",
+        "powerW": "16",
+        "colorTemperatureK": "4000"
+      },
+      "certificates": [
+        {
+          "id": "SYN-CERT-lamps",
+          "url": "https://example.invalid/certificates/lamps",
+          "file": "data/sample_catalog/certificates/synthetic-certificate.pdf",
+          "version": "1",
+          "synthetic": true
+        }
+      ],
+      "sourceUrl": "https://example.invalid/products/000031",
+      "sourceVersion": "synthetic-v1",
+      "synthetic": true,
+      "warehouses": [
+        {
+          "warehouseId": "ALA",
+          "availableQuantity": "100",
+          "status": "IN_STOCK",
+          "eligible": true
+        }
+      ]
+    },
+    {
+      "id": "1032",
+      "article": "000032",
+      "name": "Лампа SYN LED E27 17W 32",
+      "brand": "SYNTHETIC",
+      "category": "lamps",
+      "unit": "pcs",
+      "minimum": "1",
+      "step": "1",
+      "price": "4600.00",
+      "currency": "KZT",
+      "specs": {
+        "voltageV": "230",
+        "base": "E27",
+        "powerW": "17",
+        "colorTemperatureK": "4000"
+      },
+      "certificates": [
+        {
+          "id": "SYN-CERT-lamps",
+          "url": "https://example.invalid/certificates/lamps",
+          "file": "data/sample_catalog/certificates/synthetic-certificate.pdf",
+          "version": "1",
+          "synthetic": true
+        }
+      ],
+      "sourceUrl": "https://example.invalid/products/000032",
+      "sourceVersion": "synthetic-v1",
+      "synthetic": true,
+      "warehouses": [
+        {
+          "warehouseId": "ALA",
+          "availableQuantity": "100",
+          "status": "IN_STOCK",
+          "eligible": true
+        }
+      ]
+    },
+    {
+      "id": "1033",
+      "article": "000033",
+      "name": "Лампа SYN LED E27 18W 33",
+      "brand": "SYNTHETIC",
+      "category": "lamps",
+      "unit": "pcs",
+      "minimum": "1",
+      "step": "1",
+      "price": "4700.00",
+      "currency": "KZT",
+      "specs": {
+        "voltageV": "230",
+        "base": "E27",
+        "powerW": "18",
+        "colorTemperatureK": "4000"
+      },
+      "certificates": [
+        {
+          "id": "SYN-CERT-lamps",
+          "url": "https://example.invalid/certificates/lamps",
+          "file": "data/sample_catalog/certificates/synthetic-certificate.pdf",
+          "version": "1",
+          "synthetic": true
+        }
+      ],
+      "sourceUrl": "https://example.invalid/products/000033",
+      "sourceVersion": "synthetic-v1",
+      "synthetic": true,
+      "warehouses": [
+        {
+          "warehouseId": "ALA",
+          "availableQuantity": "100",
+          "status": "IN_STOCK",
+          "eligible": true
+        }
+      ]
+    },
+    {
+      "id": "1034",
+      "article": "000034",
+      "name": "Лампа SYN LED E27 19W 34",
+      "brand": "SYNTHETIC",
+      "category": "lamps",
+      "unit": "pcs",
+      "minimum": "1",
+      "step": "1",
+      "price": "4800.00",
+      "currency": "KZT",
+      "specs": {
+        "voltageV": "230",
+        "base": "E27",
+        "powerW": "19",
+        "colorTemperatureK": "4000"
+      },
+      "certificates": [
+        {
+          "id": "SYN-CERT-lamps",
+          "url": "https://example.invalid/certificates/lamps",
+          "file": "data/sample_catalog/certificates/synthetic-certificate.pdf",
+          "version": "1",
+          "synthetic": true
+        }
+      ],
+      "sourceUrl": "https://example.invalid/products/000034",
+      "sourceVersion": "synthetic-v1",
+      "synthetic": true,
+      "warehouses": [
+        {
+          "warehouseId": "ALA",
+          "availableQuantity": "100",
+          "status": "IN_STOCK",
+          "eligible": true
+        }
+      ]
+    },
+    {
+      "id": "1035",
+      "article": "Aa",
+      "name": "Лампа SYN LED E27 20W 35",
+      "brand": "SYNTHETIC",
+      "category": "lamps",
+      "unit": "pcs",
+      "minimum": "1",
+      "step": "1",
+      "price": "4900.00",
+      "currency": "KZT",
+      "specs": {
+        "voltageV": "230",
+        "base": "E27",
+        "powerW": "20",
+        "colorTemperatureK": "4000"
+      },
+      "certificates": [
+        {
+          "id": "SYN-CERT-lamps",
+          "url": "https://example.invalid/certificates/lamps",
+          "file": "data/sample_catalog/certificates/synthetic-certificate.pdf",
+          "version": "1",
+          "synthetic": true
+        }
+      ],
+      "sourceUrl": "https://example.invalid/products/Aa",
+      "sourceVersion": "synthetic-v1",
+      "synthetic": true,
+      "warehouses": [
+        {
+          "warehouseId": "ALA",
+          "availableQuantity": "100",
+          "status": "IN_STOCK",
+          "eligible": true
+        }
+      ]
+    },
+    {
+      "id": "1036",
+      "article": "BB",
+      "name": "Лампа SYN LED E27 21W 36",
+      "brand": "SYNTHETIC",
+      "category": "lamps",
+      "unit": "pcs",
+      "minimum": "1",
+      "step": "1",
+      "price": "5000.00",
+      "currency": "KZT",
+      "specs": {
+        "voltageV": "230",
+        "base": "E27",
+        "powerW": "21",
+        "colorTemperatureK": "4000"
+      },
+      "certificates": [
+        {
+          "id": "SYN-CERT-lamps",
+          "url": "https://example.invalid/certificates/lamps",
+          "file": "data/sample_catalog/certificates/synthetic-certificate.pdf",
+          "version": "1",
+          "synthetic": true
+        }
+      ],
+      "sourceUrl": "https://example.invalid/products/BB",
+      "sourceVersion": "synthetic-v1",
+      "synthetic": true,
+      "warehouses": [
+        {
+          "warehouseId": "ALA",
+          "availableQuantity": "100",
+          "status": "IN_STOCK",
+          "eligible": true
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "synthetic": true,
+  "version": "synthetic-v1",
+  "rules": {
+    "breakers": [
+      "poles",
+      "currentA",
+      "voltageV",
+      "curve",
+      "breakingCapacityKa"
+    ],
+    "cables": [
+      "cores",
+      "crossSectionMm2",
+      "material",
+      "voltageV",
+      "insulation"
+    ],
+    "lamps": [
+      "voltageV",
+      "base",
+      "powerW",
+      "colorTemperatureK"
+    ]
+  },
+  "policy": "Exact equality of all required attributes, same unit. Missing attribute means UNKNOWN; this is synthetic test policy, not engineering certification."
+}

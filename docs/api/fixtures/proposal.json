@@ -1,0 +1,31 @@
+{
+  "id": "8f04b669-03f5-4914-9e9b-b0f5f88aaf25",
+  "conversationId": "f9c6ca77-f4da-4c8f-b205-e2aac740a1b1",
+  "cartId": "e171135f-fd88-457f-9421-bc1454d0e601",
+  "revision": "2",
+  "digest": "eac57cff5d8e91972bad128f9e0ad035534d523486f1b866a3c97cc895282872",
+  "operationId": "5e275fcb-45c9-4558-924f-140853635800",
+  "expectedCartVersion": "0",
+  "status": "pending",
+  "expiresAt": "2026-09-23T10:49:58.710165Z",
+  "lines": [
+    {
+      "article": "DEMO-001",
+      "addQuantity": {
+        "value": "2",
+        "unit": "piece",
+        "step": "1"
+      },
+      "unitPrice": {
+        "amount": "1500",
+        "currency": "KZT"
+      },
+      "warehouse": "main",
+      "stockBucket": "DEMO-001:main",
+      "offerVersion": "1",
+      "provenance": [
+        "8c813370-b17a-4e61-8c8b-b05bfd7b7c64"
+      ]
+    }
+  ]
+}

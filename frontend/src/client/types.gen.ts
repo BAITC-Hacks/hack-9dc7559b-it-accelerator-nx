@@ -4,11 +4,1211 @@ export type ClientOptions = {
     baseURL: 'http://localhost:8080' | (string & {});
 };
 
+export type SessionToken = {
+    accessToken?: string;
+    expiresAt?: string;
+    principalId?: string;
+    cartId?: string;
+};
+
+export type RunSnapshot = {
+    id?: string;
+    conversationId?: string;
+    status?: string;
+    epoch?: string;
+    sequence?: string;
+    text?: string;
+    errorCode?: string | unknown;
+    createdAt?: string;
+    finishedAt?: string | unknown;
+};
+
+export type ProductRequest = {
+    id?: number;
+    article?: string;
+    name?: string;
+    brand?: string;
+    category?: string;
+    price?: number;
+    currency?: string;
+    stock?: boolean;
+    sourceUrl?: string;
+    specs?: string;
+};
+
+export type ProductSearchResult = {
+    id?: string;
+    article?: string;
+    name?: string;
+    brand?: string;
+    category?: string;
+    price?: number;
+    currency?: string;
+    stock?: boolean;
+    sourceUrl?: string;
+    score?: number;
+};
+
+export type Conversation = {
+    id?: string;
+    version?: string;
+    createdAt?: string;
+};
+
+export type TurnRequest = {
+    text?: string;
+    resultSetId?: string;
+    expectedStateVersion?: string;
+};
+
+export type AcceptedTurn = {
+    messageId?: string;
+    runId?: string;
+};
+
+export type ProposalRequest = {
+    conversationId: string;
+    expectedStateVersion?: string;
+    resultSetId?: string;
+    lines?: Array<Selection>;
+};
+
+export type Selection = {
+    article?: string;
+    unit?: string;
+    warehouse?: string;
+    addQuantity?: string;
+};
+
+export type Money = {
+    amount?: string;
+    currency?: string;
+};
+
+export type ProposalLine = {
+    article?: string;
+    addQuantity?: Quantity;
+    unitPrice?: Money;
+    warehouse?: string;
+    stockBucket?: string;
+    offerVersion?: string;
+    provenance?: Array<string>;
+};
+
+export type ProposalSnapshot = {
+    id?: string;
+    conversationId?: string;
+    cartId?: string;
+    revision?: string;
+    digest?: string;
+    operationId?: string;
+    expectedCartVersion?: string;
+    status?: string;
+    expiresAt?: string;
+    lines?: Array<ProposalLine>;
+};
+
+export type Quantity = {
+    value?: string;
+    unit?: string;
+    step?: string;
+};
+
+export type ConfirmRequest = {
+    revision?: string;
+    digest?: string;
+    origin: 'button' | 'user_text';
+    text?: string;
+};
+
+export type CartLine = {
+    article?: string;
+    quantity?: Quantity;
+    unitPrice?: Money;
+    warehouse?: string;
+    stockBucket?: string;
+};
+
+export type CartSnapshot = {
+    id?: string;
+    version?: string;
+    lines?: Array<CartLine>;
+    url?: string;
+};
+
+export type OperationOutcome = {
+    id?: string;
+    proposalId?: string;
+    status?: string;
+    cart?: CartSnapshot | unknown;
+    code?: string | unknown;
+};
+
+export type UpdateDialogue = {
+    expectedVersion?: string;
+    category?: string;
+    budget?: Money;
+    hardConstraints?: {
+        [key: string]: string;
+    };
+    quantity?: Quantity;
+    resultSetId?: string;
+    selectedIndices?: Array<number>;
+    fulfillmentOptionId?: string;
+    attachmentId?: string;
+    attachmentVersion?: string;
+};
+
+export type DialogueState = {
+    version?: string;
+    category?: string | unknown;
+    budget?: Money | unknown;
+    hardConstraints?: {
+        [key: string]: string;
+    };
+    quantity?: Quantity | unknown;
+    lastResultSetId?: string | unknown;
+    selectedArticles?: Array<string>;
+    fulfillmentOptionId?: string | unknown;
+    activeProposalId?: string | unknown;
+    attachmentId?: string | unknown;
+    attachmentVersion?: string | unknown;
+};
+
+export type AlternativePlan = {
+    id?: string;
+    kind?: string;
+    lines?: Array<Selection>;
+    differences?: Array<string>;
+};
+
+export type AlternativesPayload = {
+    alternatives?: Array<AlternativePlan>;
+    kind: 'alternatives';
+};
+
+export type ChatEvent = {
+    eventId?: string;
+    runId?: string;
+    seq?: string;
+    epoch?: string;
+    type?: string;
+    schemaVersion?: string;
+    payload?: EventPayload;
+};
+
+export type DeltaPayload = {
+    text?: string;
+    kind: 'delta';
+};
+
+export type EventPayload = (({
+    kind: 'StatusPayload';
+} & StatusPayload) | ({
+    kind: 'DeltaPayload';
+} & DeltaPayload) | ({
+    kind: 'ProductsPayload';
+} & ProductsPayload) | ({
+    kind: 'ProposalPayload';
+} & ProposalPayload) | ({
+    kind: 'TerminalPayload';
+} & TerminalPayload) | ({
+    kind: 'SourcesPayload';
+} & SourcesPayload) | ({
+    kind: 'AlternativesPayload';
+} & AlternativesPayload) | ({
+    kind: 'ReviewPayload';
+} & ReviewPayload)) & {
+    kind: string;
+};
+
+export type OfferSnapshot = {
+    article?: string;
+    price?: Money;
+    available?: Quantity;
+    warehouse?: string;
+    stockBucket?: string;
+    version?: string;
+    observedAt?: string;
+    expiresAt?: string;
+};
+
+export type ProductDetails = {
+    id?: string;
+    article?: string;
+    name?: string;
+    specs?: {
+        [key: string]: string;
+    };
+    certificates?: Array<SourceRef>;
+};
+
+export type ProductResultSet = {
+    id?: string;
+    version?: string;
+    products?: Array<ProductDetails>;
+    offers?: Array<OfferSnapshot>;
+};
+
+export type ProductsPayload = {
+    resultSet?: ProductResultSet;
+    kind: 'products';
+};
+
+export type ProposalPayload = {
+    proposal?: ProposalSnapshot;
+    kind: 'proposal';
+};
+
+export type ReviewPayload = {
+    review?: ReviewedItems;
+    kind: 'review';
+};
+
+export type ReviewedItems = {
+    attachmentId?: string;
+    version?: string;
+    items?: Array<Selection>;
+    sources?: Array<SourceRef>;
+};
+
+export type SourceChunk = {
+    source?: SourceRef;
+    text?: string;
+};
+
+export type SourceRef = {
+    id?: string;
+    version?: string;
+    title?: string;
+    page?: number | unknown;
+    sheet?: string | unknown;
+    row?: number | unknown;
+};
+
+export type SourcesPayload = {
+    sources?: Array<SourceRef>;
+    excerpts?: Array<SourceChunk>;
+    kind: 'sources';
+};
+
+export type StatusPayload = {
+    status?: string;
+    tool?: string | unknown;
+    kind: 'status';
+};
+
+export type TerminalPayload = {
+    snapshot?: RunSnapshot;
+    replayUnavailable?: boolean;
+    kind: 'terminal';
+};
+
 export type PingResponse = {
     app?: string;
     status?: string;
     time?: string;
 };
+
+export type ConversationPage = {
+    items?: Array<Conversation>;
+    nextCursor?: string | unknown;
+};
+
+export type Message = {
+    id?: string;
+    sequence?: string;
+    role?: string;
+    text?: string;
+    runId?: string;
+    createdAt?: string;
+};
+
+export type MessagePage = {
+    items?: Array<Message>;
+    nextCursor?: string | unknown;
+};
+
+export type ApiProblem = {
+    status?: unknown;
+    detail?: unknown;
+    code?: unknown;
+    correlationId?: unknown;
+    retryable?: unknown;
+};
+
+export type VisitorData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/auth/visitor-session';
+};
+
+export type VisitorErrors = {
+    /**
+     * Domain error with stable code
+     */
+    400: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    401: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    403: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    404: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    409: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    429: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    503: ApiProblem;
+};
+
+export type VisitorError = VisitorErrors[keyof VisitorErrors];
+
+export type VisitorResponses = {
+    /**
+     * OK
+     */
+    200: SessionToken;
+};
+
+export type VisitorResponse = VisitorResponses[keyof VisitorResponses];
+
+export type RefreshData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/auth/refresh';
+};
+
+export type RefreshErrors = {
+    /**
+     * Domain error with stable code
+     */
+    400: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    401: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    403: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    404: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    409: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    429: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    503: ApiProblem;
+};
+
+export type RefreshError = RefreshErrors[keyof RefreshErrors];
+
+export type RefreshResponses = {
+    /**
+     * OK
+     */
+    200: SessionToken;
+};
+
+export type RefreshResponse = RefreshResponses[keyof RefreshResponses];
+
+export type LogoutData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/auth/logout';
+};
+
+export type LogoutErrors = {
+    /**
+     * Domain error with stable code
+     */
+    400: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    401: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    403: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    404: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    409: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    429: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    503: ApiProblem;
+};
+
+export type LogoutError = LogoutErrors[keyof LogoutErrors];
+
+export type LogoutResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type CancelRunData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/runs/{id}/cancel';
+};
+
+export type CancelRunErrors = {
+    /**
+     * Domain error with stable code
+     */
+    400: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    401: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    403: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    404: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    409: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    429: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    503: ApiProblem;
+};
+
+export type CancelRunError = CancelRunErrors[keyof CancelRunErrors];
+
+export type CancelRunResponses = {
+    /**
+     * OK
+     */
+    200: RunSnapshot;
+};
+
+export type CancelRunResponse = CancelRunResponses[keyof CancelRunResponses];
+
+export type UpsertData = {
+    body: ProductRequest;
+    path?: never;
+    query?: never;
+    url: '/api/products';
+};
+
+export type UpsertErrors = {
+    /**
+     * Domain error with stable code
+     */
+    400: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    401: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    403: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    404: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    409: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    429: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    503: ApiProblem;
+};
+
+export type UpsertError = UpsertErrors[keyof UpsertErrors];
+
+export type UpsertResponses = {
+    /**
+     * Created
+     */
+    201: ProductSearchResult;
+};
+
+export type UpsertResponse = UpsertResponses[keyof UpsertResponses];
+
+export type ListConversationsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        cursor?: string;
+        limit?: number;
+    };
+    url: '/api/conversations';
+};
+
+export type ListConversationsErrors = {
+    /**
+     * Domain error with stable code
+     */
+    400: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    401: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    403: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    404: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    409: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    429: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    503: ApiProblem;
+};
+
+export type ListConversationsError = ListConversationsErrors[keyof ListConversationsErrors];
+
+export type ListConversationsResponses = {
+    /**
+     * OK
+     */
+    200: ConversationPage;
+};
+
+export type ListConversationsResponse = ListConversationsResponses[keyof ListConversationsResponses];
+
+export type CreateConversationData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/conversations';
+};
+
+export type CreateConversationErrors = {
+    /**
+     * Domain error with stable code
+     */
+    400: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    401: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    403: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    404: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    409: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    429: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    503: ApiProblem;
+};
+
+export type CreateConversationError = CreateConversationErrors[keyof CreateConversationErrors];
+
+export type CreateConversationResponses = {
+    /**
+     * Created
+     */
+    201: Conversation;
+};
+
+export type CreateConversationResponse = CreateConversationResponses[keyof CreateConversationResponses];
+
+export type ListMessagesData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: {
+        cursor?: string;
+        limit?: number;
+    };
+    url: '/api/conversations/{id}/messages';
+};
+
+export type ListMessagesErrors = {
+    /**
+     * Domain error with stable code
+     */
+    400: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    401: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    403: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    404: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    409: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    429: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    503: ApiProblem;
+};
+
+export type ListMessagesError = ListMessagesErrors[keyof ListMessagesErrors];
+
+export type ListMessagesResponses = {
+    /**
+     * OK
+     */
+    200: MessagePage;
+};
+
+export type ListMessagesResponse = ListMessagesResponses[keyof ListMessagesResponses];
+
+export type SubmitMessageData = {
+    body: TurnRequest;
+    headers: {
+        'Idempotency-Key': string;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/conversations/{id}/messages';
+};
+
+export type SubmitMessageErrors = {
+    /**
+     * Domain error with stable code
+     */
+    400: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    401: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    403: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    404: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    409: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    429: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    503: ApiProblem;
+};
+
+export type SubmitMessageError = SubmitMessageErrors[keyof SubmitMessageErrors];
+
+export type SubmitMessageResponses = {
+    /**
+     * Accepted
+     */
+    202: AcceptedTurn;
+};
+
+export type SubmitMessageResponse = SubmitMessageResponses[keyof SubmitMessageResponses];
+
+export type PrepareProposalData = {
+    body: ProposalRequest;
+    headers: {
+        'Idempotency-Key': string;
+    };
+    path?: never;
+    query?: never;
+    url: '/api/cart/proposals';
+};
+
+export type PrepareProposalErrors = {
+    /**
+     * Domain error with stable code
+     */
+    400: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    401: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    403: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    404: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    409: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    429: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    503: ApiProblem;
+};
+
+export type PrepareProposalError = PrepareProposalErrors[keyof PrepareProposalErrors];
+
+export type PrepareProposalResponses = {
+    /**
+     * OK
+     */
+    200: ProposalSnapshot;
+};
+
+export type PrepareProposalResponse = PrepareProposalResponses[keyof PrepareProposalResponses];
+
+export type RejectProposalData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/cart/proposals/{id}/reject';
+};
+
+export type RejectProposalErrors = {
+    /**
+     * Domain error with stable code
+     */
+    400: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    401: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    403: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    404: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    409: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    429: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    503: ApiProblem;
+};
+
+export type RejectProposalError = RejectProposalErrors[keyof RejectProposalErrors];
+
+export type RejectProposalResponses = {
+    /**
+     * OK
+     */
+    200: ProposalSnapshot;
+};
+
+export type RejectProposalResponse = RejectProposalResponses[keyof RejectProposalResponses];
+
+export type ConfirmProposalData = {
+    body: ConfirmRequest;
+    headers: {
+        'Idempotency-Key': string;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/cart/proposals/{id}/confirm';
+};
+
+export type ConfirmProposalErrors = {
+    /**
+     * Domain error with stable code
+     */
+    400: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    401: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    403: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    404: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    409: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    429: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    503: ApiProblem;
+};
+
+export type ConfirmProposalError = ConfirmProposalErrors[keyof ConfirmProposalErrors];
+
+export type ConfirmProposalResponses = {
+    /**
+     * OK
+     */
+    200: OperationOutcome;
+};
+
+export type ConfirmProposalResponse = ConfirmProposalResponses[keyof ConfirmProposalResponses];
+
+export type GetDialogueData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/conversations/{id}/state';
+};
+
+export type GetDialogueErrors = {
+    /**
+     * Domain error with stable code
+     */
+    400: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    401: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    403: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    404: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    409: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    429: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    503: ApiProblem;
+};
+
+export type GetDialogueError = GetDialogueErrors[keyof GetDialogueErrors];
+
+export type GetDialogueResponses = {
+    /**
+     * OK
+     */
+    200: DialogueState;
+};
+
+export type GetDialogueResponse = GetDialogueResponses[keyof GetDialogueResponses];
+
+export type UpdateDialogueData = {
+    body: UpdateDialogue;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/conversations/{id}/state';
+};
+
+export type UpdateDialogueErrors = {
+    /**
+     * Domain error with stable code
+     */
+    400: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    401: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    403: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    404: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    409: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    429: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    503: ApiProblem;
+};
+
+export type UpdateDialogueError = UpdateDialogueErrors[keyof UpdateDialogueErrors];
+
+export type UpdateDialogueResponses = {
+    /**
+     * OK
+     */
+    200: DialogueState;
+};
+
+export type UpdateDialogueResponse = UpdateDialogueResponses[keyof UpdateDialogueResponses];
+
+export type GetRunData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/runs/{id}';
+};
+
+export type GetRunErrors = {
+    /**
+     * Domain error with stable code
+     */
+    400: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    401: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    403: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    404: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    409: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    429: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    503: ApiProblem;
+};
+
+export type GetRunError = GetRunErrors[keyof GetRunErrors];
+
+export type GetRunResponses = {
+    /**
+     * OK
+     */
+    200: RunSnapshot;
+};
+
+export type GetRunResponse = GetRunResponses[keyof GetRunResponses];
+
+export type StreamRunData = {
+    body?: never;
+    headers?: {
+        'Last-Event-ID'?: string;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/runs/{id}/events';
+};
+
+export type StreamRunErrors = {
+    /**
+     * Domain error with stable code
+     */
+    400: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    401: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    403: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    404: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    409: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    429: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    503: ApiProblem;
+};
+
+export type StreamRunError = StreamRunErrors[keyof StreamRunErrors];
+
+export type StreamRunResponses = {
+    /**
+     * OK
+     */
+    200: ChatEvent;
+};
+
+export type StreamRunResponse = StreamRunResponses[keyof StreamRunResponses];
+
+export type SearchData = {
+    body?: never;
+    path?: never;
+    query: {
+        q: string;
+        limit?: number;
+        category?: string;
+        minPrice?: number;
+        maxPrice?: number;
+    };
+    url: '/api/products/search';
+};
+
+export type SearchErrors = {
+    /**
+     * Domain error with stable code
+     */
+    400: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    401: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    403: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    404: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    409: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    429: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    503: ApiProblem;
+};
+
+export type SearchError = SearchErrors[keyof SearchErrors];
+
+export type SearchResponses = {
+    /**
+     * OK
+     */
+    200: Array<ProductSearchResult>;
+};
+
+export type SearchResponse = SearchResponses[keyof SearchResponses];
 
 export type PingData = {
     body?: never;
@@ -16,6 +1216,39 @@ export type PingData = {
     query?: never;
     url: '/api/ping';
 };
+
+export type PingErrors = {
+    /**
+     * Domain error with stable code
+     */
+    400: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    401: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    403: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    404: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    409: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    429: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    503: ApiProblem;
+};
+
+export type PingError = PingErrors[keyof PingErrors];
 
 export type PingResponses = {
     /**
@@ -25,3 +1258,206 @@ export type PingResponses = {
 };
 
 export type PingResponse2 = PingResponses[keyof PingResponses];
+
+export type GetResultSetData = {
+    body?: never;
+    path: {
+        id: string;
+        resultId: string;
+    };
+    query?: never;
+    url: '/api/conversations/{id}/results/{resultId}';
+};
+
+export type GetResultSetErrors = {
+    /**
+     * Domain error with stable code
+     */
+    400: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    401: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    403: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    404: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    409: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    429: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    503: ApiProblem;
+};
+
+export type GetResultSetError = GetResultSetErrors[keyof GetResultSetErrors];
+
+export type GetResultSetResponses = {
+    /**
+     * OK
+     */
+    200: ProductResultSet;
+};
+
+export type GetResultSetResponse = GetResultSetResponses[keyof GetResultSetResponses];
+
+export type GetCartData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/cart';
+};
+
+export type GetCartErrors = {
+    /**
+     * Domain error with stable code
+     */
+    400: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    401: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    403: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    404: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    409: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    429: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    503: ApiProblem;
+};
+
+export type GetCartError = GetCartErrors[keyof GetCartErrors];
+
+export type GetCartResponses = {
+    /**
+     * OK
+     */
+    200: CartSnapshot;
+};
+
+export type GetCartResponse = GetCartResponses[keyof GetCartResponses];
+
+export type GetProposalData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/cart/proposals/{id}';
+};
+
+export type GetProposalErrors = {
+    /**
+     * Domain error with stable code
+     */
+    400: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    401: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    403: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    404: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    409: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    429: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    503: ApiProblem;
+};
+
+export type GetProposalError = GetProposalErrors[keyof GetProposalErrors];
+
+export type GetProposalResponses = {
+    /**
+     * OK
+     */
+    200: ProposalSnapshot;
+};
+
+export type GetProposalResponse = GetProposalResponses[keyof GetProposalResponses];
+
+export type GetCartOperationData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/cart/operations/{id}';
+};
+
+export type GetCartOperationErrors = {
+    /**
+     * Domain error with stable code
+     */
+    400: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    401: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    403: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    404: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    409: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    429: ApiProblem;
+    /**
+     * Domain error with stable code
+     */
+    503: ApiProblem;
+};
+
+export type GetCartOperationError = GetCartOperationErrors[keyof GetCartOperationErrors];
+
+export type GetCartOperationResponses = {
+    /**
+     * OK
+     */
+    200: OperationOutcome;
+};
+
+export type GetCartOperationResponse = GetCartOperationResponses[keyof GetCartOperationResponses];

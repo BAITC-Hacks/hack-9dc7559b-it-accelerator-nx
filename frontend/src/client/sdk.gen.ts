@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { PingData, PingResponses } from './types.gen';
+import type { CancelRunData, CancelRunErrors, CancelRunResponses, ConfirmProposalData, ConfirmProposalErrors, ConfirmProposalResponses, CreateConversationData, CreateConversationErrors, CreateConversationResponses, GetCartData, GetCartErrors, GetCartOperationData, GetCartOperationErrors, GetCartOperationResponses, GetCartResponses, GetDialogueData, GetDialogueErrors, GetDialogueResponses, GetProposalData, GetProposalErrors, GetProposalResponses, GetResultSetData, GetResultSetErrors, GetResultSetResponses, GetRunData, GetRunErrors, GetRunResponses, ListConversationsData, ListConversationsErrors, ListConversationsResponses, ListMessagesData, ListMessagesErrors, ListMessagesResponses, LogoutData, LogoutErrors, LogoutResponses, PingData, PingErrors, PingResponses, PrepareProposalData, PrepareProposalErrors, PrepareProposalResponses, RefreshData, RefreshErrors, RefreshResponses, RejectProposalData, RejectProposalErrors, RejectProposalResponses, SearchData, SearchErrors, SearchResponses, StreamRunData, StreamRunErrors, StreamRunResponse, StreamRunResponses, SubmitMessageData, SubmitMessageErrors, SubmitMessageResponses, UpdateDialogueData, UpdateDialogueErrors, UpdateDialogueResponses, UpsertData, UpsertErrors, UpsertResponses, VisitorData, VisitorErrors, VisitorResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -18,4 +18,153 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
     meta?: Record<string, unknown>;
 };
 
-export const ping = <ThrowOnError extends boolean = false>(options?: Options<PingData, ThrowOnError>) => (options?.client ?? client).get<PingResponses, unknown, ThrowOnError>({ url: '/api/ping', ...options });
+export const visitor = <ThrowOnError extends boolean = false>(options?: Options<VisitorData, ThrowOnError>) => (options?.client ?? client).post<VisitorResponses, VisitorErrors, ThrowOnError>({ url: '/auth/visitor-session', ...options });
+
+export const refresh = <ThrowOnError extends boolean = false>(options?: Options<RefreshData, ThrowOnError>) => (options?.client ?? client).post<RefreshResponses, RefreshErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/auth/refresh',
+    ...options
+});
+
+export const logout = <ThrowOnError extends boolean = false>(options?: Options<LogoutData, ThrowOnError>) => (options?.client ?? client).post<LogoutResponses, LogoutErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/auth/logout',
+    ...options
+});
+
+export const cancelRun = <ThrowOnError extends boolean = false>(options: Options<CancelRunData, ThrowOnError>) => (options.client ?? client).post<CancelRunResponses, CancelRunErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/runs/{id}/cancel',
+    ...options
+});
+
+/**
+ * Добавить товар и построить embedding
+ */
+export const upsert = <ThrowOnError extends boolean = false>(options: Options<UpsertData, ThrowOnError>) => (options.client ?? client).post<UpsertResponses, UpsertErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/products',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+export const listConversations = <ThrowOnError extends boolean = false>(options?: Options<ListConversationsData, ThrowOnError>) => (options?.client ?? client).get<ListConversationsResponses, ListConversationsErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/conversations',
+    ...options
+});
+
+export const createConversation = <ThrowOnError extends boolean = false>(options?: Options<CreateConversationData, ThrowOnError>) => (options?.client ?? client).post<CreateConversationResponses, CreateConversationErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/conversations',
+    ...options
+});
+
+export const listMessages = <ThrowOnError extends boolean = false>(options: Options<ListMessagesData, ThrowOnError>) => (options.client ?? client).get<ListMessagesResponses, ListMessagesErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/conversations/{id}/messages',
+    ...options
+});
+
+export const submitMessage = <ThrowOnError extends boolean = false>(options: Options<SubmitMessageData, ThrowOnError>) => (options.client ?? client).post<SubmitMessageResponses, SubmitMessageErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/conversations/{id}/messages',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+export const prepareProposal = <ThrowOnError extends boolean = false>(options: Options<PrepareProposalData, ThrowOnError>) => (options.client ?? client).post<PrepareProposalResponses, PrepareProposalErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/cart/proposals',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+export const rejectProposal = <ThrowOnError extends boolean = false>(options: Options<RejectProposalData, ThrowOnError>) => (options.client ?? client).post<RejectProposalResponses, RejectProposalErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/cart/proposals/{id}/reject',
+    ...options
+});
+
+export const confirmProposal = <ThrowOnError extends boolean = false>(options: Options<ConfirmProposalData, ThrowOnError>) => (options.client ?? client).post<ConfirmProposalResponses, ConfirmProposalErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/cart/proposals/{id}/confirm',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+export const getDialogue = <ThrowOnError extends boolean = false>(options: Options<GetDialogueData, ThrowOnError>) => (options.client ?? client).get<GetDialogueResponses, GetDialogueErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/conversations/{id}/state',
+    ...options
+});
+
+export const updateDialogue = <ThrowOnError extends boolean = false>(options: Options<UpdateDialogueData, ThrowOnError>) => (options.client ?? client).patch<UpdateDialogueResponses, UpdateDialogueErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/conversations/{id}/state',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+export const getRun = <ThrowOnError extends boolean = false>(options: Options<GetRunData, ThrowOnError>) => (options.client ?? client).get<GetRunResponses, GetRunErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/runs/{id}',
+    ...options
+});
+
+export const streamRun = <ThrowOnError extends boolean = false>(options: Options<StreamRunData, ThrowOnError, StreamRunResponse>) => (options.client ?? client).sse.get<StreamRunResponses, StreamRunErrors, ThrowOnError>({
+    responseType: 'text',
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/runs/{id}/events',
+    ...options
+});
+
+/**
+ * Найти товары по смыслу и фильтрам
+ */
+export const search = <ThrowOnError extends boolean = false>(options: Options<SearchData, ThrowOnError>) => (options.client ?? client).get<SearchResponses, SearchErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/products/search',
+    ...options
+});
+
+export const ping = <ThrowOnError extends boolean = false>(options?: Options<PingData, ThrowOnError>) => (options?.client ?? client).get<PingResponses, PingErrors, ThrowOnError>({ url: '/api/ping', ...options });
+
+export const getResultSet = <ThrowOnError extends boolean = false>(options: Options<GetResultSetData, ThrowOnError>) => (options.client ?? client).get<GetResultSetResponses, GetResultSetErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/conversations/{id}/results/{resultId}',
+    ...options
+});
+
+export const getCart = <ThrowOnError extends boolean = false>(options?: Options<GetCartData, ThrowOnError>) => (options?.client ?? client).get<GetCartResponses, GetCartErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/cart',
+    ...options
+});
+
+export const getProposal = <ThrowOnError extends boolean = false>(options: Options<GetProposalData, ThrowOnError>) => (options.client ?? client).get<GetProposalResponses, GetProposalErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/cart/proposals/{id}',
+    ...options
+});
+
+export const getCartOperation = <ThrowOnError extends boolean = false>(options: Options<GetCartOperationData, ThrowOnError>) => (options.client ?? client).get<GetCartOperationResponses, GetCartOperationErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/cart/operations/{id}',
+    ...options
+});

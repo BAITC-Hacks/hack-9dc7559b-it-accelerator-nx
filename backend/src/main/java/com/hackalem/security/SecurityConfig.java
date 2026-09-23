@@ -40,17 +40,29 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, JwtFilter jwtFilter, com.fasterxml.jackson.databind.ObjectMapper json) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(jwtFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(errors -> errors
+                    .authenticationEntryPoint((req,res,e) -> {
+                        res.setStatus(401); res.setContentType("application/problem+json");
+                        json.writeValue(res.getOutputStream(), com.hackalem.web.ApiErrors.problem(401,"unauthorized").getBody());
+                    })
+                    .accessDeniedHandler((req,res,e) -> {
+                        res.setStatus(403); res.setContentType("application/problem+json");
+                        json.writeValue(res.getOutputStream(), com.hackalem.web.ApiErrors.problem(403,"forbidden").getBody());
+                    }))
                 .authorizeHttpRequests(auth -> auth
                         // Публично и после включения JWT: health (healthcheck в compose) и docs.
-                        .requestMatchers("/actuator/health/**", "/auth/**",
+                        .dispatcherTypeMatchers(jakarta.servlet.DispatcherType.ASYNC, jakarta.servlet.DispatcherType.ERROR).permitAll()
+                        .requestMatchers("/actuator/health/**", "/auth/visitor-session", "/api/ping",
                                 "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                        // Каркас: остальное тоже открыто. Закрывать — по мере появления эндпоинтов.
-                        .anyRequest().permitAll())
+                        .requestMatchers("/api/admin/**", "/actuator/**").hasRole("ADMIN")
+                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/products", "/api/products/**").hasRole("ADMIN")
+                        .anyRequest().authenticated())
                 .httpBasic(basic -> basic.disable())
                 .formLogin(form -> form.disable());
         return http.build();
@@ -66,8 +78,9 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(allowedOrigins);
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("*"));
-        config.setAllowCredentials(true);
+        config.setAllowedHeaders(List.of("Authorization", "Content-Type", "Idempotency-Key", "Last-Event-ID"));
+        config.setExposedHeaders(List.of("Retry-After", "X-Request-Id"));
+        config.setAllowCredentials(false);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return source;

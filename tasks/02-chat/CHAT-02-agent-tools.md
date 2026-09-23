@@ -1,7 +1,7 @@
 ---
 id: CHAT-02
 owner: D1
-status: todo
+status: in_progress
 wave: 2
 size: L
 depends_on: ["FOUND-01", "CHAT-01"]
@@ -9,7 +9,7 @@ depends_on: ["FOUND-01", "CHAT-01"]
 
 # CHAT-02 — OpenAI agent с ограниченным tool loop
 
-**Исполнитель:** D1. **Этап:** G2. **Объём:** L. Все задачи обязательны для полного scope; отметка todo означает, что реализация не выполнена.
+**Исполнитель:** D1. **Этап:** G2. **Объём:** L. Реализация D1 в работе; непроверенные критерии не считаются выполненными.
 **Зависимости для старта:** [FOUND-01](../00-foundation/FOUND-01-contracts-and-ports.md), [CHAT-01](../02-chat/CHAT-01-history-and-runs.md)
 **Покрытие:** FR-1…7; AC-1…10.
 
@@ -62,4 +62,6 @@ backend/…/ai/agent/; ai/gateway/; config/; src/test/…/ai/
 
 **Передать:** D2: зарегистрированные tools и ошибки ports; D3: typed result events; QA: scripted provider cases и live smoke evidence.
 
-**Evidence после выполнения:** заполнить commit/PR, команды, ссылки на отчёты и фактический результат; до выполнения статус остаётся todo.
+**Evidence после выполнения:** заполнить commit/PR, команды, ссылки на отчёты и фактический результат; до подтверждения всех критериев статус остаётся in_progress.
+
+**Текущий handoff:** [реализация D1 и открытые проверки](../../docs/api/d1-handoff.md). Статус `in_progress`; результаты final integration run пока pending.

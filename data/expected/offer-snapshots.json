@@ -1,0 +1,42 @@
+{
+  "synthetic": true,
+  "snapshots": [
+    {
+      "id": "stock12-to7",
+      "productId": "1001",
+      "before": {
+        "quantity": "12",
+        "version": "s1"
+      },
+      "after": {
+        "quantity": "7",
+        "version": "s2"
+      }
+    },
+    {
+      "id": "price-change",
+      "productId": "1001",
+      "before": {
+        "price": "1500.00",
+        "version": "s1"
+      },
+      "after": {
+        "price": "1600.00",
+        "version": "s2"
+      }
+    },
+    {
+      "id": "timeout",
+      "productId": "1001",
+      "quantity": null,
+      "status": "UNKNOWN",
+      "error": "SOURCE_TIMEOUT"
+    },
+    {
+      "id": "on-order",
+      "productId": "1005",
+      "quantity": null,
+      "status": "ON_ORDER"
+    }
+  ]
+}

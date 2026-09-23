@@ -1,0 +1,10 @@
+{
+  "type": "about:blank",
+  "title": "Conflict",
+  "status": 409,
+  "detail": "stale_proposal",
+  "instance": "/api/cart/proposals/8f04b669-03f5-4914-9e9b-b0f5f88aaf25/confirm",
+  "code": "stale_proposal",
+  "correlationId": "1689e3c7-37f9-4f6c-a150-f42cc242c8ac",
+  "retryable": false
+}
