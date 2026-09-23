@@ -1,0 +1,37 @@
+# ─── Секреты ──────────────────────────────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# ─── Java / Gradle ────────────────────────────────────────────────────────────
+backend/build/
+backend/.gradle/
+backend/out/
+backend/bin/
+*.class
+*.jar
+!**/gradle/wrapper/gradle-wrapper.jar
+*.log
+hs_err_pid*
+
+# ─── Node / Vite ──────────────────────────────────────────────────────────────
+node_modules/
+frontend/dist/
+frontend/dist-ssr/
+frontend/.vite/
+frontend/coverage/
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.eslintcache
+
+# ─── IDE ──────────────────────────────────────────────────────────────────────
+.idea/
+.vscode/
+*.iml
+*.iws
+
+# ─── OS ───────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
