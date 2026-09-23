@@ -6,13 +6,15 @@ import type { CommerceDriver } from './model';
 export function CommerceProvider({ children }: { children: ReactNode }) {
   const [driver, setDriver] = useState<CommerceDriver>(unavailableCommerce);
   useEffect(() => {
-    if (!import.meta.env.DEV || import.meta.env.MODE !== 'mock') return;
     let cancelled = false;
     let active: CommerceDriver | undefined;
     let unsubscribe = () => {};
-    void import('../../mocks/commerce-demo').then(({ createDemoCommerce }) => {
+    const load = import.meta.env.DEV && import.meta.env.MODE === 'mock'
+      ? import('../../mocks/commerce-demo').then(({ createDemoCommerce }) => createDemoCommerce)
+      : import('../../lib/commerce-live').then(({ createLiveCommerce }) => createLiveCommerce);
+    void load.then((createDriver) => {
       if (cancelled) return;
-      active = createDemoCommerce();
+      active = createDriver();
       unsubscribe = auth.subscribe(() => active?.clearPrivateData());
       setDriver(active);
     }).catch(() => {

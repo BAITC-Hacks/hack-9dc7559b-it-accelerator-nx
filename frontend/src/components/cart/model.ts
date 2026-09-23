@@ -67,7 +67,7 @@ export interface ProposalView {
 export type CommerceScenario = 'normal' | 'stock-changed' | 'price-changed'
   | 'unknown-outcome' | 'stale-cart' | 'offer-unavailable' | 'not-found';
 export interface CommerceView {
-  mode: 'unavailable' | 'loading' | 'demo';
+  mode: 'unavailable' | 'loading' | 'demo' | 'live';
   products: ProductView[];
   sources: SourceView[];
   selections: Record<string, SelectionView>;
@@ -82,7 +82,9 @@ export interface CommerceDriver {
   subscribe: (listener: () => void) => () => void;
   select: (conversation: string, selection: SelectionView) => void;
   prepare: (conversation: string) => void;
-  prepareReviewed: (conversation: string, source: { jobKey: string; version: number; lines: { productKey: string; quantity: string }[] }) => string | null;
+  prepareSelection?: (conversation: string, source: { resultSetId?: string; fulfillmentOptionId?: string; lines: import('../../client/types.gen').Selection[] }) => Promise<string | null>;
+  hydrateConversation?: (conversation: string) => Promise<void>;
+  prepareReviewed: (conversation: string, source: { jobKey: string; version: number | string; lines: { productKey: string; quantity: string; article?: string; unit?: string; warehouse?: string }[] }) => string | null | Promise<string | null>;
   confirm: (conversation: string, proposal: string, revision: number) => void;
   reject: (conversation: string, proposal: string) => void;
   lookup: (operation: string) => void;

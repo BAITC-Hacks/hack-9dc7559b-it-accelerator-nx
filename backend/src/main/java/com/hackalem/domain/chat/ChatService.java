@@ -17,10 +17,11 @@ import java.util.*;
 @Service
 public class ChatService {
     private final JdbcTemplate db; private final TransactionTemplate tx; private final Json json;
+    private final DialogueSelectionBridge selections;
     private final Limits limits; private final MeterRegistry metrics; private final int queueSize,deadline;
-    public ChatService(JdbcTemplate db,TransactionTemplate tx,Json json,Limits limits,MeterRegistry metrics,
+    public ChatService(JdbcTemplate db,TransactionTemplate tx,Json json,Limits limits,MeterRegistry metrics,DialogueSelectionBridge selections,
         @Value("${app.limits.queue-size}") int queueSize,@Value("${app.worker.deadline-seconds}") int deadline) {
-        this.db=db;this.tx=tx;this.json=json;this.limits=limits;this.metrics=metrics;this.queueSize=queueSize;this.deadline=deadline;
+        this.selections=selections;this.db=db;this.tx=tx;this.json=json;this.limits=limits;this.metrics=metrics;this.queueSize=queueSize;this.deadline=deadline;
     }
     private static final RowMapper<Conversation> CONVERSATION=(r,n)->new Conversation(r.getString("id"),r.getString("version"),r.getTimestamp("created_at").toInstant());
     private static final RowMapper<Message> MESSAGE=(r,n)->new Message(r.getString("id"),r.getString("seq"),r.getString("role"),r.getString("text"),r.getString("run_id"),r.getTimestamp("created_at").toInstant());
@@ -159,6 +160,10 @@ public class ChatService {
         return tx.execute(s->{conversation(scope,id,true);var old=state(scope,id);
             if(!old.version().equals(req.expectedVersion()))throw ApiException.conflict("stale_dialogue");
             String resultId=req.resultSetId()==null?old.lastResultSetId():req.resultSetId();List<String> selected=old.selectedArticles();
+            ProductResultSet explicit=selections.explicit(req,scope);
+            if(explicit!=null)resultId=bindSelection(scope,id,explicit);
+            else if(req.resultSetId()!=null && !Boolean.TRUE.equals(db.queryForObject("SELECT EXISTS(SELECT 1 FROM result_sets WHERE id=? AND conversation_id=? AND owner_id=?)",Boolean.class,uuid(req.resultSetId()),id,scope.principalId())))
+                resultId=bindSelection(scope,id,selections.saved(req.resultSetId(),scope));
             if(req.selectedIndices()!=null) {
                 if(resultId==null)throw ApiException.conflict("result_set_required");
                 var results=resultSet(scope,id,uuid(resultId));
@@ -168,6 +173,12 @@ public class ChatService {
             supersede(id);
             return writeState(id,new DialogueState(old.version(),req.category()==null?old.category():req.category(),req.budget()==null?old.budget():req.budget(),req.hardConstraints()==null?old.hardConstraints():Map.copyOf(req.hardConstraints()),req.quantity()==null?old.quantity():req.quantity(),resultId,selected,req.fulfillmentOptionId(),null,req.attachmentId(),req.attachmentVersion()));
         });
+    }
+    private String bindSelection(TrustedScope scope,UUID conversation,ProductResultSet source){
+        UUID id=UUID.randomUUID();
+        var saved=new ProductResultSet(id.toString(),source.version(),List.copyOf(source.products()),List.copyOf(source.offers()));
+        db.update("INSERT INTO result_sets(id,conversation_id,owner_id,body) VALUES (?,?,?,?::jsonb)",id,conversation,scope.principalId(),json.write(saved));
+        return id.toString();
     }
     public void supersede(UUID id) {db.update("UPDATE cart_proposals SET state='superseded' WHERE conversation_id=? AND state='pending'",id);}
     public DialogueState writeState(UUID id,DialogueState value) {

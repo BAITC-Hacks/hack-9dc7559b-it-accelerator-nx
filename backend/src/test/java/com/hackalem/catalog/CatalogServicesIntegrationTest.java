@@ -35,6 +35,8 @@ class CatalogServicesIntegrationTest {
     @Autowired DataSource dataSource;@Autowired JdbcTemplate db;@Autowired ObjectMapper json;@Autowired CatalogImportService imports;
     @Autowired CatalogRepository catalog;@Autowired CatalogSearchService search;@Autowired CatalogOfferService offers;@Autowired CatalogAnalogsService analogs;
     @Autowired CatalogDataAdapter adapter;@Autowired SessionService sessions;
+    @Autowired com.hackalem.domain.attachments.AttachmentService attachmentService;
+    @Autowired com.hackalem.ai.attachments.AttachmentWorker attachmentWorker;
     @Autowired com.hackalem.domain.chat.ChatService chat;@Autowired com.hackalem.domain.cart.CartService carts;
     @Autowired org.springframework.test.web.servlet.MockMvc mvc;
     @MockitoSpyBean CatalogEmbeddingProvider embeddings;
@@ -47,6 +49,39 @@ class CatalogServicesIntegrationTest {
     }
     @BeforeEach void reset()throws Exception{schemaAndCatalog();db.execute("TRUNCATE visitor_sessions CASCADE");db.execute("TRUNCATE catalog_offer_seed,sample_offers");ownerToken=sessions.create().accessToken();owner=sessions.verify(ownerToken);other=sessions.verify(sessions.create().accessToken());clearInvocations(embeddings);}
     SearchCriteria query(String text){return new SearchCriteria(text,20,null,null,null,null,null,Map.of(),false);}
+    @Test void explicitBrowserSearchBindsAnOwnedImmutableResultAndCanPrepareCart(){
+        UUID conversation=UUID.fromString(chat.create(owner).id());
+        var saved=adapter.searchSnapshot(query("000001"),owner);
+        var state=chat.updateState(owner,conversation,new UpdateDialogue(chat.state(owner,conversation).version(),null,null,null,null,saved.resultSet().id(),List.of(0),null,null,null));
+        assertThat(state.lastResultSetId()).isNotEqualTo(saved.resultSet().id());
+        assertThat(chat.resultSet(owner,conversation,UUID.fromString(state.lastResultSetId())).products()).extracting(ProductDetails::article).containsExactly("000001");
+        var proposal=carts.propose(owner,new ProposalRequest(conversation,state.version(),state.lastResultSetId(),List.of(new Selection("000001","pcs","ALA","1"))),"browser-proposal");
+        assertThat(proposal.status()).isEqualTo("pending");assertThat(carts.cart(owner).lines()).isEmpty();
+        UUID foreign=UUID.fromString(chat.create(other).id());
+        assertThatThrownBy(()->chat.updateState(other,foreign,new UpdateDialogue(chat.state(other,foreign).version(),null,null,null,null,saved.resultSet().id(),List.of(0),null,null,null))).hasMessage("resource_not_found");
+        assertThat(chat.state(other,foreign).lastResultSetId()).isNull();
+    }
+    @Test void explicitFulfillmentOptionBindsEveryLineAndPreservesConsent(){
+        UUID conversation=UUID.fromString(chat.create(owner).id());
+        var selected=analogs.find("000001",new BigDecimal("20"),"pcs",query("analogs"),owner).options().stream().filter(o->o.kind().equals("PARTIAL_REPLACEMENT")).findFirst().orElseThrow();
+        var state=chat.updateState(owner,conversation,new UpdateDialogue(chat.state(owner,conversation).version(),null,null,null,null,null,null,selected.id(),null,null));
+        var proposal=carts.propose(owner,new ProposalRequest(conversation,state.version(),state.lastResultSetId(),selected.lines()),"browser-analog");
+        assertThat(proposal.lines()).hasSize(2);assertThat(carts.cart(owner).lines()).isEmpty();
+        var outcome=carts.confirm(owner,UUID.fromString(proposal.id()),"browser-confirm",new ConfirmRequest(proposal.revision(),proposal.digest(),ConsentOrigin.button,null));
+        assertThat(outcome.status()).isEqualTo("succeeded");assertThat(carts.cart(owner).lines()).hasSize(2);
+    }
+    @Test void reviewedAttachmentCanBindAndPrepareWithoutAModelRun()throws Exception{
+        UUID conversation=UUID.fromString(chat.create(owner).id());
+        var accepted=attachmentService.upload(owner,conversation,"specification.xlsx","application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",java.nio.file.Files.readAllBytes(java.nio.file.Path.of("../data/attachments/office/specification.xlsx")));
+        attachmentWorker.processOne();var snapshot=attachmentService.status(owner,accepted.attachmentId());
+        var row=snapshot.rows().stream().filter(r->r.candidates().stream().anyMatch(c->c.article().equals("000001"))).findFirst().orElseThrow();
+        var candidate=row.candidates().stream().filter(c->c.article().equals("000001")).findFirst().orElseThrow();
+        var reviewed=attachmentService.review(owner,accepted.attachmentId(),new com.hackalem.domain.attachments.AttachmentModels.ReviewRequest(snapshot.version(),List.of(new com.hackalem.domain.attachments.AttachmentModels.Selection(row.extracted().id(),candidate.productId(),"1","pcs","ALA",true))));
+        var state=chat.updateState(owner,conversation,new UpdateDialogue(chat.state(owner,conversation).version(),null,null,null,null,null,null,null,accepted.attachmentId(),reviewed.version()));
+        var proposal=carts.propose(owner,new ProposalRequest(conversation,state.version(),state.lastResultSetId(),List.of(new Selection("000001","pcs","ALA","1"))),"browser-file");
+        assertThat(proposal.status()).isEqualTo("pending");assertThat(carts.cart(owner).lines()).isEmpty();
+        assertThatThrownBy(()->chat.updateState(owner,conversation,new UpdateDialogue(chat.state(owner,conversation).version(),null,null,null,null,null,null,null,accepted.attachmentId(),snapshot.version()))).hasMessage("stale_attachment");
+    }
     @Test void exactAndMissingSkuNeverCallEmbedding(){
         assertThat(search.search(query("000001")).products()).extracting(CatalogProduct::article).containsExactly("000001");
         assertThat(search.search(query("999999")).mode()).isEqualTo("NOT_FOUND");assertThat(search.search(query("999999")).products()).isEmpty();verify(embeddings,never()).embedQuery(anyString());

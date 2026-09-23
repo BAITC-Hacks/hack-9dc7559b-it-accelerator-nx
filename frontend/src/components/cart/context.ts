@@ -2,7 +2,7 @@ import { createContext } from 'react';
 import type { CommerceDriver, CommerceView } from './model';
 
 export const initialCommerce: CommerceView = {
-  mode: import.meta.env.DEV && import.meta.env.MODE === 'mock' ? 'loading' : 'unavailable',
+  mode: 'loading',
   products: [], sources: [], selections: {}, proposals: [], cart: null,
   scenario: 'normal', busy: false, notice: null,
 };
