@@ -1,6 +1,6 @@
 # hack-9dc7559b-it-accelerator-nx
 
-Hackathon team repository for IT Accelerator NX.
+Hackathon team repository for TechnoHorizon.
 Кейс: **ИИ-ассистент для чата на сайте ekt.kz**.
 
 Стек: Spring Boot 3.5 (Java 21, Gradle) + PostgreSQL/pgvector + Flyway + Spring AI ·
