@@ -1,5 +1,6 @@
 import { ArrowUpRight, MessageSquare, Plus, Trash2, X, Zap } from 'lucide-react';
 import type { ConversationView } from './model';
+import { Link } from 'react-router-dom';
 
 interface Props {
   conversations: ConversationView[];
@@ -35,7 +36,7 @@ export function ConversationSidebar({ conversations, selectedKey, enabled, onNew
       </nav>
       <div className="sidebar-bottom">
         <div className="sidebar-note"><Zap size={19} /><p>От задачи —<br /><strong>к нужному решению.</strong></p></div>
-        <a className="catalog-link" href="https://ekt.kz/catalog/" target="_blank" rel="noopener noreferrer">Перейти в каталог<ArrowUpRight size={16} /></a>
+        <Link className="catalog-link" to="/catalog">Перейти в каталог<ArrowUpRight size={16} /></Link>
         {enabled && <button className="clear-history" onClick={onClear}><Trash2 size={14} />Очистить локальную историю</button>}
         <div className="sidebar-footnote">Электротехника для ваших проектов</div>
       </div>

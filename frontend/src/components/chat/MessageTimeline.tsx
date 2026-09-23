@@ -14,9 +14,10 @@ interface Props {
   onResume: () => void;
   onStop: () => void;
   renderMessageExtras?: (message: MessageView) => ReactNode;
+  demo?: boolean;
 }
 
-export function MessageTimeline({ chat, enabled, loading, onChoose, onLoadEarlier, onResume, onStop, renderMessageExtras }: Props) {
+export function MessageTimeline({ chat, enabled, loading, onChoose, onLoadEarlier, onResume, onStop, renderMessageExtras, demo }: Props) {
   const viewport = useRef<HTMLDivElement>(null);
   const stickToBottom = useRef(true);
   const previousChat = useRef<string | null>(null);
@@ -74,7 +75,7 @@ export function MessageTimeline({ chat, enabled, loading, onChoose, onLoadEarlie
                     <div className="message-content">
                       <div className="message-byline"><strong>{message.author === 'customer' ? 'Вы' : 'Консультант EKT'}</strong>
                         <time dateTime={message.createdAt}>{new Date(message.createdAt).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}</time>
-                        {message.author === 'assistant' && <span className="message-demo-tag">демо</span>}
+                        {message.author === 'assistant' && demo && <span className="message-demo-tag">демо</span>}
                       </div>
                       <div className="message-text">
                         {message.text ? <SafeMarkdown text={message.text} /> : <span className="message-placeholder">{chat.reply?.phase === 'cancelled' ? 'Ответ остановлен до получения текста.'
