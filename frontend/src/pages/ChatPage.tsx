@@ -1,5 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { ChevronRight, Menu, SlidersHorizontal, X } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { useCommerce } from '../hooks/useCommerce';
+import { useAttachments } from '../hooks/useAttachments';
+import { AttachmentPanel } from '../components/attachments/AttachmentPanel';
+import { CommercePanel } from '../components/catalog/CommercePanel';
 import { useChatWorkspace } from '../hooks/useChatWorkspace';
 import { ConversationSidebar } from '../components/chat/ConversationSidebar';
 import { ContextPanel } from '../components/chat/ContextPanel';
@@ -19,7 +24,9 @@ const scenarios: { value: DemoScenario; label: string }[] = [
 ];
 
 export default function ChatPage() {
-  const { driver, view, chat } = useChatWorkspace();
+  const commerce = useCommerce();
+  const attachments = useAttachments();
+  const { driver, view, chat } = useChatWorkspace(() => { commerce.driver.clearPrivateData(); attachments.driver.clearPrivateData(); });
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [contextOpen, setContextOpen] = useState(false);
   const [clearDialogOpen, setClearDialogOpen] = useState(false);
@@ -75,6 +82,7 @@ export default function ChatPage() {
             <span className="header-muted">Онлайн-консультант</span><ChevronRight size={14} /><strong>Помощь с выбором</strong>
           </div>
           <div className="chat-header-actions"><span className={`mode-badge ${enabled ? 'demo' : ''}`}><i />{enabled ? 'Локальное демо' : view.mode === 'loading' ? 'Подключение' : 'Скоро онлайн'}</span>
+            <Link className="header-cart-link" to="/cart">Корзина{commerce.view.cart ? ` · ${commerce.view.cart.lines.length}` : ''}{commerce.view.proposals.some((item) => item.state === 'outcome_unknown') ? ' ?' : ''}</Link>
             <button className="icon-button context-toggle" onClick={() => setContextOpen(!contextOpen)} aria-expanded={contextOpen} aria-controls="selection-context" aria-label="Параметры подбора"><SlidersHorizontal size={18} /></button>
           </div>
         </header>
@@ -90,9 +98,19 @@ export default function ChatPage() {
         <div className="chat-body">
           <section className="conversation-area" aria-label="Чат с консультантом">
             <MessageTimeline chat={chat} enabled={enabled} loading={view.mode === 'loading'} onChoose={choosePrompt}
+              renderMessageExtras={(message) => chat && message.author === 'assistant' && message.key === chat.reply?.messageKey
+                && (chat.reply.phase === 'completed' || commerce.view.proposals.some((item) => item.conversationKey === chat.key))
+                ? <CommercePanel conversation={chat.key} /> : null}
               onLoadEarlier={() => chat && driver.loadEarlier(chat.key)} onResume={() => chat && driver.resume(chat.key)} onStop={() => chat && driver.stop(chat.key)} />
             <Composer draft={chat?.draft ?? ''} enabled={enabled && !!chat} active={isReplyActive(chat?.reply ?? null)} interrupted={needsRecovery(chat?.reply ?? null)}
-              onDraft={(text) => chat && driver.setDraft(chat.key, text)} onSend={() => chat && driver.send(chat.key, chat.draft)} onStop={() => chat && driver.stop(chat.key)} />
+              attachmentAction={<AttachmentPanel conversation={chat?.key ?? null} enabled={enabled} />}
+              onDraft={(text) => chat && driver.setDraft(chat.key, text)} onSend={() => {
+                if (!chat) return;
+                // Never interpret natural-language assent as an authorized cart write.
+                // Until generated replyToProposalId exists, require the exact card button.
+                if (!/^(да|ага|ок|окей|yes|подтверждаю|согласен|добавляй)[.!\s]*$/iu.test(chat.draft.trim())) commerce.driver.invalidateSelection(chat.key);
+                driver.send(chat.key, chat.draft);
+              }} onStop={() => chat && driver.stop(chat.key)} />
           </section>
           <aside id="selection-context" className={`selection-context ${contextOpen ? 'context-open' : ''}`} aria-label="Контекст подбора"
             onKeyDown={(event) => { if (event.key === 'Escape') setContextOpen(false); }}>
@@ -102,8 +120,8 @@ export default function ChatPage() {
         </div>
       </main>
       <dialog ref={clearDialog} className="clear-history-dialog" onCancel={() => setClearDialogOpen(false)} onClose={() => setClearDialogOpen(false)}>
-        <h2>Очистить локальную историю?</h2><p>Сообщения и черновики демонстрации в этой вкладке будут удалены.</p>
-        <div><button onClick={() => setClearDialogOpen(false)} autoFocus>Сохранить</button><button className="confirm-clear" onClick={() => { driver.clearPrivateData(); setClearDialogOpen(false); }}>Очистить</button></div>
+        <h2>Очистить локальное демо?</h2><p>Сообщения, файлы, проверки, предложения и учебная корзина этой вкладки будут удалены.</p>
+        <div><button onClick={() => setClearDialogOpen(false)} autoFocus>Сохранить</button><button className="confirm-clear" onClick={() => { driver.clearPrivateData(); commerce.driver.clearPrivateData(); attachments.driver.clearPrivateData(); setClearDialogOpen(false); }}>Очистить</button></div>
       </dialog>
     </div>
   );
