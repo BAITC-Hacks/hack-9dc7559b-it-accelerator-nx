@@ -192,6 +192,9 @@ class CoreIntegrationTest {
         var key=io.jsonwebtoken.security.Keys.hmacShaKeyFor("dev-only-secret-change-me-min-32-chars-long".getBytes(java.nio.charset.StandardCharsets.UTF_8));
         String token=io.jsonwebtoken.Jwts.builder().issuer("hackalem").subject(owner.toString()).audience().add("ekt-widget").and().expiration(Date.from(Instant.now().plusSeconds(60))).signWith(key).compact();
         mvc.perform(get("/actuator/info").header("Authorization","Bearer "+token)).andExpect(status().isOk());
+        // Admin reaches catalog controller using the verified session, without legacy X-Admin-Token.
+        mvc.perform(get("/api/admin/jobs/99999999").header("Authorization","Bearer "+token)).andExpect(status().isNotFound());
+        mvc.perform(get("/api/admin/jobs/99999999").header("Authorization","Bearer "+tokenA.accessToken())).andExpect(status().isForbidden());
         mvc.perform(get("/actuator/info").header("Authorization","Bearer "+tokenA.accessToken())).andExpect(status().isForbidden());
     }
     @Test void unknownToolsCannotMutate(){
@@ -222,14 +225,14 @@ class CoreIntegrationTest {
         UUID run=UUID.randomUUID();limits.reserve(run,a.principalId(),100,60);limits.reserve(run,a.principalId(),100,60);
         assertThat(cache.opsForZSet().size("ekt:active")).isEqualTo(1);limits.release(run,50);assertThat(cache.opsForZSet().size("ekt:active")).isZero();
     }
-    @Test void cleanSchemaAndUpgradeRegistryAreApplied(){assertThat(db.queryForList("SELECT version FROM flyway_schema_history WHERE success ORDER BY installed_rank",String.class)).containsExactly("1","2","3");}
+    @Test void cleanSchemaAndUpgradeRegistryAreApplied(){assertThat(db.queryForList("SELECT version FROM flyway_schema_history WHERE success ORDER BY installed_rank",String.class)).contains("1","2","3","4");}
     @Test void existingV2DatabaseUpgradesWithoutChangingOldMigrations(){
         db.execute("CREATE DATABASE upgrade_d1");
         String url=postgres.getJdbcUrl().replace("/"+postgres.getDatabaseName(),"/upgrade_d1");
         var flyway=org.flywaydb.core.Flyway.configure().dataSource(url,postgres.getUsername(),postgres.getPassword()).target("2").load();
         assertThat(flyway.migrate().migrationsExecuted).isEqualTo(2);
-        var upgrade=org.flywaydb.core.Flyway.configure().dataSource(url,postgres.getUsername(),postgres.getPassword()).load();
-        assertThat(upgrade.migrate().migrationsExecuted).isEqualTo(1);assertThat(upgrade.info().current().getVersion().getVersion()).isEqualTo("3");
+        var upgrade=org.flywaydb.core.Flyway.configure().dataSource(url,postgres.getUsername(),postgres.getPassword()).locations("classpath:db/migration","classpath:db/baseline-identity").target("4").load();
+        assertThat(upgrade.migrate().migrationsExecuted).isEqualTo(2);assertThat(upgrade.info().current().getVersion().getVersion()).isEqualTo("4");
     }
     @Test void eventOpenApiHasDiscriminatorWithoutCircularSubtypeInheritance()throws Exception{
         var response=mvc.perform(get("/v3/api-docs")).andExpect(status().isOk()).andReturn();

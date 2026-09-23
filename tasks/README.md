@@ -52,9 +52,12 @@ Mock fixtures `satisfies GeneratedDto` проходят wire-schema провер
 
 V1 и V2 уже существуют и не изменяются. Текущий непрерывный D1 baseline:
 
-- **V3__identity_chat_cart.sql** — весь D1: identity, conversations/messages/runs/events, result sets/dialogue/tool persistence, immutable proposals, cart operations и stateful sample cart.
-- **V4 (следующая D2, ещё не создана)** — расширение products, offers, stock и catalog import metadata.
-- **V5 (следующая D2, ещё не создана)** — KB versions/chunks/jobs и private attachments/reviews.
+- **V3/V4 baseline identity** — исходная V3 D1, затем каталог CAT-01 в V4.
+- **V3/V4 baseline catalog** — исходная V3 CAT-01, затем D1 в V4 для уже существующих catalog-only БД.
+- Flyway выбирает baseline по существующей записи V3 (read-only); новая БД получает identity baseline.
+- Исходные V3 SQL сохранены без изменений в `db/baseline-identity/` и `db/baseline-catalog/`.
+- **V5** — следующие D2 KB/attachments. Новые миграции общие в `db/migration/`.
+
 
 V6/V7 отдельно под D1 больше не резервируются: их плановый scope включён в V3. После V5 следующий номер выдаётся D1 по фактическому merge order. В общей integration DB применять только непрерывный согласованный prefix: сейчас V1→V2→V3, затем V4→V5. Перед назначением сверить интегрированную ветку, чтобы не было двух SQL с одним номером. Не создавать holes и не включать Flyway outOfOrder. Применённый SQL не редактировать; изменения — новой следующей миграцией. Contract/UI могут использовать ports и snapshot до D2 schema. Подробности: [handoff D1](../docs/api/d1-handoff.md).
 
@@ -129,7 +132,7 @@ OPS-02 должен поставить:
 
 ### D2 — Каталог, RAG и распознавание
 - [ ] [DATA-01 — Синтетические данные и ожидаемые сценарии](00-foundation/DATA-01-sample-data-contract.md) — G0, M.
-- [ ] [CAT-01 — Развитие каталога V2, безопасный импорт и индексация](03-catalog/CAT-01-import-and-schema.md) — G1, L.
+- [ ] [CAT-01 — Развитие каталога V2, безопасный импорт и индексация](03-catalog/CAT-01-import-and-schema.md) — G1, L. Реализация выполнена, V3 применена; закрытие карточки ждёт AUTH-01 (admin identity).
 - [ ] [ATT-01 — Приватные вложения, storage и durable processing](06-attachments/ATT-01-upload-and-jobs.md) — G1, M.
 - [ ] [CAT-02 — Точный, лексический и семантический поиск](03-catalog/CAT-02-search-and-comparison.md) — G2, M.
 - [ ] [CAT-03 — Актуальные цены, остатки и склады](03-catalog/CAT-03-offers-and-stock.md) — G2, M.

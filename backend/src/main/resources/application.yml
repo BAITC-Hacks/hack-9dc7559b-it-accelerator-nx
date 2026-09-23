@@ -87,6 +87,22 @@ app:
   jwt:
     secret: ${JWT_SECRET:dev-only-secret-change-me-min-32-chars-long}
     ttl-minutes: ${JWT_TTL_MINUTES:1440}
+  catalog:
+    embedding:
+      # live — реальная модель (нужен ключ), fake — детерминированные векторы
+      # для offline и тестов. Пространства векторов не смешиваются: поиск сверяет
+      # vector_space активной версии с текущим провайдером.
+      mode: ${CATALOG_EMBEDDING_MODE:live}
+      batch-size: ${CATALOG_EMBEDDING_BATCH_SIZE:64}
+      # Соответствует колонке vector(1536) из V2/V3. Другая размерность — новая миграция.
+      dimensions: 1536
+    seed:
+      # Идемпотентная загрузка синтетического каталога на старте.
+      enabled: ${CATALOG_SEED_ENABLED:true}
+      # Путь для bootRun с хоста; в контейнере data/ монтируется в /app/data.
+      location: ${CATALOG_SEED_LOCATION:file:../data/sample_catalog/products.json}
+    retained-versions: ${CATALOG_RETAINED_VERSIONS:3}
+    import-queue-capacity: ${CATALOG_IMPORT_QUEUE_CAPACITY:8}
 
 management:
   endpoints:

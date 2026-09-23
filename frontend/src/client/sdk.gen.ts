@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { CancelRunData, CancelRunErrors, CancelRunResponses, ConfirmProposalData, ConfirmProposalErrors, ConfirmProposalResponses, CreateConversationData, CreateConversationErrors, CreateConversationResponses, GetCartData, GetCartErrors, GetCartOperationData, GetCartOperationErrors, GetCartOperationResponses, GetCartResponses, GetDialogueData, GetDialogueErrors, GetDialogueResponses, GetProposalData, GetProposalErrors, GetProposalResponses, GetResultSetData, GetResultSetErrors, GetResultSetResponses, GetRunData, GetRunErrors, GetRunResponses, ListConversationsData, ListConversationsErrors, ListConversationsResponses, ListMessagesData, ListMessagesErrors, ListMessagesResponses, LogoutData, LogoutErrors, LogoutResponses, PingData, PingErrors, PingResponses, PrepareProposalData, PrepareProposalErrors, PrepareProposalResponses, RefreshData, RefreshErrors, RefreshResponses, RejectProposalData, RejectProposalErrors, RejectProposalResponses, SearchData, SearchErrors, SearchResponses, StreamRunData, StreamRunErrors, StreamRunResponse, StreamRunResponses, SubmitMessageData, SubmitMessageErrors, SubmitMessageResponses, UpdateDialogueData, UpdateDialogueErrors, UpdateDialogueResponses, UpsertData, UpsertErrors, UpsertResponses, VisitorData, VisitorErrors, VisitorResponses } from './types.gen';
+import type { ByArticleData, ByArticleErrors, ByArticleResponses, CancelRunData, CancelRunErrors, CancelRunResponses, ConfirmProposalData, ConfirmProposalErrors, ConfirmProposalResponses, CreateConversationData, CreateConversationErrors, CreateConversationResponses, GetCartData, GetCartErrors, GetCartOperationData, GetCartOperationErrors, GetCartOperationResponses, GetCartResponses, GetDialogueData, GetDialogueErrors, GetDialogueResponses, GetProposalData, GetProposalErrors, GetProposalResponses, GetResultSetData, GetResultSetErrors, GetResultSetResponses, GetRunData, GetRunErrors, GetRunResponses, JobStatusData, JobStatusErrors, JobStatusResponses, ListConversationsData, ListConversationsErrors, ListConversationsResponses, ListMessagesData, ListMessagesErrors, ListMessagesResponses, LogoutData, LogoutErrors, LogoutResponses, PingData, PingErrors, PingResponses, PrepareProposalData, PrepareProposalErrors, PrepareProposalResponses, RefreshData, RefreshErrors, RefreshResponses, RejectProposalData, RejectProposalErrors, RejectProposalResponses, SearchData, SearchErrors, SearchResponses, StartImportData, StartImportErrors, StartImportResponses, StreamRunData, StreamRunErrors, StreamRunResponse, StreamRunResponses, SubmitMessageData, SubmitMessageErrors, SubmitMessageResponses, UpdateDialogueData, UpdateDialogueErrors, UpdateDialogueResponses, VisitorData, VisitorErrors, VisitorResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -36,19 +36,6 @@ export const cancelRun = <ThrowOnError extends boolean = false>(options: Options
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/api/runs/{id}/cancel',
     ...options
-});
-
-/**
- * Добавить товар и построить embedding
- */
-export const upsert = <ThrowOnError extends boolean = false>(options: Options<UpsertData, ThrowOnError>) => (options.client ?? client).post<UpsertResponses, UpsertErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/products',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
 });
 
 export const listConversations = <ThrowOnError extends boolean = false>(options?: Options<ListConversationsData, ThrowOnError>) => (options?.client ?? client).get<ListConversationsResponses, ListConversationsErrors, ThrowOnError>({
@@ -105,6 +92,21 @@ export const confirmProposal = <ThrowOnError extends boolean = false>(options: O
     }
 });
 
+/**
+ * Импортировать выгрузку каталога
+ *
+ * Создаёт новую версию каталога и публикует её только после успешной записи. Повтор с тем же Idempotency-Key возвращает прежнее задание, а не второй импорт.
+ */
+export const startImport = <ThrowOnError extends boolean = false>(options: Options<StartImportData, ThrowOnError>) => (options.client ?? client).post<StartImportResponses, StartImportErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/admin/catalog/imports',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
 export const getDialogue = <ThrowOnError extends boolean = false>(options: Options<GetDialogueData, ThrowOnError>) => (options.client ?? client).get<GetDialogueResponses, GetDialogueErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/api/conversations/{id}/state',
@@ -135,7 +137,20 @@ export const streamRun = <ThrowOnError extends boolean = false>(options: Options
 });
 
 /**
- * Найти товары по смыслу и фильтрам
+ * Карточка товара по точному артикулу
+ *
+ * Ведущие нули значимы. Отсутствующий артикул возвращает 404, похожий товар вместо него не подставляется.
+ */
+export const byArticle = <ThrowOnError extends boolean = false>(options: Options<ByArticleData, ThrowOnError>) => (options.client ?? client).get<ByArticleResponses, ByArticleErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/products/{article}',
+    ...options
+});
+
+/**
+ * Найти товары по смыслу и фильтрам в активной версии каталога
+ *
+ * Требует построенного семантического индекса. Точный артикул ищите через /api/products/{article}.
  */
 export const search = <ThrowOnError extends boolean = false>(options: Options<SearchData, ThrowOnError>) => (options.client ?? client).get<SearchResponses, SearchErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
@@ -166,5 +181,14 @@ export const getProposal = <ThrowOnError extends boolean = false>(options: Optio
 export const getCartOperation = <ThrowOnError extends boolean = false>(options: Options<GetCartOperationData, ThrowOnError>) => (options.client ?? client).get<GetCartOperationResponses, GetCartOperationErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/api/cart/operations/{id}',
+    ...options
+});
+
+/**
+ * Статус задания импорта
+ */
+export const jobStatus = <ThrowOnError extends boolean = false>(options: Options<JobStatusData, ThrowOnError>) => (options.client ?? client).get<JobStatusResponses, JobStatusErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/admin/jobs/{id}',
     ...options
 });
