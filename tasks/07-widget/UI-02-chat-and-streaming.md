@@ -1,7 +1,7 @@
 ---
 id: UI-02
 owner: D3
-status: todo
+status: in_progress
 wave: 2
 size: L
 depends_on: ["UI-01"]
@@ -63,3 +63,30 @@ frontend/src/pages/; components/chat/; lib/query.ts; hooks/; frontend browser te
 **Передать:** D1: reproducible UX/network failures; UI-03/04: chat event slots и composer attachment integration.
 
 **Evidence после выполнения:** заполнить commit/PR, команды, ссылки на отчёты и фактический результат; до выполнения статус остаётся todo.
+
+## Ход реализации D3 — 23.09.2026
+
+Работа продолжается поверх незавершённой UI-01 в её изолированном worktree
+`/private/tmp/hackalem-ui01.NF4q1E`, ветка `codex/ui-01-client-transport`.
+
+Подготовлены экран чата (`/` и `/widget`), список диалогов, локальная история
+с порционной загрузкой, черновики, composer, Stop/recovery controls, контекст
+подбора, подсказки продолжения, auto-scroll с сохранением позиции чтения и
+адаптивная навигация. Диагностическая ping-страница перенесена на `/status`.
+
+`npm run dev:mock` включает **локальный UI simulator**, не имитацию неизвестного
+HTTP-контракта. История/partial reply/submission key сохраняются в sessionStorage;
+reload восстанавливает незавершённый ответ с ручным продолжением. Сценарии:
+обычный ответ, disconnect, duplicate chunks, snapshot после expiry, 401,
+429 с ожиданием и timeout-after-accept. Повтор сохраняет ключ отправки и не
+создаёт второе пользовательское сообщение. Stop останавливает только локальную
+демонстрацию; настоящий cancel endpoint ещё не подключён.
+
+UI view models и reducer actions не являются wire DTO. HTTP-типы, ChatEvent
+union и backend fixtures не создавались вручную. После FOUND-01 нужны live
+driver на generated SDK + TanStack Query, server cursor paging, run status и
+cancel, настоящие seq/epoch/terminal mappings и интеграционные проверки.
+Backend недоступен в live-режиме явно; локальные ответы не выдаются за live.
+
+**Сборки, тесты, browser и backend проверки не запускались по просьбе пользователя.**
+Done-checklist остаётся незаполненным. Реальный AC-10/14 не заявляется пройденным.

@@ -1,7 +1,7 @@
 ---
 id: UI-01
 owner: D3
-status: todo
+status: in_progress
 wave: 1
 size: M
 depends_on: ["FOUND-01"]
@@ -62,3 +62,20 @@ frontend/openapi-ts.config.ts; src/client/** generated only; src/lib/api.ts; src
 **Передать:** D3 UI-02…05: общий transport и fixtures; D1/D2: contract feedback без блокировки бизнес-разработки.
 
 **Evidence после выполнения:** заполнить commit/PR, команды, ссылки на отчёты и фактический результат; до выполнения статус остаётся todo.
+
+## Ход реализации D3 — 23.09.2026
+
+Ветка `codex/ui-01-client-transport`, отдельный worktree. Подготовлены общий
+REST/SSE auth transport, session abort/cache cleanup, ограниченный reconnect
+с Last-Event-ID и Retry-After, тестовая инфраструктура Vitest/MSW, dev:mock entry
+и команда gen:check для контроля drift без изменения generated файлов.
+
+В актуальной на момент fetch `origin/main` (`a5c0e27`) нет
+`docs/api/openapi.json`; FOUND-01 остаётся todo. Полная генерация клиента и
+product/proposal/cart/attachment/error/terminal fixtures ждут handoff D1/D2.
+Временные HTTP-типы и snapshot вручную не создавались.
+
+До остановки проверок пользователем: 12 транспортных тестов, build и lint
+проходили. Последующие изменения mock entry/SSE helper ещё не проверены;
+**повторные проверки, сборки и тесты отложены до явного сигнала пользователя**.
+Карточка не закрыта. Handoff и команды — [frontend/README.md](../../frontend/README.md).
