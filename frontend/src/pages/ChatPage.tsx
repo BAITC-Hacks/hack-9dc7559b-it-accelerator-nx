@@ -48,6 +48,7 @@ export default function ChatPage({ embed = false, onOpenCart, onRequestClose, pa
   useEffect(() => {
     if (!drawerOpen) return;
     const panel = drawer.current;
+    const menuTrigger = menuButton.current;
     panel?.querySelector<HTMLElement>('button, a')?.focus();
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') { setDrawerOpen(false); return; }
@@ -59,7 +60,7 @@ export default function ChatPage({ embed = false, onOpenCart, onRequestClose, pa
       else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
     };
     document.addEventListener('keydown', onKey);
-    return () => { document.removeEventListener('keydown', onKey); menuButton.current?.focus(); };
+    return () => { document.removeEventListener('keydown', onKey); menuTrigger?.focus(); };
   }, [drawerOpen]);
 
   useEffect(() => {

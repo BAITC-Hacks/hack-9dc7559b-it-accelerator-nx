@@ -82,6 +82,7 @@ export function AttachmentPanel({ conversation, enabled }: { conversation: strin
   const dialog = useRef<HTMLElement>(null);
   useEffect(() => {
     if (!open) return;
+    const triggerButton = trigger.current;
     dialog.current?.querySelector<HTMLButtonElement>('button')?.focus();
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') { event.preventDefault(); setOpen(false); return; }
@@ -93,7 +94,7 @@ export function AttachmentPanel({ conversation, enabled }: { conversation: strin
       else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
     };
     document.addEventListener('keydown', onKey);
-    return () => { document.removeEventListener('keydown', onKey); trigger.current?.focus(); };
+    return () => { document.removeEventListener('keydown', onKey); triggerButton?.focus(); };
   }, [open]);
   const jobs = view.jobs.filter((job) => job.conversation === conversation);
   const usable = enabled && view.mode === 'demo' && !!conversation;

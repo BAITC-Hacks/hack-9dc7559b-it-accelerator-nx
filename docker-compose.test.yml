@@ -1,0 +1,17 @@
+# Use only with -p <unique-project> -f docker-compose.yml -f docker-compose.test.yml
+# and a distinct set of host ports. Project-scoped pgdata and attachment-files
+# never mount the shared hackalem_pgdata or hackalem_attachment-files volumes.
+services:
+  backend:
+    environment:
+      SPRING_PROFILES_ACTIVE: test
+      SPRING_AI_MODEL_CHAT: none
+      SPRING_AI_MODEL_EMBEDDING: none
+      OPENAI_API_KEY: ""
+      LLM_ADAPTER_MODE: mock
+      CATALOG_STOCK_ADAPTER_MODE: sample
+      CART_MODE: sample
+      PARTNER_CART_VERIFIED: "false"
+      PARTNER_CART_BASE_URL: ""
+      PARTNER_CART_TOKEN: ""
+      CHAT_WORKER_ENABLED: "true"
