@@ -269,41 +269,37 @@ public class CatalogRepository {
         return hydrateStock(found).stream().findFirst();
     }
 
-    /**
-     * Семантический поиск по активной версии. Вектор запроса приходит готовым:
-     * провайдер вызывается выше, вне транзакции и вне этого запроса.
-     */
-    public List<CatalogProduct> semanticSearch(float[] queryVector, int limit, String category,
-                                               String brand, BigDecimal minPrice, BigDecimal maxPrice) {
-        String vector = vectorLiteral(queryVector);
-        StringBuilder sql = new StringBuilder(PRODUCT_COLUMNS)
-                .append(", 1 - (pv.embedding <=> CAST(? AS vector)) AS score\n")
-                .append(ACTIVE_PRODUCT_FROM)
-                .append(" AND pv.embedding IS NOT NULL");
-        List<Object> args = new ArrayList<>();
-        args.add(vector);
-        if (category != null && !category.isBlank()) {
-            sql.append(" AND pv.category = ?");
-            args.add(category.strip());
-        }
-        if (brand != null && !brand.isBlank()) {
-            sql.append(" AND pv.brand = ?");
-            args.add(brand.strip());
-        }
-        if (minPrice != null) {
-            sql.append(" AND o.price >= ?");
-            args.add(minPrice);
-        }
-        if (maxPrice != null) {
-            sql.append(" AND o.price <= ?");
-            args.add(maxPrice);
-        }
-        sql.append(" ORDER BY pv.embedding <=> CAST(? AS vector) LIMIT ?");
-        args.add(vector);
-        args.add(limit);
+    public Optional<CatalogProduct> findByArticle(long versionId, String article) {
+        return hydrateStock(jdbc.query(PRODUCT_COLUMNS + ACTIVE_PRODUCT_FROM.replace("cv.status = 'ACTIVE'", "cv.id = ?")
+                + " AND p.article_normalized = ?",productMapper(),versionId,ArticleNormalizer.normalize(article))).stream().findFirst();
+    }
 
-        List<CatalogProduct> found = jdbc.query(sql.toString(), productMapper(), args.toArray());
-        return hydrateStock(found);
+    public List<CatalogProduct> candidates(long versionId,String category,String brand,int limit) {
+        StringBuilder sql=new StringBuilder(PRODUCT_COLUMNS).append(ACTIVE_PRODUCT_FROM.replace("cv.status = 'ACTIVE'","cv.id = ?"));
+        List<Object> args=new ArrayList<>();args.add(versionId);
+        if(category!=null&&!category.isBlank()){sql.append(" AND pv.category=?");args.add(category);}
+        if(brand!=null&&!brand.isBlank()){sql.append(" AND pv.brand=?");args.add(brand);}
+        sql.append(" ORDER BY p.id LIMIT ?");args.add(Math.min(limit,2000));
+        return hydrateStock(jdbc.query(sql.toString(),productMapper(),args.toArray()));
+    }
+
+    /** Query embeddings are prepared before entering this short SQL-only transaction. */
+    @Transactional(readOnly=true)
+    public List<CatalogProduct> semanticSearch(long versionId,float[] queryVector,int limit,String category,
+                                               String brand,Map<String,String> specs,boolean exactBaseline) {
+        if(exactBaseline)jdbc.execute("SET LOCAL enable_indexscan=off");
+        else jdbc.execute("SET LOCAL hnsw.ef_search=100");
+        String vector=vectorLiteral(queryVector);
+        StringBuilder sql=new StringBuilder(PRODUCT_COLUMNS)
+                .append(", 1 - (pv.embedding <=> CAST(? AS vector)) AS score\n")
+                .append(ACTIVE_PRODUCT_FROM.replace("cv.status = 'ACTIVE'","cv.id = ?"))
+                .append(" AND pv.embedding IS NOT NULL");
+        List<Object> args=new ArrayList<>();args.add(vector);args.add(versionId);
+        if(category!=null&&!category.isBlank()){sql.append(" AND pv.category=?");args.add(category);}
+        if(brand!=null&&!brand.isBlank()){sql.append(" AND pv.brand=?");args.add(brand);}
+        if(specs!=null&&!specs.isEmpty()){sql.append(" AND pv.specs @> CAST(? AS jsonb)");args.add(writeJson(specs));}
+        sql.append(" ORDER BY pv.embedding <=> CAST(? AS vector) LIMIT ?");args.add(vector);args.add(Math.min(limit,100));
+        return hydrateStock(jdbc.query(sql.toString(),productMapper(),args.toArray()));
     }
 
     /** Остатки подтягиваются одним запросом на весь результат, а не по товару. */

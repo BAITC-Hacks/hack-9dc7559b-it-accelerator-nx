@@ -58,13 +58,13 @@ public class CatalogResponseMapper {
 
     public CatalogResponses.ProductSearchResponse toSearchResponse(List<CatalogProduct> products,
                                                                    CatalogVersion version,
-                                                                   String vectorSpace) {
+                                                                   String vectorSpace, String mode, List<String> warnings) {
         return new CatalogResponses.ProductSearchResponse(
                 String.valueOf(version.id()),
                 version.sourceVersion(),
                 vectorSpace,
                 products.size(),
-                products.stream().map(this::toProduct).toList());
+                products.stream().map(this::toProduct).toList(), mode, warnings);
     }
 
     public ImportJobResponse toJob(CatalogImportJob job) {

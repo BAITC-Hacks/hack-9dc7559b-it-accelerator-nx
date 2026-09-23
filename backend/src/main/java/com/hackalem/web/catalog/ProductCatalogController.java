@@ -32,7 +32,7 @@ import java.math.BigDecimal;
 @Tag(name = "Products", description = "Каталог: точный артикул и семантический поиск")
 public class ProductCatalogController {
 
-    private static final int MAX_LIMIT = 100;
+    private static final int MAX_LIMIT = 50;
 
     private final CatalogQueryService catalog;
     private final CatalogResponseMapper mapper;
@@ -47,7 +47,7 @@ public class ProductCatalogController {
 
     @GetMapping("/search")
     @Operation(summary = "Найти товары по смыслу и фильтрам в активной версии каталога",
-            description = "Требует построенного семантического индекса. Точный артикул ищите через /api/products/{article}.")
+            description = "Точный артикул, затем лексический поиск с опечатками, затем ограниченный семантический поиск.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Результаты поиска"),
             @ApiResponse(responseCode = "503", description = "Индекс каталога не готов или построен другой моделью")
@@ -59,9 +59,9 @@ public class ProductCatalogController {
             @RequestParam(required = false) String brand,
             @RequestParam(required = false) BigDecimal minPrice,
             @RequestParam(required = false) BigDecimal maxPrice) {
-        CatalogQueryService.SearchResult result = catalog.search(q, Math.min(limit, MAX_LIMIT),
+        CatalogQueryService.SearchResult result = catalog.search(q, limit,
                 category, brand, minPrice, maxPrice);
-        return mapper.toSearchResponse(result.items(), result.version(), embeddings.vectorSpace());
+        return mapper.toSearchResponse(result.items(), result.version(), embeddings.vectorSpace(), result.mode(), result.warnings());
     }
 
     @GetMapping("/{article}")
