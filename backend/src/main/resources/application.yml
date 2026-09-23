@@ -54,6 +54,7 @@ spring:
         options:
           model: ${OPENAI_MODEL:gpt-4o-mini}
           temperature: 0.2
+          stream-usage: true
       embedding:
         options:
           model: ${OPENAI_EMBEDDING_MODEL:text-embedding-3-small}

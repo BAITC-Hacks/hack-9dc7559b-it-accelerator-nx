@@ -39,7 +39,7 @@ services:
       LLM_GLOBAL_RPM: "1000"
       LLM_PRINCIPAL_RPM: "100"
       CHAT_MAX_ROUNDS: "4"
-      CHAT_MAX_TOKENS: "8000"
+      CHAT_MAX_TOKENS: "16000"
     volumes: ["../data:/app/data:ro"]
     healthcheck:
       test: ["CMD", "curl", "-fsS", "http://localhost:8080/actuator/health"]

@@ -40,6 +40,11 @@ class AttachmentHttpIntegrationTest {
     @Autowired JdbcTemplate db;@Autowired MockMvc mvc;@Autowired Json json;
     @MockitoBean AttachmentCatalog catalog;
     SessionToken tokenA,tokenB;TrustedScope a,b;UUID conversation;
+    @Test void reviewSchemaDoesNotCollideWithCartSelection() throws Exception {
+        mvc.perform(get("/v3/api-docs")).andExpect(status().isOk())
+            .andExpect(jsonPath("$.components.schemas.ReviewRequest.properties.selections.items['$ref']").value("#/components/schemas/AttachmentSelection"))
+            .andExpect(jsonPath("$.components.schemas.AttachmentSelection.properties.rowId.type").value("string"));
+    }
     @BeforeEach void setup(){
         if(!Boolean.TRUE.equals(db.queryForObject("SELECT to_regclass('attachments') IS NOT NULL",Boolean.class)))new ResourceDatabasePopulator(new ClassPathResource("db/drafts/attachments.sql")).execute(Objects.requireNonNull(db.getDataSource()));
         db.execute("TRUNCATE visitor_sessions CASCADE");tokenA=sessions.create();tokenB=sessions.create();a=sessions.verify(tokenA.accessToken());b=sessions.verify(tokenB.accessToken());conversation=UUID.fromString(chat.create(a).id());

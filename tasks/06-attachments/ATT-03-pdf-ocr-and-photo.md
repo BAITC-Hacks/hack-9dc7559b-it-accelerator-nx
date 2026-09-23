@@ -71,3 +71,11 @@ backend/…/ai/attachments/pdf/; ai/attachments/vision/; backend/Dockerfile; com
 Reprocess API защищён ACL + `expectedVersion`; новая desired version отзывает старые claims. Review и исходное evidence сохраняются отдельно; изменившийся OCR не перепривязывает выбранный товар по номеру строки. OCR возвращает word boxes в координатах исходного JPEG или 144-DPI PDF page, с ограниченным размером provenance.
 
 Статус остаётся `in_progress` до общей интеграционной проверки образа/SDK и применимых внешних gates: container-only OCR, live vision quality. Проверка scripted vision подтверждает маршрутизацию и uncertainty, не качество реальной модели. Жёсткая изоляция POI/PDFBox в отдельном процессе не реализована: есть лимиты input/ZIP/pages/rows/text/pixels и cooperative deadline, а зависшая операция библиотеки требует отдельного worker container/process для жёсткого прерывания. Этот предел явно отражён в handoff, а не выдан за пройденный gate.
+
+
+## Итоговая интеграция D2
+
+Объединено в `codex/d2-remaining-services`: V5, D1 JWT/ports, актуальный OpenAPI и generated SDK.
+Полная backend/frontend сборка и отдельный Compose HTTP runner проверены.
+[Итоговый отчёт и failed quality gates](../../docs/reports/d2-integration.md).
+Код реализован; статус остаётся `in_progress` из-за указанных в отчёте ограничений качества.

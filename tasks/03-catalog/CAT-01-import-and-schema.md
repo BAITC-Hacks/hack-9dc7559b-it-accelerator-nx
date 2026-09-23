@@ -1,7 +1,7 @@
 ---
 id: CAT-01
 owner: D2
-status: in_progress
+status: done
 wave: 1
 size: L
 depends_on: ["FOUND-01", "DATA-01"]
@@ -189,3 +189,10 @@ admin-доступ проверен временным токеном, а не �
 - **OPS-02:** каталог готовится сам при старте (`CATALOG_SEED_ENABLED`,
   `CATALOG_SEED_LOCATION`); отдельной команды инициализации не требуется.
   Для offline-прогонов — `CATALOG_EMBEDDING_MODE=fake`.
+
+
+## Итоговая интеграция D2
+
+Объединено в `codex/d2-remaining-services`: V5, D1 JWT/ports, актуальный OpenAPI и generated SDK.
+Полная backend/frontend сборка и отдельный Compose HTTP runner проверены.
+[Итоговый отчёт и failed quality gates](../../docs/reports/d2-integration.md).

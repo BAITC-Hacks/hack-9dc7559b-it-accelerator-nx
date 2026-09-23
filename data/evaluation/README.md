@@ -23,8 +23,8 @@ For a separately isolated live stack, use the root `.env` with a working provide
 key, `SPRING_PROFILES_ACTIVE=live CATALOG_EMBEDDING_MODE=live`, a different project
 name and runner arguments `--mode live --model gpt-4o-mini --embedding-model
 text-embedding-3-small --max-cases 12 --report /reports/qa02-live.json`. The sample
-includes every behavior. Backend limits are four rounds and 8,000 tokens/run;
-12 runs plus one follow-up setup cap the planned chat budget at 104,000 tokens.
+includes every behavior. Backend limits are four rounds and 16,000 tokens/run;
+12 runs plus one follow-up setup cap the planned chat budget at 208,000 tokens.
 Use `--skip-attachments` to exclude optional vision charges. Vision is explicitly
 opt-in with `ATTACHMENT_VISION_ENABLED=true`; record capabilities in the report.
 Provider failure or missing measurements must never be reported as a pass.

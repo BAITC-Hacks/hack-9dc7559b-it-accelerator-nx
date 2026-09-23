@@ -80,3 +80,11 @@ DATA expected sourceId/sourceVersion теперь явно сопоставля�
 проверены из `terms-answers.json`. Mixed availability+delivery query направляется
 в каталог. Общая проверка D1 tool replay/cache ACL и итоговый QA-02 остаются
 за root интеграцией; это не основание заранее закрывать весь RAG gate.
+
+
+## Итоговая интеграция D2
+
+Объединено в `codex/d2-remaining-services`: V5, D1 JWT/ports, актуальный OpenAPI и generated SDK.
+Полная backend/frontend сборка и отдельный Compose HTTP runner проверены.
+[Итоговый отчёт и failed quality gates](../../docs/reports/d2-integration.md).
+Код реализован; статус остаётся `in_progress` из-за указанных в отчёте ограничений качества.

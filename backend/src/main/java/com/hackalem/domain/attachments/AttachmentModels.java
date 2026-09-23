@@ -21,6 +21,7 @@ public final class AttachmentModels {
     public record Extraction(List<ExtractedRow> rows, List<String> warnings) {}
     public record Candidate(String productId, String article, String name, String unit, String evidence, String minimum, String step, List<String> warehouses) {}
     public record MatchedRow(ExtractedRow extracted, String status, List<Candidate> candidates) {}
+    @io.swagger.v3.oas.annotations.media.Schema(name="AttachmentSelection")
     public record Selection(@NotBlank String rowId, @NotBlank String productId,
                             @NotBlank @Pattern(regexp="[0-9]+(?:\\.[0-9]{1,6})?") String quantity,
                             @NotBlank String unit, @NotBlank String warehouse, boolean selected) {}
