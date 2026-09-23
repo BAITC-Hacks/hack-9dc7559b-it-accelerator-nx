@@ -122,6 +122,7 @@ public class AttachmentExtractor {
     }
     private void photo(byte[] bytes,DocumentRows out,List<String> warnings,long deadline) throws IOException {
         AttachmentValidator.validateJpeg(bytes);
+        if(ImageQualityGate.clearlyBlurred(bytes)){warnings.add("IMAGE_BLURRED_RETAKE");return;}
         String text="";List<WordBox> boxes=List.of();
         if(ocrAvailable()) {var recognized=ocr.getObject().recognizeWithRegions(bytes,deadline);text=recognized.text();boxes=recognized.words();warnings.add("OCR_TEXT_REQUIRES_REVIEW");}
         else warnings.add("OCR_UNAVAILABLE");
@@ -134,8 +135,9 @@ public class AttachmentExtractor {
             String observed=observation.rawText()==null?"":observation.rawText();
             if(observed.isBlank()) observed=String.join(" ",observation.visibleMarkings());
             if(observed.isBlank()) observed=Objects.toString(observation.category(),"Unidentified product");
-            out.text(observed,new Location("image",null,null,null,1,null));
-            out.visual(new VisualEvidence(observation.category(),observation.visibleMarkings(),observation.observedAttributes(),observation.qualityFlags()));
+            // Model-only markings are unverified observations, never parsed into article/quantity.
+            warnings.add("VISION_OBSERVATIONS_UNVERIFIED");
+            out.visualOnly(observation.category(),new VisualEvidence(observation.category(),observation.visibleMarkings(),observation.observedAttributes(),observation.qualityFlags()));
         } else warnings.add("VISION_UNAVAILABLE");
     }
     private static void check(long deadline) {

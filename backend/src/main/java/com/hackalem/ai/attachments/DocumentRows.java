@@ -12,6 +12,10 @@ public class DocumentRows {
     private final List<ExtractedRow> rows=new ArrayList<>();
     private int article=-1,quantity=-1,unit=-1; private int chars;
     private final Map<String,Integer> occurrences=new HashMap<>();
+    public void visualOnly(String category,VisualEvidence evidence) {
+        String raw="Visual category candidate: "+Objects.toString(category,"unknown");
+        rows.add(new ExtractedRow("visual-"+com.hackalem.domain.Json.hash(raw).substring(0,24),raw,null,null,null,new Location("image",null,null,null,1,null),List.of("VISION_OBSERVATIONS_UNVERIFIED","ARTICLE_UNCERTAIN","QUANTITY_REQUIRED","UNIT_REQUIRED"),evidence));
+    }
     public void visual(VisualEvidence evidence) {
         for(int i=0;i<rows.size();i++){var r=rows.get(i);rows.set(i,new ExtractedRow(r.id(),r.rawText(),r.article(),r.quantity(),r.unit(),r.source(),r.warnings(),evidence));}
     }

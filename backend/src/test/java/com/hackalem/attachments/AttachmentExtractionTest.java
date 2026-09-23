@@ -76,4 +76,22 @@ class AttachmentExtractionTest {
         assertThat(result.rows()).anySatisfy(row->{assertThat(row.article()).isNull();assertThat(row.visualEvidence().category()).isEqualTo("circuit breaker");assertThat(row.visualEvidence().observedAttributes()).doesNotContainKey("currentA");});
     }
 
+    @Test void unreadableBlurredFixtureNeverReachesOcrOrVision()throws Exception{
+        byte[] blurred=Files.readAllBytes(Path.of("../data/attachments/images/blurred.jpg"));
+        byte[] sharp=Files.readAllBytes(Path.of("../data/attachments/images/product-only.jpg"));
+        assertThat(ImageQualityGate.laplacianVariance(blurred)).isLessThan(8d);assertThat(ImageQualityGate.laplacianVariance(sharp)).isGreaterThanOrEqualTo(8d);
+        var beans=new DefaultListableBeanFactory();
+        beans.registerSingleton("ocr",new OcrGateway(){public boolean available(){return true;}public String recognize(byte[] bytes,long deadline){throw new AssertionError("blurred file must not be interpreted");}});
+        beans.registerSingleton("vision",new VisionGateway(){public boolean available(){return true;}public Observation inspect(byte[] bytes,long deadline){throw new AssertionError("blurred file must not reach vision");}});
+        var extractor=new AttachmentExtractor(beans.getBeanProvider(OcrGateway.class),beans.getBeanProvider(VisionGateway.class));
+        var result=extractor.extract(blurred,"jpg");assertThat(result.rows()).isEmpty();assertThat(result.warnings()).containsExactly("IMAGE_BLURRED_RETAKE");
+    }
+    @Test void visionOnlyInventedSkuAndQuantityAreNeverPromotedToExtractedFields()throws Exception{
+        var beans=new DefaultListableBeanFactory();
+        beans.registerSingleton("vision",new VisionGateway(){public boolean available(){return true;}public Observation inspect(byte[] bytes,long deadline){return new Observation("Article: 1234 Quantity: 20 unit: pcs","heater",java.util.List.of("1234"),java.util.Map.of("voltage","120V"),java.util.List.of());}});
+        var extractor=new AttachmentExtractor(beans.getBeanProvider(OcrGateway.class),beans.getBeanProvider(VisionGateway.class));
+        var result=extractor.extract(Files.readAllBytes(Path.of("../data/attachments/images/product-only.jpg")),"jpg");
+        assertThat(result.rows()).allSatisfy(row->{assertThat(row.article()).isNull();assertThat(row.quantity()).isNull();assertThat(row.unit()).isNull();assertThat(row.warnings()).contains("VISION_OBSERVATIONS_UNVERIFIED");});
+    }
+
 }
