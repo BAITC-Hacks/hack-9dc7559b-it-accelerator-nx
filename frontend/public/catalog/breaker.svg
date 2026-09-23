@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <rect width="400" height="300" fill="#eaf1e6"/>
+  <rect x="150" y="70" width="100" height="170" rx="10" fill="#1d4532"/>
+  <rect x="150" y="70" width="100" height="170" rx="10" fill="none" stroke="#123425" stroke-width="3"/>
+  <rect x="168" y="92" width="64" height="30" rx="4" fill="#eaf1e6" opacity="0.15"/>
+  <rect x="182" y="130" width="36" height="70" rx="6" fill="#eaf1e6"/>
+  <rect x="182" y="130" width="36" height="34" rx="6" fill="#3f7a56"/>
+  <circle cx="200" cy="220" r="6" fill="#eaf1e6" opacity="0.6"/>
+  <rect x="120" y="245" width="160" height="12" rx="6" fill="#c6d6c0"/>
+  <text x="200" y="272" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" fill="#4c5b4f">Автоматический выключатель</text>
+</svg>

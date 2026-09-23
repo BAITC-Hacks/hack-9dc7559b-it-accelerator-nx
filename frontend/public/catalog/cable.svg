@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <rect width="400" height="300" fill="#eef1f6"/>
+  <circle cx="200" cy="150" r="78" fill="none" stroke="#2a4d73" stroke-width="16"/>
+  <circle cx="200" cy="150" r="52" fill="none" stroke="#3f6d99" stroke-width="14"/>
+  <circle cx="200" cy="150" r="26" fill="none" stroke="#c98a3a" stroke-width="10"/>
+  <rect x="192" y="60" width="16" height="34" rx="4" fill="#2a4d73"/>
+  <rect x="192" y="206" width="16" height="34" rx="4" fill="#2a4d73"/>
+  <text x="200" y="272" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" fill="#414c5c">Силовой кабель</text>
+</svg>

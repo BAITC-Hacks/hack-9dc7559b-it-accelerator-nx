@@ -11,6 +11,7 @@
 .product-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 18px 0; }
 .product-card { border: 1px solid #dce3d9; background: #fff; border-radius: 12px; padding: 18px; display: flex; flex-direction: column; align-items: stretch; gap: 9px; min-width: 0; }
 .product-card.is-selected { border-color: #326447; box-shadow: 0 0 0 1px #326447; }
+.product-photo { width: calc(100% + 36px); margin: -18px -18px 0; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 12px 12px 0 0; background: #eef2ec; display: block; }
 .product-article { color: #627469; font: 10px monospace; }
 .product-card h3, .product-card p { margin: 0; }
 .offer-status { font-size: 10px; background: #edf4e8; color: #3f6842; border-radius: 20px; padding: 3px 7px; white-space: nowrap; }

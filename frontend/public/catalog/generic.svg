@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <rect width="400" height="300" fill="#eef0ee"/>
+  <rect x="140" y="90" width="120" height="120" rx="12" fill="#c6d0c6"/>
+  <circle cx="200" cy="150" r="26" fill="#eef0ee"/>
+  <text x="200" y="272" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" fill="#5a635b">Электротовар</text>
+</svg>

@@ -7,6 +7,7 @@ import { useCommerce } from '../../hooks/useCommerce';
 import { commerceError, commerceRead, commerceWrite, productView } from '../../lib/commerce-live';
 import { ProposalCard } from '../cart/ProposalCard';
 import { formatMoney, formatQuantity, validQuantity } from './decimal';
+import { productImage } from './productImage';
 import type { ProductView } from '../cart/model';
 
 export function LiveCatalogPanel({ conversation }: { conversation?: string }) {
@@ -61,6 +62,7 @@ export function LiveCatalogPanel({ conversation }: { conversation?: string }) {
     {saved && <div className="commerce-actions"><small>Поиск: {saved.mode} · найдено {products.length}</small><button className="commerce-secondary" disabled={busy || !saved.resultSet?.id} onClick={() => run(async () => { setSaved(await commerceRead(['saved', saved.resultSet!.id], () => sdk.result({ path: { id: saved.resultSet!.id! }, throwOnError: true }))); })}>Обновить сохранённую выдачу</button><button className="commerce-secondary" disabled={busy || checked.length < 2} onClick={() => run(async () => { setComparison(await commerceWrite(() => sdk.compare({ path: { id: saved.resultSet!.id! }, body: { indices: checked }, throwOnError: true }))); })}>Сравнить выбранные ({checked.length})</button></div>}
     {(saved || browsed) && !products.length && <p>По заданным условиям товары не найдены. Измените запрос или фильтры.</p>}
     <div className="product-grid">{products.map((product, index) => <article className={`product-card ${selected?.article === product.article ? 'is-selected' : ''}`} key={product.key}>
+      <img className="product-photo" src={productImage(product.title)} alt={product.title} loading="lazy" />
       <div className="product-card-top"><span className="product-article">{product.article}</span>{saved && <label className="catalog-toggle"><input type="checkbox" aria-label={`Сравнить ${product.article}`} checked={checked.includes(index)} disabled={!checked.includes(index) && checked.length >= 10} onChange={e => setChecked(e.target.checked ? [...checked, index] : checked.filter(i => i !== index))} />Сравнить</label>}</div>
       <h3>{product.title}</h3><dl className="product-specs">{product.specs.slice(0, 5).map(s => <div key={s.label}><dt>{s.label}</dt><dd>{s.value}</dd></div>)}</dl>
       <p className="product-price">{formatMoney(product.price, product.currency)}</p><p>{product.stock === null ? 'Уточните цену и остаток в карточке' : `Доступно ${formatQuantity(product.stock)} ${product.unit} · ${product.warehouse}`}</p>
