@@ -7,3 +7,8 @@ spring:
       embedding: none
 app:
   visitor-enabled: true
+  catalog:
+    embedding:
+      mode: fake
+    seed:
+      enabled: false

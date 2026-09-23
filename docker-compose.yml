@@ -97,6 +97,19 @@ services:
       EVENT_MAX_LENGTH: ${EVENT_MAX_LENGTH:-1000}
       SSE_MAX_SUBSCRIBERS: ${SSE_MAX_SUBSCRIBERS:-100}
       ADMIN_PRINCIPAL_IDS: ${ADMIN_PRINCIPAL_IDS:-}
+      # ─── Каталог (CAT-01) ───────────────────────────────────────────────
+      CATALOG_EMBEDDING_MODE: ${CATALOG_EMBEDDING_MODE:-live}
+      CATALOG_EMBEDDING_BATCH_SIZE: ${CATALOG_EMBEDDING_BATCH_SIZE:-64}
+      CATALOG_SEED_ENABLED: ${CATALOG_SEED_ENABLED:-true}
+      # Путь внутри контейнера: data/ примонтирована ниже, значение с хоста
+      # (../data/...) здесь намеренно не используется.
+      CATALOG_SEED_LOCATION: file:/app/data/sample_catalog/products.json
+      CATALOG_RETAINED_VERSIONS: ${CATALOG_RETAINED_VERSIONS:-3}
+      CATALOG_IMPORT_QUEUE_CAPACITY: ${CATALOG_IMPORT_QUEUE_CAPACITY:-8}
+    volumes:
+      # Синтетический каталог не копируется в образ: build context — ./backend.
+      # Монтируем только на чтение, чтобы seed видел тот же файл, что и валидатор.
+      - ./data:/app/data:ro
     ports:
       - "8080:8080"
     healthcheck:
